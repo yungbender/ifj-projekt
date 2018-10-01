@@ -1,8 +1,9 @@
-// kniznica pre lexikalny analyzator
+// LEXICAL ANALYZATOR
+#include "str.h"
 
-// vycet stavov
-// state 0 je pociatocny stav
-// state 1 je po preskoceni komentarov a WS
+/* init state = 0
+ * state after white space/comment = 1
+ */
 enum comment { 	LC = 10,	// line comment
 		BC,		// block comment
 		END_C,		// end of block comment	
@@ -20,20 +21,31 @@ enum number { 	ZERO = 100,	// FS: zero
 		FL_EX,		// FS: floating literal with exponent
 		IL_EX		// FS: integer literal with exponent
 };
-enum ident { 	ID = 1000,	// FS: identifier
+enum ident { 	ID_STATE = 1000,// FS: identifier
 		ID_F 		// FS: identifier of function
 };
 enum string { 	SL = 10000,	// FS: string literal
 		TMP_SL,		// temporary state for SL
-		ES,		// escape sequence
+		ES,			// escape sequence
 		X_ES,		// hexadecimal escape sequence \xh
 		XHH_ES		// hexadecimal escape sequence \xhh
 };
 
 
+// TOKEN STRUCTURE
+struct token{
+	int type;
+	union {
+		int i;
+		float f;
+		string str;
+	} attr ;
+};
+
+
 // ======= LEXICAL ERROR =======
 #define L_ERR     -1
-
+#define INT_ERR	  99
 
 // ======= TYPES OF TOKEN =======
 #define IDF     0
@@ -56,16 +68,16 @@ enum string { 	SL = 10000,	// FS: string literal
 #define WHILE 18
 
 // OPERATOR
-#define ASSIGMENT     20 // '='
-#define PLUS          21 // '+'
-#define MINUS         22 // '-'
-#define ASTERISK      23 // '*'
-#define SLASH         24 // '/'
-#define LESS_THAN     25 // '<'
-#define GREATER_THAN  26 // '>'
+#define PLUS          20 // '+'
+#define MINUS         21 // '-'
+#define ASTERISK      22 // '*'
+#define SLASH         23 // '/'
+#define ASSIGNMENT    24 // '='
+#define EQUAL         25 // '=='
+#define LESS_THAN     26 // '<'
 #define LESS_EQUAL    27 // '<='
-#define GREATER_EQUAL 28 // '>='
-#define EQUAL         29 // '=='
+#define GREATER_THAN  28 // '>'
+#define GREATER_EQUAL 29 // '>='
 #define NOT_EQUAL     30 // '!='
 
 // SPECIAL
@@ -77,6 +89,6 @@ enum string { 	SL = 10000,	// FS: string literal
 #define CLOSE_BRACE   45 // '}'
 #define COMMA         46 // ','
 
-//hlavicka funkcie simulujuca lexikalny analyzator
+// hlavicka funkcie simulujuca lexikalny analyzator
 //void set_source_file(FILE *f);
 //int get_token();

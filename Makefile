@@ -1,6 +1,7 @@
 CC=gcc
-CFLAGS= -std=c99 -pedantic -Wall -Wextra -Werror -g
+CFLAGS= -std=c99 -pedantic -Wall -Wextra -g
 
-scanner: scanner.c
-	$(CC) $(CFLAGS) scanner.c -o scanner
+ALL: str.c scanner.c
+	$(CC) $(CFLAGS) str.c scanner.c -o scanner
+
 
