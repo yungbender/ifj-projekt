@@ -6,27 +6,51 @@
 int line = 1;
 FILE *source;
 
-/* function that inicializes global variable when called */
-void set_source_file(FILE *f)
-{
-	source = f;
-}
-
 /* checking if identifier is key word  */
 void is_key_word (struct token *LEX)
 {
-	if(str_cmp_const_str(&LEX->attr.str, "nil") == 0) LEX->type = NIL; 
-	else if(str_cmp_const_str(&LEX->attr.str, "def") == 0) LEX->type = DEF; 
-	else if(str_cmp_const_str(&LEX->attr.str, "do") == 0) LEX->type = DO; 
-	else if(str_cmp_const_str(&LEX->attr.str, "else") == 0) LEX->type = ELSE; 
-	else if(str_cmp_const_str(&LEX->attr.str, "end") == 0) LEX->type = END; 
-	else if(str_cmp_const_str(&LEX->attr.str, "if") == 0) LEX->type = IF; 
-	else if(str_cmp_const_str(&LEX->attr.str, "then") == 0) LEX->type = THEN; 
-	else if(str_cmp_const_str(&LEX->attr.str, "while") == 0) LEX->type = WHILE; 
-	else if(str_cmp_const_str(&LEX->attr.str, "not") == 0) LEX->type = NOT; 
-	else return;
+	if(str_cmp_const_str(&LEX->attr.str, "nil") == 0) 
+	{
+		LEX->type = NIL;
+	} 
+	else if(str_cmp_const_str(&LEX->attr.str, "def") == 0) 
+	{
+		LEX->type = DEF;
+	} 
+	else if(str_cmp_const_str(&LEX->attr.str, "do") == 0) 
+	{
+		LEX->type = DO;
+	} 
+	else if(str_cmp_const_str(&LEX->attr.str, "else") == 0) 
+	{
+		LEX->type = ELSE;
+	} 
+	else if(str_cmp_const_str(&LEX->attr.str, "end") == 0) 
+	{
+		LEX->type = END;
+	} 
+	else if(str_cmp_const_str(&LEX->attr.str, "if") == 0) 
+	{
+		LEX->type = IF;
+	} 
+	else if(str_cmp_const_str(&LEX->attr.str, "then") == 0) 
+	{
+		LEX->type = THEN;
+	} 
+	else if(str_cmp_const_str(&LEX->attr.str, "while") == 0) 
+	{
+		LEX->type = WHILE;
+	} 
+	else if(str_cmp_const_str(&LEX->attr.str, "not") == 0) 
+	{
+		LEX->type = NOT;
+	} 
+	else 
+	{
+		return; 
+	}
 
-	str_free(&LEX->attr.str);
+	str_free(&LEX->attr.str); // If we changed id to keyword, we dont need the string
 }
 
 /* analyzes and returns next token, returns ID and value, if possible */
@@ -34,10 +58,11 @@ struct token get_token()
 {
 	struct token T1;
 	int state = 0;
-	int c, i = 0;
+	int c;
+	int i = 0;
 
 	string attr; 
-	if(str_init(&attr) == STR_ERROR)
+	if(str_init(&attr) == STR_ERROR) // Memory allocation for string failed
 	{
 		T1.type = INT_ERR;
 		return T1;
@@ -49,10 +74,13 @@ struct token get_token()
 		switch(state)
 		{
 			case 0: // init state
-				if(c == '\n' || c == '\r') // looking for =begin string
+				if(c == '\n' || line == 1) // looking for =begin string, line condition for comments to work on first line
 				{
-					line++;
-					c = getc(source);
+					if(line > 1)
+					{
+						c = getc(source); // To skip reading 2nd char on beginning of file
+						line++;
+					}
 					if(c == '=')
 					{
 						c = getc(source);
@@ -99,7 +127,7 @@ struct token get_token()
 				break;
 
 			case LC: // line comment
-				if(c == '\n' || c == '\r' || c == EOF)
+				if(c == '\n' || c == EOF)
 				{
 					ungetc(c, source);
 					state = 0;
@@ -111,7 +139,7 @@ struct token get_token()
 				{
 					state = TMP_C;
 				}
-				else if(c == '\n' || c == '\r') // Checking for empty comment
+				else if(c == '\n') // Checking for empty comment
 				{
 					line++;
 					c = getc(source);
@@ -138,11 +166,11 @@ struct token get_token()
 				break;
 
 			case TMP_C: // temporary state for BC
-				if(c == '\n' || c == '\r')
+				if(c == '\n')
 				{
 					line++;
 					c = getc(source);
-					if(c == '\n' || c == '\r') // Seems unnecessary, but its needed for not messing up line number
+					if(c == '\n') // Seems unnecessary, but its needed for not messing up line number
 					{
 						line++;
 						break;
@@ -166,7 +194,7 @@ struct token get_token()
 				break;
 
 			case END_C: // end of block comment	
-				if(c == '\n' || c == '\r' || c == EOF) //comment ends
+				if(c == '\n' || c == EOF) //comment ends
 				{
 					state = 0;
 					ungetc(c, source);
@@ -185,7 +213,7 @@ struct token get_token()
 				break;
 
 			case COMM: // line comment after END_C
-				if(c == '\n' || c == '\r' || c == EOF)
+				if(c == '\n' || c == EOF)
 				{
 					state = 0;
 					ungetc(c, source);
@@ -221,23 +249,59 @@ struct token get_token()
 				else
 				{
 					// Testing if c is unique one-letter operator
-					if(c == '+') T1.type = PLUS;
-					else if(c == '-') T1.type = MINUS;
-					else if(c == '*') T1.type = ASTERISK;
-					else if(c == '/') T1.type = SLASH;
+					if(c == '+') 
+					{
+						T1.type = PLUS;
+					}
+					else if(c == '-') 
+					{
+						T1.type = MINUS;
+					}
+					else if(c == '*') 
+					{
+						T1.type = ASTERISK;
+					}
+					else if(c == '/') 
+					{
+						T1.type = SLASH;
+					}
 					// Testing if c is special character
-					else if(c == '(') T1.type = OPEN_PARENTH;
-					else if(c == ')') T1.type = CLOSE_PARENTH;
-					else if(c == '[') T1.type = OPEN_BRACKET;
-					else if(c == ']') T1.type = CLOSE_BRACKET;
-					else if(c == '{') T1.type = OPEN_BRACE;
-					else if(c == '}') T1.type = CLOSE_BRACE;
-					else if(c == ',') T1.type = COMMA;
+					else if(c == '(') 
+					{
+						T1.type = OPEN_PARENTH;
+					}
+					else if(c == ')') 
+					{
+						T1.type = CLOSE_PARENTH;
+					}
+					else if(c == '[') 
+					{
+						T1.type = OPEN_BRACKET;
+					}
+					else if(c == ']') 
+					{
+						T1.type = CLOSE_BRACKET;
+					}
+					else if(c == '{') 
+					{
+						T1.type = OPEN_BRACE;
+					}
+					else if(c == '}') 
+					{
+						T1.type = CLOSE_BRACE;
+					}
+					else if(c == ',') 
+					{
+						T1.type = COMMA;
+					}
 					//Testing if c is non-unique one or two letter operator
 					else if(c == '=')
 					{
 						c = getc(source);
-						if(c == '=') T1.type = EQUAL;
+						if(c == '=') 
+						{
+							T1.type = EQUAL;
+						}
 						else
 						{
 							T1.type = ASSIGNMENT;
@@ -248,7 +312,10 @@ struct token get_token()
 					else if(c == '<')
 					{
 						c = getc(source);
-						if(c == '=') T1.type = LESS_EQUAL;
+						if(c == '=') 
+						{
+							T1.type = LESS_EQUAL;
+						}
 						else
 						{
 							T1.type = LESS_THAN;
@@ -259,7 +326,10 @@ struct token get_token()
 					else if(c == '>')
 					{
 						c = getc(source);
-						if(c == '=') T1.type = GREATER_EQUAL;
+						if(c == '=') 
+						{
+							T1.type = GREATER_EQUAL;
+						}
 						else
 						{
 							T1.type = GREATER_THAN;
@@ -270,7 +340,10 @@ struct token get_token()
 					else if(c == '!')
 					{
 						c = getc(source);
-						if(c == '=') T1.type = NOT_EQUAL;
+						if(c == '=') 
+						{
+							T1.type = NOT_EQUAL;
+						}
 						else
 						{
 							T1.type = L_ERR;
@@ -625,23 +698,9 @@ struct token get_token()
 }	
 
 
-int main (int argc, char **argv)
+int main(void)
 {	
-	if(argc != 2)
-	{
-		fprintf(stderr, "ERROR: Too many arguments or source file name not specified\n");
-		return INT_ERR;
-	}
-	else
-	{
-		source = fopen(argv[1], "r");
-		if(source == NULL)
-		{
-			fprintf(stderr, "ERROR: Cant open source file\n");
-			return INT_ERR;
-		}
-	}
-
+	source = stdin;
 	struct token LEX;
 	LEX.type = -2;	// temporary, doesnt mean anything, just so we dont get EOF value by random
 
@@ -654,14 +713,12 @@ int main (int argc, char **argv)
 		}
 		else if(LEX.type == INT_ERR)
 		{
-			fprintf(stderr, "ERROR: Internal 	compiler error\n");
-			fclose(source);
+			fprintf(stderr, "ERROR: Internal compiler error\n");
 			return INT_ERR;
 		}
 		if(LEX.type == -1)
 		{
 			fprintf(stderr,"ERROR: Lexical analyzer error at line: %d\n", line);
-			//fclose(source);
 			//return 1;
 		}
 		else if(LEX.type == 2)
@@ -682,7 +739,6 @@ int main (int argc, char **argv)
 			printf("Lexem je typu %d\n", LEX.type);
 		}
 	}
-	fclose(source);
 	return 0;
 }
 
