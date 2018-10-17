@@ -77,8 +77,3 @@ int str_get_length(string *s)
 {
 	return s->length;
 }
-
-int main()
-{
-	return 0;
-}
