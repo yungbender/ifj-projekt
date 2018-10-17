@@ -1,12 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <stdbool.h>
 #include "scanner.h"
 
-int line = 1;
+
+int line = 0; // Line counter
+bool lineBeginning = true; // Global variable indicating that we're on the beginning of line
 FILE *source;
 
-/* checking if identifier is key word  */
+/* Function for setting the input file */
+void set_source_file(FILE *f)
+{
+	source = f;
+	lineBeginning = true; // If we somehow changed file in the middle of program (ie. testing), we reset global variables
+	line = 0;
+}
+
+/* Checking if identifier is key word  */
 void is_key_word (struct token *LEX)
 {
 	if(str_cmp_const_str(&LEX->attr.str, "nil") == 0) 
@@ -53,7 +64,7 @@ void is_key_word (struct token *LEX)
 	str_free(&LEX->attr.str); // If we changed id to keyword, we dont need the string
 }
 
-/* analyzes and returns next token, returns ID and value, if possible */
+/* Analyzes and returns next token, returns ID and value/line number, if possible */
 struct token get_token()
 {
 	struct token T1;
@@ -74,13 +85,19 @@ struct token get_token()
 		switch(state)
 		{
 			case 0: // init state
-				if(c == '\n' || line == 1) // looking for =begin string, line condition for comments to work on first line
+				if(c == '\n' && lineBeginning == false) // New line, returning EOL token
 				{
-					if(line > 1)
-					{
-						c = getc(source); // To skip reading 2nd char on beginning of file
-						line++;
-					}
+					lineBeginning = true;
+					T1.type = END_OF_LINE;
+					T1.attr.i = line;
+					str_free(&attr);
+					return T1;	
+				}
+				else if(lineBeginning == true && c != EOF) // looking for =begin string, line condition for comments to work on first line
+				{
+					line++;
+					lineBeginning = false;
+
 					if(c == '=')
 					{
 						c = getc(source);
@@ -95,8 +112,9 @@ struct token get_token()
 						}
 						else // =begin string wasnt found, reverting read characters
 						{
-							fseek(source, -2 - i, SEEK_CUR);
-							state = 0;
+							ungetc(c, source); // We return the char
+							fseek(source, (-1-i), SEEK_CUR); // And set back the position before the '=' character
+							state = 1;
 						}
 					}
 					else
@@ -105,17 +123,18 @@ struct token get_token()
 						state = 0;
 					}
 				}
-				else if(isspace(c))	
-				{
-					state = 0; // white space
-				}
 				else if(c == '#') 
 				{
 					state = LC; // line comment
 				}
+				else if(isspace(c))	
+				{
+					state = 0; // white space
+				}
 				else if(c == EOF)
 				{
 					T1.type = END_OF_FILE;
+					T1.attr.i = line;
 					str_free(&attr);
 					return T1;
 				}  
@@ -381,6 +400,7 @@ struct token get_token()
 					}
 					str_copy_string(&T1.attr.str, &attr);
 					str_free(&attr);
+					is_key_word(&T1);
 					return T1;
 				}
 				break;
@@ -399,7 +419,7 @@ struct token get_token()
 					T1.type = IDF;
 					if(str_init(&T1.attr.str) == STR_ERROR)
 					{
-						T1.type = INT_ERR; // TODO: Add to #define list
+						T1.type = INT_ERR;
 						return T1;
 					}
 					str_copy_string(&T1.attr.str, &attr);
@@ -408,11 +428,7 @@ struct token get_token()
 				}
 
 			case ZERO: // FS: zero
-				if(c == ZERO)
-				{
-					state = ZERO;
-				}
-				else if(c == '.')
+				if(c == '.')
 				{
 					str_add_char(&attr, '0');
 					str_add_char(&attr, c);
@@ -421,12 +437,15 @@ struct token get_token()
 				else if(c == 'e' || c == 'E')
 				{
 					state = TMP_I_EX;
+					str_add_char(&attr, '0');
 					str_add_char(&attr, c);
 				}
-				else if(isdigit(c)) // If other letters start, we discard the zero
+				else if(isdigit(c)) // There cant be zeros before other numbers
 				{
-					state = IL;
-					str_add_char(&attr, c);
+					T1.type = L_ERR;
+					T1.attr.i = line;
+					str_free(&attr);
+					return T1;
 				}
 				else // We return zero as standalone integer token
 				{ 
@@ -591,8 +610,17 @@ struct token get_token()
 				else
 				{
 					ungetc(c, source);
-					T1.type = INTEGER;
-					T1.attr.i = atof(attr.str); // We use atof because atoi wont work with exponent, so we convert it and then cut the decimal part
+					if((atof(attr.str) - (int)atof(attr.str)) == 0) // We test whether we created a floating point number
+					{
+						T1.type = INTEGER;
+						T1.attr.i = atof(attr.str); // We use atof because atoi wont work with exponent, so we convert it and then cut the decimal part
+					}
+					else
+					{
+						T1.type = FLOAT; //Negative exponent created negative number, so we use float
+						T1.attr.f = atof(attr.str);
+					} 
+					
 					str_free(&attr);
 					return T1;
 				}
@@ -631,7 +659,7 @@ struct token get_token()
 				else if(c == '\"' || c == '\\' || c == 'n' || c == 't' || c == 's') // Accepted escape sequences
 				{
 					state = TMP_SL;
-					str_add_char(&attr, c);	
+					str_add_char(&attr, c);
 				}
 				else
 				{
@@ -646,7 +674,7 @@ struct token get_token()
 				if((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F')) // Accepted hexadecimal alphanumericals
 				{
 					state = XHH_ES;
-					str_add_char(&attr, c);	
+					str_add_char(&attr, c);
 				}
 				else
 				{
@@ -695,50 +723,4 @@ struct token get_token()
 				return T1;
 		}
 	}
-}	
-
-
-int main(void)
-{	
-	source = stdin;
-	struct token LEX;
-	LEX.type = -2;	// temporary, doesnt mean anything, just so we dont get EOF value by random
-
-	while(LEX.type != 5)
-	{ // Simulace lexikalni analyzy
-		LEX = get_token(); 
-		if(LEX.type == 1)
-		{
-			is_key_word(&LEX);
-		}
-		else if(LEX.type == INT_ERR)
-		{
-			fprintf(stderr, "ERROR: Internal compiler error\n");
-			return INT_ERR;
-		}
-		if(LEX.type == -1)
-		{
-			fprintf(stderr,"ERROR: Lexical analyzer error at line: %d\n", line);
-			//return 1;
-		}
-		else if(LEX.type == 2)
-		{ // Zkusebni vypis podle typu lexemu
-			printf("Lexem je typu %d s hodnotou %d\n", LEX.type, LEX.attr.i);
-		}
-		else if(LEX.type == 3)
-		{
-			printf("Lexem je typu %d s hodnotou %f\n", LEX.type, LEX.attr.f);
-		}
-		else if(LEX.type == 0 || LEX.type == 1 || LEX.type == 4)
-		{
-			printf("Lexem je typu %d s hodnotou %s\n", LEX.type, LEX.attr.str.str);
-			str_free(&LEX.attr.str);
-		}
-		else
-		{
-			printf("Lexem je typu %d\n", LEX.type);
-		}
-	}
-	return 0;
 }
-

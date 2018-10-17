@@ -1,4 +1,5 @@
-// LEXICAL ANALYZATOR
+// LEXICAL ANALYSER
+
 #include "str.h"
 
 /* init state = 0
@@ -43,7 +44,7 @@ struct token{
 };
 
 
-// ======= LEXICAL ERROR =======
+// ======= ERRORS =======
 #define L_ERR     -1
 #define INT_ERR	  99
 
@@ -55,8 +56,9 @@ struct token{
 #define STRING  4
 
 #define END_OF_FILE 5
+#define END_OF_LINE 6
 
-// KEYWORD
+// KEYWORDS
 #define DEF   10
 #define DO    11
 #define ELSE  12
@@ -67,7 +69,7 @@ struct token{
 #define THEN  17
 #define WHILE 18
 
-// OPERATOR
+// OPERATORS
 #define PLUS          20 // '+'
 #define MINUS         21 // '-'
 #define ASTERISK      22 // '*'
@@ -80,7 +82,7 @@ struct token{
 #define GREATER_EQUAL 29 // '>='
 #define NOT_EQUAL     30 // '!='
 
-// SPECIAL
+// SPECIAL CHARACTERS
 #define OPEN_PARENTH  40 // '('
 #define CLOSE_PARENTH 41 // ')'
 #define OPEN_BRACKET  42 // '['
@@ -89,6 +91,6 @@ struct token{
 #define CLOSE_BRACE   45 // '}'
 #define COMMA         46 // ','
 
-// hlavicka funkcie simulujuca lexikalny analyzator
-//void set_source_file(FILE *f);
-//int get_token();
+// Function headers
+void set_source_file(FILE *f);
+struct token get_token();
