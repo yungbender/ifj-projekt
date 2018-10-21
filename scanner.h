@@ -34,14 +34,14 @@ enum string { 	SL = 10000,	// FS: string literal
 
 
 // TOKEN STRUCTURE
-struct token{
+typedef struct token{
 	int type;
 	union {
 		int i;
 		float f;
 		string str;
 	} attr ;
-};
+}tToken;
 
 
 // ======= ERRORS =======
