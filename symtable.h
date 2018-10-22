@@ -13,7 +13,8 @@ typedef struct paramList // if the identifier in tree is function, this is list 
 
 typedef struct node
 {
-    tToken id; // name of the identifier + type
+    string id; // name of the identifier + type
+    int dataType; // current datatype
     tParamList *params; // list of parameters names
     int paramsNum; // number of parameters of function
     tIList *instrs; // list of instruction of function

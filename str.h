@@ -11,7 +11,7 @@ typedef struct {
 	char* str;	// Char array allocated for the string, ended with '\0'
 	int length;	// Length of string
 	int allocSize;	// Size of allocated memory
-} string;
+}string;
 
 
 int str_init(string *s);
