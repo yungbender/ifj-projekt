@@ -86,22 +86,21 @@ tNode* create_var(tToken id, int dataType)
  * @param id Token with informations about variable.
  * @param dataType Information about which dataType does variable have.
  **/ 
-void insert_var(tNode *root, tToken id, int dataType)
+tNode* insert_var(tNode *root, tToken id, int dataType)
 {
     if(root == NULL)
     {
-        tNode *temp;
-        temp = create_var(id, dataType);
-        root = temp;
+        return create_var(id, dataType);
     }
     else if(str_cmp_string(&(id.attr.str),&(root->id)) < 0)
     {
-        insert_var(root->lptr, id, dataType);
+        root->lptr = insert_var(root->lptr, id, dataType);
     }
     else if(str_cmp_string(&(id.attr.str),&(root->id)) > 0)
     {
-        insert_var(root->rptr, id, dataType);
+        root->rptr = insert_var(root->rptr, id, dataType);
     }
+    return root;
 }
 
 /**
@@ -118,6 +117,7 @@ tNode *create_fun(tToken id, int paramsNum)
     str_copy_string(&(temp->id),&(id.attr.str)); // must be string because its function identificator
     temp->dataType = 0;
     temp->instrs = NULL;
+    temp->params = NULL;
     temp->paramsNum = paramsNum;
     temp->lptr = NULL;
     temp->rptr = NULL;
@@ -131,22 +131,21 @@ tNode *create_fun(tToken id, int paramsNum)
  * @param id Token with informations about function.
  * @param paramsNum Number of parameters function takes.
  **/ 
-void insert_fun(tNode* root, tToken id, int paramsNum)
+tNode* insert_fun(tNode* root, tToken id, int paramsNum)
 {
     if(root == NULL)
     {
-        tNode *temp;
-        temp = create_fun(id, paramsNum);
-        root = temp;
+        return create_fun(id,paramsNum);
     }
     else if(str_cmp_string(&(id.attr.str),&(root->id)) < 0)
     {
-        insert_var(root->lptr, id, paramsNum);
+        root->lptr = insert_fun(root->lptr, id, paramsNum);
     }
     else if(str_cmp_string(&(id.attr.str),&(root->id)) > 0)
     {
-        insert_var(root->rptr, id, paramsNum);
+        root->rptr = insert_fun(root->rptr, id, paramsNum);
     }
+    return root;
 }
 
 /**
@@ -158,23 +157,16 @@ void insert_fun(tNode* root, tToken id, int paramsNum)
  **/
 tNode *search_local_table(tNode *root, string id)
 {
-    if(root == NULL)
-    {
-        return NULL;
-    }
-    else if(str_cmp_string(&(id),&(root->id)) < 0)
-    {
-        search_local_table(root->lptr, id);
-    }
-    else if(str_cmp_string(&(id),&(root->id)) > 0)
-    {
-        search_local_table(root->rptr, id);
-    }
-    else if(str_cmp_string(&(id),&(root->id)) == 0)
+    if(root == NULL || str_cmp_string(&(id),&(root->id)) == 0)
     {
         return root;
     }
-    return NULL;
+    else if(str_cmp_string(&(id),&(root->id)) < 0)
+    {
+        return search_local_table(root->lptr, id);
+    }
+    
+    return search_local_table(root->rptr, id);
 }
 
 /**
@@ -199,6 +191,38 @@ tNode *search_global_table(tSymTable *symTable, string id)
     return result;
 }
 
+tParamList* insert_param(tParamList *params, string id)
+{
+    tParamList *temp = (tParamList *)malloc(sizeof(struct paramList));
+    // TODO: unsucc malloc
+    str_copy_string(&(params->id),&(id));
+    temp->next = NULL;
+    // If the parameters list is empty
+    if(params == NULL)
+    {
+        return temp;
+    }
+    // If it is not empty
+    // Go to the latest parameter
+    while(params->next != NULL)
+    {
+        params = params->next;
+    }
+    params->next = temp;
+    return params;
+}
+
+void free_params(tParamList *params)
+{
+    tParamList *temp;
+    while(temp != NULL)
+    {
+        temp = params->next;
+        free(params);
+        params = temp;
+    }
+}
+
 /**
  * Function frees whole tree (every node).
  * @param root Pointer to the tree root node.
@@ -219,6 +243,7 @@ void free_tree(tNode *root)
     }
     if(root->lptr!= NULL && root->rptr != NULL)
     {
+        free_params(root->params);
         free(root);
     }
 }

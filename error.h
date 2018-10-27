@@ -1,49 +1,3 @@
-// LEXICAL ANALYSER
-
-#include "str.h"
-
-/* init state = 0
- * state after white space/comment = 1
- */
-enum comment { 	LC = 10,	// line comment
-		BC,		// block comment
-		END_C,		// end of block comment	
-		TMP_C,		// temporary state for BC
-		COMM		// line comment after END_C
-};
-enum number { 	ZERO = 100,	// FS: zero
-		IL,		// FS: integer literal
-		FL,		// FS: floating literal
-		TMP_FL,		// temporary state for FL
-		TMP_F_EX,	// temporary state for FL with exponent
-		TMP_I_EX,	// temporary state for IL with exponent
-		SIGN_F,		// signed exponent for FL
-		SIGN_I,		// signed exponent for IL
-		FL_EX,		// FS: floating literal with exponent
-		IL_EX		// FS: integer literal with exponent
-};
-enum ident { 	ID_STATE = 1000,// FS: identifier
-		ID_F 		// FS: identifier of function
-};
-enum string { 	SL = 10000,	// FS: string literal
-		TMP_SL,		// temporary state for SL
-		ES,			// escape sequence
-		X_ES,		// hexadecimal escape sequence \xh
-		XHH_ES		// hexadecimal escape sequence \xhh
-};
-
-
-// TOKEN STRUCTURE
-typedef struct token{
-	int type;
-	union {
-		int i;
-		float f;
-		string str;
-	} attr ;
-}tToken;
-
-
 // ======= ERRORS =======
 #define L_ERR     1
 #define SY_ERR	  2
@@ -53,6 +7,9 @@ typedef struct token{
 #define SE_ERR	  6 // other semanthic errors
 #define ZERO_DIV  9 // division by zero
 #define INT_ERR	  99
+// Unnoficial errors for error case
+#define IDF_REDEF 100
+#define UNEXPECTED_F 101
 
 // ======= TYPES OF TOKEN =======
 #define IDF     0
@@ -97,6 +54,4 @@ typedef struct token{
 #define CLOSE_BRACE   45 // '}'
 #define COMMA         46 // ','
 
-// Function headers
-void set_source_file(FILE *f);
-struct token get_token();
+void print_error_exit(int id);
