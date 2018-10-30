@@ -116,10 +116,10 @@ tNode *create_fun(tToken id, int paramsNum)
 
     str_copy_string(&(temp->id),&(id.attr.str)); // must be string because its function identificator
     temp->dataType = 0;
-    temp->instrs = NULL;
-    temp->params = NULL;
+    temp->instrs = (tIList *)malloc(sizeof(struct instructionList));
+    temp->params = (tParamList *)malloc(sizeof(struct paramList));
     temp->paramsNum = paramsNum;
-    temp->lptr = NULL;
+    temp->lptr = NULL;  
     temp->rptr = NULL;
 
     return temp;
@@ -157,7 +157,7 @@ tNode* insert_fun(tNode* root, tToken id, int paramsNum)
  **/
 tNode *search_local_table(tNode *root, string id)
 {
-    if(root == NULL || str_cmp_string(&(id),&(root->id)) == 0)
+    if(str_cmp_string(&(id),&(root->id)) == 0 || root == NULL)
     {
         return root;
     }
@@ -165,8 +165,10 @@ tNode *search_local_table(tNode *root, string id)
     {
         return search_local_table(root->lptr, id);
     }
-    
-    return search_local_table(root->rptr, id);
+    else 
+    {
+        return search_local_table(root->rptr, id);
+    }
 }
 
 /**
@@ -214,6 +216,11 @@ tParamList* insert_param(tParamList *params, string id)
 
 void free_params(tParamList *params)
 {
+    if(params == NULL)
+    {
+        return;
+    }
+
     tParamList *temp;
     while(temp != NULL)
     {
@@ -244,6 +251,7 @@ void free_tree(tNode *root)
     if(root->lptr!= NULL && root->rptr != NULL)
     {
         free_params(root->params);
+        free_ilist(root->instrs);
         free(root);
     }
 }

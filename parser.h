@@ -1,4 +1,6 @@
+#include <stdbool.h>
 #include "symtable.h"
+#include "error.h"
 
 typedef struct parserdata
 {
@@ -10,6 +12,9 @@ typedef struct parserdata
     tSymTable *global;
     // Pointer to the list of instructions (from whole source code)
     tIList *instrs;
+    // Bool variable which tells the parser if he is parsing funcion or main
+    bool inDefinition;
 }tPData;
 
 void start();
+void parser_init();

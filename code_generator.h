@@ -31,3 +31,6 @@ typedef struct instructionList
     tInstr *instr;
     tInstr *next;
 }instructionList;
+
+void ilist_init(tIList *instrs);
+void free_ilist(tIList *instrs);

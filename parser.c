@@ -2,22 +2,25 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "parser.h"
-#include "error.h"
 
 tPData pData;
 
-void init_parser()
+void parser_init()
 {
     pData.global = (tSymTable *)malloc(sizeof(struct symTable));
     pData.local = (tSymTable *)malloc(sizeof(struct symTable));
+    pData.instrs = (tIList *)malloc(sizeof(struct instructionList));
+    pData.inDefinition = false;
+    ilist_init(pData.instrs);
     stack_init(pData.global);
-    stack_init(pData.local); 
+    stack_init(pData.local);
 }
 
 void error(int id)
 {
     free_symtable(pData.global);
     free_symtable(pData.local);
+    free_ilist(pData.instrs);
     print_error_exit(id);
 }
 
@@ -117,14 +120,24 @@ bool validate_function(string name)
     
 }
 // <f_def> <start> <f_decl>
-void parse_function_definition()
+void parse_function_definition(tNode *function)
 {
-    tSymTable *globalBackup = pData.global;
+    // Function definition is going to be parsed, need to swap the global table with local so parsing can be simulated like it was in "main"
+    tSymTable *temp = pData.global;
     tIList *listBackup = pData.instrs;
-    pData.global = NULL;
+    pData.global = pData.local;
+    pData.local = temp;
+    // Setting if the parser is currently in definition to true so parser can search functions in local symtable
+    pData.inDefinition = true;
     pData.instrs = NULL;
+    // Recursively calling parser
     start();
-
+    // Function is parsed restoring symtables and saving the instruction list to the BST
+    function->instrs = pData.instrs;
+    pData.global = pData.local;
+    free_symtable(pData.local);
+    pData.local = NULL;
+    pData.instrs = listBackup;
 }
 
 // <params> ID  <params> ) <f_decl>
@@ -182,6 +195,11 @@ void start()
         // <start> DEF <f_decl> IDF ( <params> EOL <f_def> <start>
         case DEF:
             // <f_decl> IDF ( <param> EOL <f_def>
+            // If parser found def keyword inside function
+            if(pData.inDefinition == true)
+            {
+                error(UNEXPECTED_F);
+            }
             // Function definition implementation
             pData.token = get_token();
             // Expecting function identificator
@@ -224,22 +242,27 @@ void start()
                 error(UNEXPECTED_F);
             }
             // Expecting function definition
-            parse_function_definition();
+            parse_function_definition(function);
             // end of function parsing
             pData.token = get_token();
             start();
             break;
-        
+        // <start> ID = 
         case ID:
-            break;
 
+            
+            break;
+        // <start> ID_F -> <f_call>
+        case ID_F:
+            
+            break;
 
     }
 }
 
 void parse()
 {
-    init_parser();
+    parser_init();
     // get first token
     pData.token = get_token();
     start();
