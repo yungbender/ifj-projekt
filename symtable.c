@@ -248,7 +248,7 @@ void free_tree(tNode *root)
     {
         free_tree(root->rptr);
     }
-    if(root->lptr!= NULL && root->rptr != NULL)
+    if(root->lptr == NULL && root->rptr == NULL)
     {
         free_params(root->params);
         free_ilist(root->instrs);

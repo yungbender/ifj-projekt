@@ -140,6 +140,57 @@ void parse_function_definition(tNode *function)
     pData.instrs = listBackup;
 }
 
+void function_declaration()
+{
+    if(pData.inDefinition == true)
+            {
+                error(UNEXPECTED_F);
+            }
+            // Function definition implementation
+            pData.token = get_token();
+            // Expecting function identificator
+            if(pData.token.type != IDF)
+            {
+                error(IDF);
+            }
+            // Expecting valid function ID, that means: no keyword, no redefinition of existing function
+            bool result = validate_function(pData.token.attr.str);
+            if(result == false)
+            {
+                error(IDF_REDEF);
+            }
+
+            // Funtion name is correct and is not defined already, need to save the function name for including in table
+            if(pData.global->root == NULL) // If the table is empty, the root must be saved as first node
+            {
+                pData.global->root = insert_fun(pData.global->root,pData.token,0);
+            }
+            else
+            {
+                insert_fun(pData.global->root,pData.token,0);
+            }
+            tNode *function = search_global_table(pData.global,pData.token.attr.str);
+            if(function == NULL)
+            {
+                error(INT_ERR);
+            }
+            // Parse parameters function parameters
+            pData.token = get_token();
+            if(pData.token.type != OPEN_PARENTH)
+            {
+                error(UNEXPECTED_F);
+            }
+            params(function);
+            // Parameters are parsed, expecting EOL
+            pData.token = get_token();
+            if(pData.token.type != END_OF_LINE)
+            {
+                error(UNEXPECTED_F);
+            }
+            // Expecting function definition
+            parse_function_definition(function);
+}
+
 // <params> ID  <params> ) <f_decl>
 void params(tNode *function)
 {
@@ -196,67 +247,19 @@ void start()
         case DEF:
             // <f_decl> IDF ( <param> EOL <f_def>
             // If parser found def keyword inside function
-            if(pData.inDefinition == true)
-            {
-                error(UNEXPECTED_F);
-            }
-            // Function definition implementation
-            pData.token = get_token();
-            // Expecting function identificator
-            if(pData.token.type != IDF)
-            {
-                error(IDF);
-            }
-            // Expecting valid function ID, that means: no keyword, no redefinition of existing function
-            bool result = validate_function(pData.token.attr.str);
-            if(result == false)
-            {
-                error(IDF_REDEF);
-            }
-
-            // Funtion name is correct and is not defined already, need to save the function name for including in table
-            if(pData.global->root == NULL) // If the table is empty, the root must be saved as first node
-            {
-                pData.global->root = insert_fun(pData.global->root,pData.token,0);
-            }
-            else
-            {
-                insert_fun(pData.global->root,pData.token,0);
-            }
-            tNode *function = search_global_table(pData.global,pData.token.attr.str);
-            if(function == NULL)
-            {
-                error(INT_ERR);
-            }
-            // Parse parameters function parameters
-            pData.token = get_token();
-            if(pData.token.type != OPEN_PARENTH)
-            {
-                error(UNEXPECTED_F);
-            }
-            params(function);
-            // Parameters are parsed, expecting EOL
-            pData.token = get_token();
-            if(pData.token.type != END_OF_LINE)
-            {
-                error(UNEXPECTED_F);
-            }
-            // Expecting function definition
-            parse_function_definition(function);
+            function_declaration();
             // end of function parsing
             pData.token = get_token();
             start();
             break;
         // <start> ID = 
         case ID:
-
             
             break;
         // <start> ID_F -> <f_call>
         case ID_F:
-            
+            function_call();
             break;
-
     }
 }
 
