@@ -42,7 +42,8 @@ void open_file(char *file)
 {
 	if((f = fopen(file, "r")) == NULL)
 	{
-		exit(1);
+		fprintf(stderr, "ERROR: Cant open file\n");
+		return;
 	}
 	set_source_file(f);
 }
@@ -182,11 +183,11 @@ int main()
 	open_file("tests_scanner/test17");
 	puts("TEST17 -- Various floats beginning with zero");
 	LEX = get_token();
-	assert(LEX.type == FLOAT && LEX.attr.f == 0.01f);
+	assert(LEX.type == FLOAT && LEX.attr.f == (double)0.01);
 	LEX = get_token();
 	assert(LEX.type == END_OF_LINE && LEX.attr.i == 1);
 	LEX = get_token();
-	assert(LEX.type == FLOAT && LEX.attr.f == 0.0f);
+	assert(LEX.type == FLOAT && LEX.attr.f == (double)0.0);
 	LEX = get_token();
 	assert(LEX.type == END_OF_FILE && LEX.attr.i == 2);
 	fclose(f);
@@ -194,15 +195,15 @@ int main()
 	open_file("tests_scanner/test18");
 	puts("TEST18 -- Various floats beginning with integer");
 	LEX = get_token();
-	assert(LEX.type == FLOAT && LEX.attr.f == 1.1f);
+	assert(LEX.type == FLOAT && LEX.attr.f == (double)1.1);
 	LEX = get_token();
 	assert(LEX.type == END_OF_LINE && LEX.attr.i == 1);
 	LEX = get_token();
-	assert(LEX.type == FLOAT && LEX.attr.f == 1.0f);
+	assert(LEX.type == FLOAT && LEX.attr.f == (double)1.0);
 	LEX = get_token();
 	assert(LEX.type == END_OF_LINE && LEX.attr.i == 2);
 	LEX = get_token();
-	assert(LEX.type == FLOAT && LEX.attr.f == 1.02f);
+	assert(LEX.type == FLOAT && LEX.attr.f == (double)1.02);
 	LEX = get_token();
 	assert(LEX.type == END_OF_FILE && LEX.attr.i == 3);
 	fclose(f);
@@ -212,7 +213,7 @@ int main()
 	for(int i = 0; i < 6; i++)
 	{
 		LEX = get_token();
-		assert(LEX.type == FLOAT && LEX.attr.f == 10.001f);
+		assert(LEX.type == FLOAT && LEX.attr.f == (double)10.001);
 		LEX = get_token();
 		assert(LEX.type == END_OF_LINE && LEX.attr.i == i + 1);
 	}
@@ -224,11 +225,11 @@ int main()
 		assert(LEX.type == END_OF_LINE && LEX.attr.i == i + 7);
 	}
 	LEX = get_token();
-	assert(LEX.type == FLOAT && LEX.attr.f == 0.1f);
+	assert(LEX.type == FLOAT && LEX.attr.f == (double)0.1);
 	LEX = get_token();
 	assert(LEX.type == END_OF_LINE && LEX.attr.i == 25);
 	LEX = get_token();
-	assert(LEX.type == FLOAT && LEX.attr.f == 0.1f);
+	assert(LEX.type == FLOAT && LEX.attr.f == (double)0.1);
 	LEX = get_token();
 	assert(LEX.type == END_OF_FILE && LEX.attr.i == 26);
 	fclose(f);
@@ -238,7 +239,7 @@ int main()
 	for(int i = 0; i < 6; i++)
 	{
 		LEX = get_token();
-		assert(LEX.type == FLOAT && LEX.attr.f == 0.01f);
+		assert(LEX.type == FLOAT && LEX.attr.f == (double)0.01);
 		LEX = get_token();
 		assert(LEX.type == END_OF_LINE && LEX.attr.i == i + 1);
 	}
@@ -496,7 +497,7 @@ int main()
 	open_file("tests_scanner/test42");
 	puts("TEST42 -- ERROR: Decimal exponent part");
 	LEX = get_token();
-	assert(LEX.type == FLOAT && LEX.attr.f == 10.0f);
+	assert(LEX.type == FLOAT && LEX.attr.f == (double)10.0);
 	LEX = get_token();
 	assert(LEX.type == L_ERR && LEX.attr.i == 1);
 	fclose(f);	
@@ -505,7 +506,7 @@ int main()
 	puts("TEST43 -- Empty line comment");
 	LEX = get_token();
 	assert(LEX.type == END_OF_FILE && LEX.attr.i == 1);
-	fclose(f);	
+	fclose(f);
 
 	puts("\nEverything is OK\n");
 	return 0;
