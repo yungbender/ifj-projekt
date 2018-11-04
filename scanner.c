@@ -114,7 +114,7 @@ struct token get_token()
 						{
 							ungetc(c, source); // We return the char
 							fseek(source, (-1-i), SEEK_CUR); // And set back the position before the '=' character
-							state = 1;
+							state = 0;
 						}
 					}
 					else
@@ -511,7 +511,7 @@ struct token get_token()
 				{
 					ungetc(c, source);
 					T1.type = FLOAT;
-					T1.attr.f = atof(attr.str);
+					T1.attr.f = strtod(attr.str, NULL);
 					str_free(&attr);
 					return T1;
 				}
@@ -561,7 +561,7 @@ struct token get_token()
 				{
 					ungetc(c, source);
 					T1.type = FLOAT;
-					T1.attr.f = atof(attr.str);
+					T1.attr.f = strtod(attr.str, NULL);
 					str_free(&attr);
 					return T1;
 				}
@@ -610,15 +610,15 @@ struct token get_token()
 				else
 				{
 					ungetc(c, source);
-					if((atof(attr.str) - (int)atof(attr.str)) == 0) // We test whether we created a floating point number
+					if((strtod(attr.str, NULL) - (int)strtod(attr.str, NULL)) == 0) // We test whether we created a floating point number
 					{
 						T1.type = INTEGER;
-						T1.attr.i = atof(attr.str); // We use atof because atoi wont work with exponent, so we convert it and then cut the decimal part
+						T1.attr.i = strtod(attr.str, NULL); // We use strtod because atoi wont work with exponent, so we convert it and then cut the decimal part
 					}
 					else
 					{
 						T1.type = FLOAT; //Negative exponent created negative number, so we use float
-						T1.attr.f = atof(attr.str);
+						T1.attr.f = strtod(attr.str, NULL);
 					} 
 					
 					str_free(&attr);
