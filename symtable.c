@@ -157,17 +157,21 @@ tNode* insert_fun(tNode* root, tToken id, int paramsNum)
  **/
 tNode *search_local_table(tNode *root, string id)
 {
-    if(str_cmp_string(&(id),&(root->id)) == 0 || root == NULL)
+    if(root == NULL)
     {
-        return root;
+        return NULL;
     }
     else if(str_cmp_string(&(id),&(root->id)) < 0)
     {
         return search_local_table(root->lptr, id);
     }
-    else 
+    else if(str_cmp_string(&(id),&(root->id)) > 0)
     {
         return search_local_table(root->rptr, id);
+    }
+    else if(str_cmp_string(&(id),&(root->id)) == 0)
+    {
+        return root;
     }
 }
 
