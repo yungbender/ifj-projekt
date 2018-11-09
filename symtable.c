@@ -40,6 +40,7 @@ tNode* head_stack(tStack *stack)
 tNode* pop_stack(tStack *stack)
 {
     tNode *temp;
+    tStack *tmp;
     if(stack->head == NULL)
     {
         return NULL;
@@ -52,9 +53,11 @@ tNode* pop_stack(tStack *stack)
             stack->head = NULL;
             return temp;
         }
+        tmp = stack->next;
         temp = stack->head;
         stack->head = stack->next->head;
         stack->next = stack->next->next;
+        free(tmp);
         return temp;
     }
 }
@@ -209,6 +212,10 @@ void free_tree(tNode *root)
     }
     if(root->lptr == NULL && root->rptr == NULL)
     {
+        if(root->id.str != NULL)
+        {
+            str_free(&(root->id));
+        }
         free(root);
     }
 }
@@ -220,6 +227,11 @@ void free_tree(tNode *root)
 void free_symtable(tSymTable *symTable)
 {
     free_tree(symTable->root);
+    if(symTable->root != NULL)
+    {
+        str_free(&(symTable->root->id));
+        free(symTable->root);
+    }
     free(symTable);    
 }
 
