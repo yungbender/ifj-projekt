@@ -1,9 +1,10 @@
-#include "scanner.h"
+#include <stdbool.h>
 #include "code_generator.h"
 
 typedef struct node tNode;
 typedef struct paramList tParamList;
 typedef struct symTable tSymTable;
+typedef struct nodeStack tStack;
 
 typedef struct paramList
 {
@@ -18,8 +19,9 @@ typedef struct node
     int dataType; // current datatype
     // Function
     int paramsNum; // number of parameters of function
-    tParamList *params; // list of name of parameters
-    tIList *instrs; // list of instruction of function
+    bool wasDefined; // bool which means if the function was defined because IFJ18 supports function calls before definition
+    //tParamList *params; // list of name of parameters
+    //tIList *instrs; // list of instruction of function
     // BST nodes pointers
     tNode *lptr; // pointer to the next identifier (left side are variables)
     tNode *rptr; // pointer to the next identifier (right side are function)
@@ -28,20 +30,25 @@ typedef struct node
 typedef struct symTable
 {
     tNode *root; // root node of BST
-    tSymTable *next; // next BST in stack
 }symTable;
 
-void stack_init(tSymTable *symTable);
-tNode* stack_head(tSymTable *symTable);
-tSymTable* stack_pop(tSymTable *symTable);
-tSymTable* stack_push(tSymTable *symTable, tNode *new);
+typedef struct nodeStack
+{
+    tNode *head; // root of current pushed BST
+    tStack *next; // pointer to the next member of the stack
+}nodeStack;
+
+void init_stack(tStack *stack);
+tNode* head_stack(tStack *stack);
+tNode* pop_stack(tStack *stack);
+void push_stack(tStack *stack, tNode *new);
+void init_table(tSymTable *symTable);
 tNode* create_var(tToken id, int dataType);
 tNode* insert_var(tNode *root, tToken id, int dataType);
-tNode* create_fun(tToken id, int paramsNum);
-tNode* insert_fun(tNode* root, tToken id, int paramsNum);
-tNode *search_local_table(tNode *root, string id);
-tNode *search_global_table(tSymTable *symTable, string id);
-tParamList* insert_param(tParamList *params, string id);
+tNode *create_fun(tToken id, int paramsNum, bool wasDefined);
+tNode* insert_fun(tNode* root, tToken id, int paramsNum, bool wasDefined);
+tNode *search_table(tNode *root, string id);
+void free_stack(tStack *stack);
 void free_params(tParamList *params);
 void free_tree(tNode *root);
 void free_symtable(tSymTable *symTable);

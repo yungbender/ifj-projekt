@@ -12,7 +12,11 @@ typedef struct parserdata
     tSymTable *global;
     // Pointer to the list of instructions (from whole source code)
     tIList *instrs;
-    // Bool variable which tells the parser if he is parsing funcion or main
+    // Stack with local symbol tables (used for function calls, recursions, function parsing)
+    tStack *stack;
+    // Int variable which signals in how many scopes parser is (function,while,if,etc) this is for "end" keyword to determine, if end token is correct
+    int scopes;
+    // Bool variable which signals if parser is inside function definition body
     bool inDefinition;
 }tPData;
 

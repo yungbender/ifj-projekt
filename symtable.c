@@ -3,60 +3,75 @@
 #include "symtable.h"
 
 /**
- * Function initalizes stack. 
+ * Function symbol table. 
  * @param symTable Symbol table which is supposed to initalize.
  **/
-void stack_init(tSymTable *symTable)
+void init_table(tSymTable *symTable)
 {
-    symTable->next = NULL;
     symTable->root = NULL;
 }
 
 /**
- * Function returns first member of stack. If stack is empty, returns NULL.
- * @param symTable Symbol table which head user wants to know.
- * @return Function returns head of symbol table.
+ * Function initialize stack.
+ * @param stack Stack with symbol tables.
  **/
-tNode* stack_head(tSymTable *symTable)
+void init_stack(tStack *stack)
 {
-    return symTable->root;
+    stack->head = NULL;
+    stack->next = NULL;
 }
 
 /**
- * Function pops out the first BST from stack. If stack is empty, function returns nothing. But this one frees the BST.
- * @param symTable Symbol table from which is popped first BST.
- * @return Function returns popped stack.
+ * Function returns first member of stack. If stack is empty, returns NULL.
+ * @param stack Stack which head user wants to know.
+ * @return Function returns head of stack.
  **/
-tSymTable* stack_pop(tSymTable *symTable)
+tNode* head_stack(tStack *stack)
 {
-    if(symTable->root == NULL)
+    return stack->head;
+}
+
+/**
+ * Function pops out the first BST from stack. If stack is empty, function returns NULL..
+ * @param stack Stack from which is popped first BST.
+ * @return Function returns popped symtable.
+ * @warning If the pop is not cathced inside variable, there will be memory leak, because the pointer will get lost.
+ **/
+tNode* pop_stack(tStack *stack)
+{
+    tNode *temp;
+    if(stack->head == NULL)
     {
-        return symTable;
+        return NULL;
     }
     else
     {
-        tNode *temp;
-        temp = symTable->root;
-        symTable = symTable->next;
-        free(temp);
-        return symTable;
+        if(stack->next == NULL)
+        {
+            temp = stack->head;
+            stack->head = NULL;
+            return temp;
+        }
+        temp = stack->head;
+        stack->head = stack->next->head;
+        stack->next = stack->next->next;
+        return temp;
     }
 }
 
 /**
  * Function push BST on stack as first member of stack.
- * @param symTable Symbol table where is BST pushed.
+ * @param stack Stack where is BST pushed.
  * @param new Which BST is supposed to be pushed.
  * @return Function returns pushed symbolic table.
  **/
-tSymTable* stack_push(tSymTable *symTable, tNode *new)
+void push_stack(tStack *stack, tNode *new)
 {
-    tSymTable *temp;
-    stack_init(temp);
-    temp->root = new;
-    temp->next = symTable;
-    symTable = temp;
-    return symTable;
+    tStack *temp = (tStack*)malloc(sizeof(tStack));
+    temp->head = stack->head;
+    temp->next = stack->next;
+    stack->head = new;
+    stack->next = temp;
 }
 
 /**
@@ -72,7 +87,7 @@ tNode* create_var(tToken id, int dataType)
 
     str_copy_string(&(temp->id),&(id.attr.str)); // must be string because its variable identificator
     temp->dataType = dataType;
-    temp->instrs = NULL;
+    temp->wasDefined = true;
     temp->paramsNum = 0;
     temp->lptr = NULL;
     temp->rptr = NULL;
@@ -107,17 +122,17 @@ tNode* insert_var(tNode *root, tToken id, int dataType)
  * Function creates function node and returns its pointer.
  * @param id Token with informations about function.
  * @param paramsNum Number of parameters function takes.
+ * @param wasDefined Bool which means if the function was defined or is expecitng to get defined.
  * @return Function returns pointer to the new node.
  **/
-tNode *create_fun(tToken id, int paramsNum)
+tNode *create_fun(tToken id, int paramsNum, bool wasDefined)
 {
     tNode *temp = (tNode *)malloc(sizeof(struct node));
     //TODO unsucc malloc
 
     str_copy_string(&(temp->id),&(id.attr.str)); // must be string because its function identificator
     temp->dataType = 0;
-    temp->instrs = (tIList *)malloc(sizeof(struct instructionList));
-    temp->params = (tParamList *)malloc(sizeof(struct paramList));
+    temp->wasDefined = wasDefined;
     temp->paramsNum = paramsNum;
     temp->lptr = NULL;  
     temp->rptr = NULL;
@@ -131,31 +146,30 @@ tNode *create_fun(tToken id, int paramsNum)
  * @param id Token with informations about function.
  * @param paramsNum Number of parameters function takes.
  **/ 
-tNode* insert_fun(tNode* root, tToken id, int paramsNum)
+tNode* insert_fun(tNode *root, tToken id, int paramsNum, bool wasDefined)
 {
     if(root == NULL)
     {
-        return create_fun(id,paramsNum);
+        return create_fun(id, paramsNum, wasDefined);
     }
     else if(str_cmp_string(&(id.attr.str),&(root->id)) < 0)
     {
-        root->lptr = insert_fun(root->lptr, id, paramsNum);
+        root->lptr = insert_fun(root->lptr, id, paramsNum, wasDefined);
     }
     else if(str_cmp_string(&(id.attr.str),&(root->id)) > 0)
     {
-        root->rptr = insert_fun(root->rptr, id, paramsNum);
+        root->rptr = insert_fun(root->rptr, id, paramsNum, wasDefined);
     }
     return root;
 }
 
 /**
  * Function searches for the variable/function inside symbol table tree (BST) and returns its pointer.
- * @warning This function is supposed to be used ONLY for searching inside Function! (local symbol table) 
  * @param root Root of symbol table (BST) where variable or function is searched.
  * @param id Identificator of searched symbol.
  * @return Function returns pointer to the searched variable/function, if it is not found returns NULL.
  **/
-tNode *search_local_table(tNode *root, string id)
+tNode *search_table(tNode *root, string id)
 {
     if(root == NULL)
     {
@@ -163,74 +177,15 @@ tNode *search_local_table(tNode *root, string id)
     }
     else if(str_cmp_string(&(id),&(root->id)) < 0)
     {
-        return search_local_table(root->lptr, id);
+        return search_table(root->lptr, id);
     }
     else if(str_cmp_string(&(id),&(root->id)) > 0)
     {
-        return search_local_table(root->rptr, id);
+        return search_table(root->rptr, id);
     }
-    else if(str_cmp_string(&(id),&(root->id)) == 0)
+    else
     {
         return root;
-    }
-}
-
-/**
- * Function searches for the variable/function inside symbol table and returns its pointer.
- * @warning This function is supposed to be used ONLY for searching inside MAIN (searches WHOLE table, not single tree) 
- * @param root Root of symbol table (BST) where variable or function is searched.
- * @param id Identificator of searched symbol.
- * @return Function returns pointer to the searched variable/function, if it is not found returns NULL.
- **/
-tNode *search_global_table(tSymTable *symTable, string id)
-{
-    tNode *result = NULL;
-    if(symTable == NULL)
-    {
-        return NULL;
-    }
-    while(symTable != NULL)
-    {
-        result = search_local_table(symTable->root, id);
-        symTable = symTable->next;
-    }
-    return result;
-}
-
-tParamList* insert_param(tParamList *params, string id)
-{
-    tParamList *temp = (tParamList *)malloc(sizeof(struct paramList));
-    // TODO: unsucc malloc
-    str_copy_string(&(params->id),&(id));
-    temp->next = NULL;
-    // If the parameters list is empty
-    if(params == NULL)
-    {
-        return temp;
-    }
-    // If it is not empty
-    // Go to the latest parameter
-    while(params->next != NULL)
-    {
-        params = params->next;
-    }
-    params->next = temp;
-    return params;
-}
-
-void free_params(tParamList *params)
-{
-    if(params == NULL)
-    {
-        return;
-    }
-
-    tParamList *temp;
-    while(temp != NULL)
-    {
-        temp = params->next;
-        free(params);
-        params = temp;
     }
 }
 
@@ -254,8 +209,6 @@ void free_tree(tNode *root)
     }
     if(root->lptr == NULL && root->rptr == NULL)
     {
-        free_params(root->params);
-        free_ilist(root->instrs);
         free(root);
     }
 }
@@ -266,9 +219,30 @@ void free_tree(tNode *root)
  **/
 void free_symtable(tSymTable *symTable)
 {
-    while(symTable != NULL)
+    free_tree(symTable->root);
+    free(symTable);    
+}
+
+/**
+ * Function free's up the whole BST stack.
+ * @params stack Stack with symbol tables(BST).
+ **/
+void free_stack(tStack *stack)
+{
+    if(stack == NULL)
     {
-        free_tree(symTable->root);
-        symTable = symTable->next;
-    }    
+        return;
+    }
+    tStack *temp;
+    while(temp != NULL)
+    {
+        temp = stack->next;
+        free(stack->head);
+        if(temp == NULL)
+        {
+            break;
+        }
+        stack->head = temp->head;
+    }
+    free(stack);
 }
