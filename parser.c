@@ -106,6 +106,26 @@ bool validate_symbol(string name)
     return true;
 }
 
+void validate_calls(tNode *root)
+{
+    if(root == NULL)
+    {
+        return;
+    }
+    if(root->rptr != NULL)
+    {
+        validate_calls(root->rptr);
+    }
+    if(root->lptr != NULL)
+    {
+        validate_calls(root->lptr);
+    }
+    if(root->wasDefined == false)
+    {
+        error(UNDEF_F);
+    }
+}
+
 bool validate_variable(string name)
 {
     // Check if the variable name is not built-in function name or keyword
@@ -267,6 +287,17 @@ void function_call()
     
 }
 
+void end_of_file()
+{
+    // Check for unexpected end of file (in definition or in while)
+    if(pData.inDefinition == true || pData.scopes > 0)
+    {
+        error(UNEXPECTED_EOF);
+    }
+    // Check if there is some function that was called but not defined
+    validate_calls(pData.global->root);
+}
+
 void start()
 {
     switch(pData.token.type)
@@ -304,6 +335,11 @@ void start()
             // If there are scopes, end just returns back to the parsing function (parser_function_definition, while_function, if_function)
             return;
             // This break instruction is dead code, there is no possibility that parser reaches this break!
+            break;
+            // <EOF> -> end
+        case END_OF_FILE:
+            // Need to check if we are not in function, check if all scopes are 0 and if all called functions got their own definition
+            end_of_file();
             break;
     }
 }

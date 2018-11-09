@@ -10,6 +10,8 @@
 // Unnoficial errors for error case
 #define IDF_REDEF 100
 #define UNEXPECTED_F 101
+#define UNEXPECTED_EOF 102
+#define UNDEF_F 103 // calling nonexisting function
 
 // ======= TYPES OF TOKEN =======
 #define IDF     0
