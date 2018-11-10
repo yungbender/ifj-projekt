@@ -4,7 +4,8 @@
 // User's functions
 #define FUN_DEF 200
 #define FUN_END 201
-#define FUN_CALL 202
+#define FUN_CALL 202 // function return is going to be saved
+#define NOFUN_CALL 216 // function return value is not going to be saved
 // If calls
 #define IF_CALL 203
 #define ELSE_CALL 204

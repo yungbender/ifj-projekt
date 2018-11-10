@@ -16,6 +16,9 @@ void print_error_exit(int id)
         case UNDEF_F:
             fprintf(stderr,"Semantic error, calling undefined function! \n");
             exit(SE_ERR);
+        case PARAM_NUM:
+            fprintf(stderr,"Semantic error, wrong number of parameters inside function call! \n");
+            exit(SE_ERR);
         case UNEXPECTED_F:
             fprintf(stderr,"Syntax error, unexpected token inside function! \n");
             exit(SY_ERR);

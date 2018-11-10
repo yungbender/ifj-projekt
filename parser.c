@@ -106,6 +106,45 @@ bool validate_symbol(string name)
     return true;
 }
 
+void validate_params(tNode *root)
+{
+    tInstr *head = pData.instrs->head;
+    tTList *params = NULL;
+    tNode *function = NULL;
+    int callingNum = 0;
+
+    while(head != NULL)
+    {
+        // FUN_CALL has first parameter where function return value is saved, second parameter name of the function, other parameters are function parameters
+        // NOFUN_CALL has first parameter name of function, other parameters are fucntion parameters
+        if(head->instr == FUN_CALL || head->instr == NOFUN_CALL)
+        {
+            params = head->params;
+            // If FUN_CALL parser must skip first parameter beacause its where return value is stored
+            if(head->instr == FUN_CALL)
+            {
+                params = params->next;
+            }
+            // Search the function inside global table to get paramsNum
+            function = search_table(root,params->param.attr.str);
+            // For every paramter token increase counter of function call parameters
+            params = params->next;
+            while(params != NULL)
+            {
+                callingNum++;
+                params = params->next;
+            }
+            // If the function was not found (dead code) or the number of calling parameters is not equal to function parameters number semantic error
+            if(function == NULL || function->paramsNum != callingNum)
+            {
+                error(PARAM_NUM);
+            }
+        }
+        callingNum = 0;
+        head = head->next;
+    }
+}
+
 void validate_calls(tNode *root)
 {
     if(root == NULL)
@@ -296,6 +335,7 @@ void end_of_file()
     }
     // Check if there is some function that was called but not defined
     validate_calls(pData.global->root);
+    validate_params(pData.global->root);
 }
 
 void start()
@@ -354,5 +394,5 @@ void parse()
 
 int main()
 {
-    return 0;
+    
 }
