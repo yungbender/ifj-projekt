@@ -20,5 +20,6 @@ typedef struct parserdata
     bool inDefinition;
 }tPData;
 
+void parse();
 void start();
 void parser_init();

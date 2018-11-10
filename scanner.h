@@ -1,7 +1,7 @@
 // LEXICAL ANALYSER
 
 #include "str.h"
-
+#include <stdio.h>
 /* init state = 0
  * state after white space/comment = 1
  */

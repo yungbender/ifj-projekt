@@ -336,6 +336,16 @@ void end_of_file()
     // Check if there is some function that was called but not defined
     validate_calls(pData.global->root);
     validate_params(pData.global->root);
+    free_symtable(pData.global);
+    free_symtable(pData.local);
+    free_ilist(pData.instrs);
+    free_stack(pData.stack);
+}
+
+void end_of_line()
+{
+    pData.token = get_token();
+    start();
 }
 
 void start()
@@ -347,20 +357,18 @@ void start()
             // <f_decl> IDF ( <param> EOL <f_def>
             // If parser found def keyword inside function
             function_declaration();
-            // end of function parsing
-            pData.token = get_token();
-            start();
             break;
         // <start> ID = 
         case ID:
             
             break;
+        case END_OF_LINE:
+            end_of_line();
+            break;
         // <start> ID_F -> <f_call>
         case ID_F:
             function_call();
             // Function was called and exectuted, parse next
-            pData.token = get_token();
-            start();
             break;
         // <end> -> <f_def>
         // <end> -> <if>
@@ -371,6 +379,12 @@ void start()
             if(pData.scopes == 0)
             {
                 error(SY_ERR);
+            }
+            // Expecting EOL or EOF
+            pData.token = get_token();
+            if(pData.token.type != END_OF_FILE && pData.token.type != END_OF_LINE)
+            {
+                error(UNEXPECTED_END);
             }
             // If there are scopes, end just returns back to the parsing function (parser_function_definition, while_function, if_function)
             return;
@@ -390,9 +404,4 @@ void parse()
     // get first token
     pData.token = get_token();
     start();
-}
-
-int main()
-{
-    
 }

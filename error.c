@@ -28,5 +28,8 @@ void print_error_exit(int id)
         case UNEXPECTED_EOF:
             fprintf(stderr,"Syntax error, unexpected end of file! \n");
             exit(SY_ERR);
+        case UNEXPECTED_END:
+            fprintf(stderr,"Syntax error, unexpected token after keyword END! \n");
+            exit(SY_ERR);
     }
 }

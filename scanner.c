@@ -81,6 +81,7 @@ struct token get_token()
 
 	while(1)
 	{
+
 		c = getc(source);
 		switch(state)
 		{

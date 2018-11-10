@@ -13,6 +13,7 @@
 #define UNEXPECTED_EOF 102
 #define UNDEF_F 103 // calling nonexisting function
 #define PARAM_NUM 104
+#define UNEXPECTED_END 105
 // ======= TYPES OF TOKEN =======
 #define IDF     0
 #define ID      1
