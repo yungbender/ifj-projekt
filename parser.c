@@ -33,77 +33,77 @@ void error(int id)
  * @params name Name of the function/variable.
  * @returns True if it is validate name, false if not.
  **/ 
-bool validate_symbol(string name)
+int validate_symbol(string name)
 {
     if(str_cmp_const_str(&(name),"def") == 0)
     {
-        return false;
+        return DEF;
     }
     else if (str_cmp_const_str(&(name),"do") == 0)
     {
-        return false;
+        return DO;
     }
     else if (str_cmp_const_str(&(name),"else") == 0)
     {
-        return false;
+        return ELSE;
     }
     else if (str_cmp_const_str(&(name),"end") == 0)
     {
-        return false;
+        return END;
     }
     else if (str_cmp_const_str(&(name),"if") == 0)
     {
-        return false;
+        return IF;
     }
     else if (str_cmp_const_str(&(name),"not") == 0)
     {
-        return false;
+        return NOT;
     }
     else if (str_cmp_const_str(&(name),"nil") == 0)
     {
-        return false;
+        return NIL;
     }
     else if (str_cmp_const_str(&(name),"then") == 0)
     {
-        return false;
+        return THEN;
     }
     else if (str_cmp_const_str(&(name),"while") == 0)
     {
-        return false;
+        return WHILE;
     }
     else if (str_cmp_const_str(&(name),"inputs") == 0)
     {
-        return false;
+        return INPUTS_CALL;
     }
     else if (str_cmp_const_str(&(name),"inputi") == 0)
     {
-        return false;
+        return INPUTI_CALL;
     }
     else if (str_cmp_const_str(&(name),"inputf") == 0)
     {
-        return false;
+        return INPUTF_CALL;
     }
     else if (str_cmp_const_str(&(name),"print") == 0)
     {
-        return false;
+        return PRINT_CALL;
     }
     else if (str_cmp_const_str(&(name),"lengths") == 0)
     {
-        return false;
+        return LENGTH_CALL;
     }
     else if (str_cmp_const_str(&(name),"substr") == 0)
     {
-        return false;
+        return SUBSTR_CALL;
     }
     else if (str_cmp_const_str(&(name),"ord") == 0)
     {
-        return false;
+        return ORD_CALL;
     }
     else if (str_cmp_const_str(&(name),"chr") == 0)
     {
-        return false;
+        return CHR_CALL;
     }
-    return true;
+    return OK;
 }
 
 void validate_params(tNode *root)
@@ -119,6 +119,7 @@ void validate_params(tNode *root)
         // NOFUN_CALL has first parameter name of function, other parameters are fucntion parameters
         if(head->instr == FUN_CALL || head->instr == NOFUN_CALL)
         {
+            int result = OK;
             params = head->params;
             // If FUN_CALL parser must skip first parameter beacause its where return value is stored
             if(head->instr == FUN_CALL)
@@ -126,7 +127,6 @@ void validate_params(tNode *root)
                 params = params->next;
             }
             // Search the function inside global table to get paramsNum
-            function = search_table(root,params->param.attr.str);
             // For every paramter token increase counter of function call parameters
             params = params->next;
             while(params != NULL)
@@ -134,11 +134,63 @@ void validate_params(tNode *root)
                 callingNum++;
                 params = params->next;
             }
-            // If the function was not found (dead code) or the number of calling parameters is not equal to function parameters number semantic error
-            if(function == NULL || function->paramsNum != callingNum)
+            // Parser must check first if user called built in function or user defined function
+            result = validate_symbol(params->param.attr.str);
+            // It is built in function, must check its parameters
+            if(result != OK)
             {
-                error(PARAM_NUM);
+                // These functions cant have any calling parameter
+                if(result == INPUTF_CALL || result == INPUTI_CALL || result == INPUTS_CALL)
+                {
+                    if(callingNum != 0)
+                    {
+                        error(PARAM_NUM);
+                    }
+                }
+                // These functions must have only one parameter
+                else if(result == LENGTH_CALL || result == CHR_CALL)
+                {
+                    if(callingNum != 1)
+                    {
+                        error(PARAM_NUM);
+                    }
+                }
+                // These functions must have only two parameters
+                else if(result == ORD_CALL)
+                {
+                    if(callingNum != 2)
+                    {
+                        error(PARAM_NUM);
+                    }
+                }
+                // These functions must have only three parameters
+                else if(result == SUBSTR_CALL)
+                {
+                    if(callingNum != 3)
+                    {
+                        error(PARAM_NUM);
+                    }
+                }
+                // These functions must have more than zero parameters
+                else if(result == PRINT_CALL)
+                {
+                    if(callingNum == 0)
+                    {
+                        error(PARAM_NUM);
+                    }
+                }
             }
+            // Its user defined function, must check number of parameters from global symbol table
+            else
+            {
+                // If the function was not found (dead code) or the number of calling parameters is not equal to function parameters number semantic error
+                function = search_table(root,params->param.attr.str);
+                if(function == NULL || function->paramsNum != callingNum)
+                {
+                    error(PARAM_NUM);
+                }
+            }
+
         }
         callingNum = 0;
         head = head->next;
@@ -168,8 +220,8 @@ void validate_calls(tNode *root)
 bool validate_variable(string name)
 {
     // Check if the variable name is not built-in function name or keyword
-    bool result = validate_symbol(name);
-    if(result != false)
+    int result = validate_symbol(name);
+    if(result != OK)
     {
         error(IDF_REDEF);
     }
@@ -261,8 +313,8 @@ void function_declaration()
         error(IDF);
     }
     // Expecting valid function ID, that means: no keyword, no redefinition of built-in functions
-    bool result = validate_symbol(pData.token.attr.str);
-    if(result == false)
+    int result = validate_symbol(pData.token.attr.str);
+    if(result != OK)
     {
         error(IDF_REDEF);
     }
@@ -338,8 +390,9 @@ void end_of_file()
     validate_params(pData.global->root);
     free_symtable(pData.global);
     free_symtable(pData.local);
-    free_ilist(pData.instrs);
     free_stack(pData.stack);
+    // Give the final instruction list to the code generator
+    ilist = pData.instrs;
 }
 
 void end_of_line()

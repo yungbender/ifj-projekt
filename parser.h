@@ -2,6 +2,8 @@
 #include "symtable.h"
 #include "error.h"
 
+#define OK 0
+
 typedef struct parserdata
 {
     // Currently loaded token

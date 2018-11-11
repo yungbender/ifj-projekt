@@ -41,25 +41,19 @@ tNode* pop_stack(tStack *stack)
 {
     tNode *temp;
     tStack *tmp;
-    if(stack->head == NULL)
+
+    if(stack->next == NULL)
     {
-        return NULL;
-    }
-    else
-    {
-        if(stack->next == NULL)
-        {
-            temp = stack->head;
-            stack->head = NULL;
-            return temp;
-        }
-        tmp = stack->next;
         temp = stack->head;
-        stack->head = stack->next->head;
-        stack->next = stack->next->next;
-        free(tmp);
+        stack->head = NULL;
         return temp;
     }
+    tmp = stack->next;
+    temp = stack->head;
+    stack->head = stack->next->head;
+    stack->next = stack->next->next;
+    free(tmp);
+    return temp;
 }
 
 /**

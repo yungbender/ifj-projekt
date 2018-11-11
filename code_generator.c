@@ -101,3 +101,8 @@ void free_ilist(tIList *instrs)
     }
     free(instrs);
 }
+
+void generate_code()
+{
+    
+}

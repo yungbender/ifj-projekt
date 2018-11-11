@@ -48,7 +48,10 @@ typedef struct instructionList
     tInstr *active; // active instruction pointer 
 }instructionList;
 
+tIList *ilist;
+
 void init_ilist(tIList *instrs);
 void insert_instr(tIList *instrs, int instr);
 void insert_param(tIList *instrs, tToken param);
 void free_ilist(tIList *instrs);
+void generate_code();
