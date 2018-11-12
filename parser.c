@@ -10,7 +10,7 @@ void parser_init()
     pData.global = (tSymTable *)malloc(sizeof(struct symTable));
     pData.local = (tSymTable *)malloc(sizeof(struct symTable));
     pData.instrs = (tIList *)malloc(sizeof(struct instructionList));
-    pData.stack = (tStack *)malloc(sizeof(struct nodeStack));
+    pData.stack = (tStack *)malloc(sizeof(struct tokenStack));
     pData.scopes = 0;
     pData.inDefinition = false;
     init_stack(pData.stack);
@@ -243,7 +243,7 @@ void parse_function_definition()
     pData.inDefinition = true;
     pData.scopes++;
     // Parser needs to save now the local table, to work with a new one inside function definition
-    push_stack(pData.stack,pData.local->root);
+    tNode *temp = pData.local->root;
     pData.local->root = NULL;
     // Recursively calling parser
     pData.token = get_token();
@@ -251,7 +251,7 @@ void parse_function_definition()
     // Function is parsed without error, saving end keyword
     insert_instr(pData.instrs,FUN_END);
     // Restoring back local table, restoring bool and decrementing scope
-    pData.local->root = pop_stack(pData.stack);
+    pData.local->root = temp;
     pData.inDefinition = false;
     pData.scopes--;
 }

@@ -26,7 +26,7 @@ void init_stack(tStack *stack)
  * @param stack Stack which head user wants to know.
  * @return Function returns head of stack.
  **/
-tNode* head_stack(tStack *stack)
+tToken* head_stack(tStack *stack)
 {
     return stack->head;
 }
@@ -37,9 +37,9 @@ tNode* head_stack(tStack *stack)
  * @return Function returns popped symtable.
  * @warning If the pop is not cathced inside variable, there will be memory leak, because the pointer will get lost.
  **/
-tNode* pop_stack(tStack *stack)
+tToken* pop_stack(tStack *stack)
 {
-    tNode *temp;
+    tToken *temp;
     tStack *tmp;
 
     if(stack->next == NULL)
@@ -62,7 +62,7 @@ tNode* pop_stack(tStack *stack)
  * @param new Which BST is supposed to be pushed.
  * @return Function returns pushed symbolic table.
  **/
-void push_stack(tStack *stack, tNode *new)
+void push_stack(tStack *stack, tToken *new)
 {
     tStack *temp = (tStack*)malloc(sizeof(tStack));
     temp->head = stack->head;

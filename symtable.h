@@ -4,7 +4,7 @@
 typedef struct node tNode;
 typedef struct paramList tParamList;
 typedef struct symTable tSymTable;
-typedef struct nodeStack tStack;
+typedef struct tokenStack tStack;
 
 typedef struct paramList
 {
@@ -32,16 +32,16 @@ typedef struct symTable
     tNode *root; // root node of BST
 }symTable;
 
-typedef struct nodeStack
+typedef struct tokenStack
 {
-    tNode *head; // root of current pushed BST
+    tToken *head; // root of current pushed token
     tStack *next; // pointer to the next member of the stack
-}nodeStack;
+}tokenStack;
 
 void init_stack(tStack *stack);
-tNode* head_stack(tStack *stack);
-tNode* pop_stack(tStack *stack);
-void push_stack(tStack *stack, tNode *new);
+tToken* head_stack(tStack *stack);
+tToken* pop_stack(tStack *stack);
+void push_stack(tStack *stack, tToken *new);
 void init_table(tSymTable *symTable);
 tNode* create_var(tToken id, int dataType);
 tNode* insert_var(tNode *root, tToken id, int dataType);
