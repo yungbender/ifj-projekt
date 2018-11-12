@@ -102,7 +102,81 @@ void free_ilist(tIList *instrs)
     free(instrs);
 }
 
+/**
+ * Function creates output file, insert needed header for ifjcode18 and creates temporary frame for working with "main".
+ * @return Function returns pointer to the output file.
+ **/
+FILE* generate_head()
+{
+    FILE *f = fopen("prog.out","w");
+    fprintf(f,".IFJcode18\n");
+    fprintf(f,"CREATEFRAME\n");
+    return f;
+}
+
+/**
+ * Function generates while operation inside code.
+ **/
+void generate_while()
+{
+
+}
+
+/**
+ * Function generates if operation inside code.
+ **/
+void generate_if()
+{
+
+}
+
+/**
+ * Function generates ONE instruction only.
+ * @param f Pointer to the IFJcode2018 source code.
+ * @param instruction Pointer to the single instruction from inside code.
+ **/
+void generate_instruction(FILE *f, tInstr *instruction)
+{
+    switch(instruction->instr)
+    {
+        case WHILE_CALL:
+            generate_while();
+            break;
+        case IF_CALL:
+            generate_if();
+            break;
+        // ...
+
+    }
+}
+
+/**
+ * Function generates instruction one by one but ignores function definitions and everything inside it until end macro.
+ * @param f Pointer to the IFJcode2018 source code.
+ **/
+void generate_main(FILE *f)
+{
+
+}
+
+/**
+ * Function finds function definition macro and generates everything until end of the function and continues until end of the list.
+ * @param f Pointer to the IFJcode2018 source code.
+ **/
+void generate_fundef(FILE *f)
+{
+
+}
+
+
+/**
+ * Function which generates parsed inside code to final IFJcode2018 code.
+ **/
 void generate_code()
 {
     
+    FILE *f = generate_head();
+    generate_main(f);
+    generate_fundef(f);
+    fclose(f);
 }

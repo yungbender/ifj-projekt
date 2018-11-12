@@ -1,7 +1,5 @@
 #include "parser.h"
 
-#define OK 0
-
 /**
  * Main function which calls all compiler functions. Firstly sets correct input from where is input source code read. Parses it. And if parsing 
  * is okay, calls code generator which generates output ifjcode18 code.

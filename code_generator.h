@@ -22,7 +22,22 @@
 #define SUBSTR_CALL 213
 #define ORD_CALL 214
 #define CHR_CALL 215
-
+// Operators
+#define ADD 217 // '+'
+#define SUB 218 // '-'
+#define MUL 219 // '*'
+#define DIV 220 // '/'
+#define MOV 221 // '='
+#define EQ  222 // '=='
+#define LT  223 // '<'
+#define LE  224 // '<='
+#define GT  225 // '>'
+#define GE  226 // '>='
+#define NE  227 // '!='
+// Exit call
+#define EXIT 217
+// Empty instruction
+#define NOP 218
 
 typedef struct tokenList tTList;
 typedef struct instructionList tIList;

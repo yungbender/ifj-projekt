@@ -301,8 +301,8 @@ void params(tNode *function)
 void function_declaration()
 {
     // Function definition implementation
-    // Cannot define function inside other function
-    if(pData.inDefinition == true)
+    // Cannot define function inside other function or inside while, if
+    if(pData.inDefinition == true || pData.scopes > 0)
     {
         error(UNEXPECTED_F);
     }
@@ -388,6 +388,13 @@ void end_of_file()
     // Check if there is some function that was called but not defined
     validate_calls(pData.global->root);
     validate_params(pData.global->root);
+    // Generate successful exit (EXIT 0)
+    insert_instr(pData.instrs,EXIT);
+    tToken number;
+    number.type = INTEGER;
+    number.attr.i = 0;
+    insert_param(pData.instrs,number);
+    // Free out the symtables and stack
     free_symtable(pData.global);
     free_symtable(pData.local);
     free_stack(pData.stack);
