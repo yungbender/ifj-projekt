@@ -68,11 +68,11 @@ void is_key_word (struct token *LEX)
 struct token get_token()
 {
 	// Check if stdin is empty
-	if ((fseek(stdin, 0, SEEK_END), ftell(stdin)) < 0)
+/* 	if ((fseek(stdin, 0, SEEK_END), ftell(stdin)) < 0)
 	{
 		fprintf(stderr,"Error, no ifj2018 source code found! \n");
 		exit (L_ERR);
-	}
+	} */
 
 	struct token T1;
 	int state = 0;
