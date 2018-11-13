@@ -5,6 +5,11 @@
 
 tPData pData;
 
+#define GET_TOKEN() \
+    pData.token = get_token(); \
+    if(pData.token.type == L_ERR) \
+        error(L_ERR);
+
 void parser_init()
 {
     pData.global = (tSymTable *)malloc(sizeof(struct symTable));
@@ -121,6 +126,11 @@ void validate_params(tNode *root)
         {
             int result = OK;
             params = head->params;
+            if(params == NULL)
+            {
+                head = head->next;
+                continue;
+            }
             // If FUN_CALL parser must skip first parameter beacause its where return value is stored
             if(head->instr == FUN_CALL)
             {
@@ -246,7 +256,7 @@ void parse_function_definition()
     tNode *temp = pData.local->root;
     pData.local->root = NULL;
     // Recursively calling parser
-    pData.token = get_token();
+    GET_TOKEN();
     start();
     // Function is parsed without error, saving end keyword
     insert_instr(pData.instrs,FUN_END);
@@ -259,7 +269,7 @@ void parse_function_definition()
 // <params> ID  <params> ) <f_decl>
 void params(tNode *function)
 {
-    pData.token = get_token();
+    GET_TOKEN();
     // Expecting ID or parenth
     // If we get parenth there are no parameters for function
     if(pData.token.type == CLOSE_PARENTH)
@@ -279,7 +289,7 @@ void params(tNode *function)
         insert_param(pData.instrs, pData.token);
         function->paramsNum++;
         // Expecting comma or close parenth
-        pData.token = get_token();
+        GET_TOKEN();
         // If there is no other argument, expect close parenth and return
         if(pData.token.type == CLOSE_PARENTH)
         {
@@ -290,7 +300,7 @@ void params(tNode *function)
         {
             error(UNEXPECTED_F);
         }
-        pData.token = get_token();
+        GET_TOKEN();
         if(pData.token.type != ID)
         {
             error(UNEXPECTED_F);
@@ -307,7 +317,7 @@ void function_declaration()
         error(UNEXPECTED_F);
     }
     // Expecting function identificator
-    pData.token = get_token();
+    GET_TOKEN();
     if(pData.token.type != IDF && pData.token.type != ID)
     {
         error(IDF);
@@ -354,14 +364,14 @@ void function_declaration()
     insert_instr(pData.instrs, FUN_DEF);
     insert_param(pData.instrs, pData.token);
     // Parse function parameters
-    pData.token = get_token();
+    GET_TOKEN();
     if(pData.token.type != OPEN_PARENTH)
     {
         error(UNEXPECTED_F);
     }
     params(function);
     // Parameters are parsed, expecting EOL
-    pData.token = get_token();
+    GET_TOKEN();
     if(pData.token.type != END_OF_LINE)
     {
         error(UNEXPECTED_F);
@@ -369,13 +379,95 @@ void function_declaration()
     // Expecting function definition
     parse_function_definition();
     // Function was parsed, get token and start parsing
-    pData.token = get_token();
+    GET_TOKEN();
     start();
 }
 
-void function_call()
+void function_call(bool moved)
 {
-    
+    // Check if the called function is in the global table
+    tNode *result = search_table(pData.global->root,pData.token.attr.str);
+    // If parser did not found function inside global symtable and parser is inside main, semantic error
+    if(result == NULL && pData.inDefinition == false)
+    {
+        error(UNDEF_F);
+    }
+    // If parser did not found function, but is inside function definition, parser just creates new function inside global symtable that it was called but not still not defined
+    else if(result == NULL && pData.inDefinition == true)
+    {
+        insert_fun(pData.global->root,pData.token,0,false);
+    }
+    // Add function calling as instruction
+    // If the function result value will not be moved
+    if(moved == false)
+    {
+        insert_instr(pData.instrs,NOFUN_CALL);
+    }
+    // If will be moved
+    else
+    {
+        insert_instr(pData.instrs,FUN_CALL);
+        tToken name = head_stack(pData.stack);
+        pop_stack(pData.stack);
+        insert_param(pData.instrs,name);
+    }
+
+    // Bool if leftbracket to check for rightbracket
+    bool leftbracket = false;
+    bool rightbracket = false;
+    GET_TOKEN();
+    // Expecting leftbracket or ID or EOF
+    // If leftbracket, activate bool and get next token
+    if(pData.token.type == OPEN_PARENTH)
+    {
+        leftbracket = true;
+        GET_TOKEN();
+    }
+    // Get parameters
+    while(pData.token.type != END_OF_LINE)
+    {
+        // If close parenth, must check if there was open parenth and return
+        if(pData.token.type == CLOSE_PARENTH)
+        {
+            if(leftbracket == false)
+            {
+                error(UNEXPECTED_F);
+            }
+            // Jump from the while
+            rightbracket = true;
+            break;
+        }
+        // If it is variable search it in local symtable, if int,float,string, just add as paramter
+        else if(pData.token.type == ID || pData.token.type == INTEGER || pData.token.type == FLOAT || pData.token.type == STRING)
+        {
+            // Search if the variable is defined, if not, error
+            if(pData.token.type == ID)
+            {
+                result = search_table(pData.local->root,pData.token.attr.str);
+                if(result == NULL)
+                {
+                    error(UNDEF_V);
+                }
+            }
+            // If is, generate parameter
+            insert_param(pData.instrs,pData.token);
+        }
+        // Unexpected token
+        else
+        {
+            error(WRONG_PARAM);
+        }
+        // Get next parameter and parse
+        GET_TOKEN();
+    }
+    // Here is EOL, need to check parenths are allright
+    if(leftbracket == true && rightbracket != true)
+    {
+        error(WRONG_PARAM);
+    }
+    // Function call is parsed, get next token and continue parsing.
+    GET_TOKEN();
+    start();
 }
 
 void end_of_file()
@@ -404,7 +496,7 @@ void end_of_file()
 
 void end_of_line()
 {
-    pData.token = get_token();
+    GET_TOKEN();
     start();
 }
 
@@ -425,10 +517,9 @@ void start()
         case END_OF_LINE:
             end_of_line();
             break;
-        // <start> ID_F -> <f_call>
-        case ID_F:
-            function_call();
-            // Function was called and exectuted, parse next
+        // <start> IDF -> <f_call>
+        case IDF:
+            function_call(false);
             break;
         // <end> -> <f_def>
         // <end> -> <if>
@@ -441,7 +532,7 @@ void start()
                 error(SY_ERR);
             }
             // Expecting EOL or EOF
-            pData.token = get_token();
+            GET_TOKEN();
             if(pData.token.type != END_OF_FILE && pData.token.type != END_OF_LINE)
             {
                 error(UNEXPECTED_END);
@@ -462,6 +553,6 @@ void parse()
 {
     parser_init();
     // get first token
-    pData.token = get_token();
+    GET_TOKEN();
     start();
 }

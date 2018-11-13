@@ -45,7 +45,7 @@ typedef struct token{
 
 
 // ======= ERRORS =======
-#define L_ERR     1
+#define L_ERR     111
 #define SY_ERR	  2
 #define DEF_ERR	  3 // not defined var,function, redefinition, etc.
 #define DATA_ERR  4 // wrong data type operations (string++, etc.)

@@ -19,6 +19,9 @@ void print_error_exit(int id)
         case PARAM_NUM:
             fprintf(stderr,"Semantic error, wrong number of parameters inside function call! \n");
             exit(SE_ERR);
+        case UNDEF_V:
+            fprintf(stderr,"Semtantic error, using undefined variable! \n");
+            exit(SE_ERR);
         case UNEXPECTED_F:
             fprintf(stderr,"Syntax error, unexpected token inside function! \n");
             exit(SY_ERR);
@@ -31,5 +34,11 @@ void print_error_exit(int id)
         case UNEXPECTED_END:
             fprintf(stderr,"Syntax error, unexpected token after keyword END! \n");
             exit(SY_ERR);
+        case WRONG_PARAM:
+            fprintf(stderr,"Syntax error, unexpected token inside function call! \n");
+            exit(SY_ERR);
+        case L_ERR:
+            fprintf(stderr,"Lexical error, wrong lexem structure! \n");
+            exit(L_ER);
     }
 }

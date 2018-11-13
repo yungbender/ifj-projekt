@@ -392,7 +392,7 @@ struct token get_token()
 				{
 					str_add_char(&attr, c);
 				}
-				else if(c == '!' ||c == '?')
+				else if(c == '!' || c == '?')
 				{
 					state = ID_F;
 					str_add_char(&attr, c);

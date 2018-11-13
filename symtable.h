@@ -34,14 +34,14 @@ typedef struct symTable
 
 typedef struct tokenStack
 {
-    tToken *head; // root of current pushed token
+    tToken head; // root of current pushed token
     tStack *next; // pointer to the next member of the stack
 }tokenStack;
 
 void init_stack(tStack *stack);
-tToken* head_stack(tStack *stack);
-tToken* pop_stack(tStack *stack);
-void push_stack(tStack *stack, tToken *new);
+tToken head_stack(tStack *stack);
+void pop_stack(tStack *stack);
+void push_stack(tStack *stack, tToken new);
 void init_table(tSymTable *symTable);
 tNode* create_var(tToken id, int dataType);
 tNode* insert_var(tNode *root, tToken id, int dataType);

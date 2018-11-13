@@ -1,5 +1,5 @@
 // ======= ERRORS =======
-#define L_ERR     1
+#define L_ER     1
 #define SY_ERR	  2
 #define DEF_ERR	  3 // not defined var,function, redefinition, etc.
 #define DATA_ERR  4 // wrong data type operations (string++, etc.)
@@ -8,12 +8,15 @@
 #define ZERO_DIV  9 // division by zero
 #define INT_ERR	  99
 // Unnoficial errors for error case
+#define L_ERR 111
 #define IDF_REDEF 100
 #define UNEXPECTED_F 101
 #define UNEXPECTED_EOF 102
 #define UNDEF_F 103 // calling nonexisting function
 #define PARAM_NUM 104
 #define UNEXPECTED_END 105
+#define UNDEF_V 106
+#define WRONG_PARAM 107
 // ======= TYPES OF TOKEN =======
 #define IDF     0
 #define ID      1

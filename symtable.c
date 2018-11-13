@@ -2,6 +2,8 @@
 #include <malloc.h>
 #include "symtable.h"
 
+#define EMPTY 999
+
 /**
  * Function symbol table. 
  * @param symTable Symbol table which is supposed to initalize.
@@ -17,7 +19,7 @@ void init_table(tSymTable *symTable)
  **/
 void init_stack(tStack *stack)
 {
-    stack->head = NULL;
+    stack->head.type = EMPTY;
     stack->next = NULL;
 }
 
@@ -26,7 +28,7 @@ void init_stack(tStack *stack)
  * @param stack Stack which head user wants to know.
  * @return Function returns head of stack.
  **/
-tToken* head_stack(tStack *stack)
+tToken head_stack(tStack *stack)
 {
     return stack->head;
 }
@@ -37,23 +39,22 @@ tToken* head_stack(tStack *stack)
  * @return Function returns popped symtable.
  * @warning If the pop is not cathced inside variable, there will be memory leak, because the pointer will get lost.
  **/
-tToken* pop_stack(tStack *stack)
+void pop_stack(tStack *stack)
 {
-    tToken *temp;
     tStack *tmp;
 
-    if(stack->next == NULL)
+    if(stack == NULL)
     {
-        temp = stack->head;
-        stack->head = NULL;
-        return temp;
+        return;
     }
-    tmp = stack->next;
-    temp = stack->head;
-    stack->head = stack->next->head;
-    stack->next = stack->next->next;
+    else if(stack->head.type == EMPTY)
+    {
+        return;
+    }
+
+    tmp = stack;
+    stack = stack->next;
     free(tmp);
-    return temp;
 }
 
 /**
@@ -62,7 +63,7 @@ tToken* pop_stack(tStack *stack)
  * @param new Which BST is supposed to be pushed.
  * @return Function returns pushed symbolic table.
  **/
-void push_stack(tStack *stack, tToken *new)
+void push_stack(tStack *stack, tToken new)
 {
     tStack *temp = (tStack*)malloc(sizeof(tStack));
     temp->head = stack->head;
@@ -243,12 +244,6 @@ void free_stack(tStack *stack)
     while(temp != NULL)
     {
         temp = stack->next;
-        free(stack->head);
-        if(temp == NULL)
-        {
-            break;
-        }
-        stack->head = temp->head;
+        free(stack);
     }
-    free(stack);
 }
