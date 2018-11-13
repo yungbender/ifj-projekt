@@ -2,8 +2,6 @@
 #include <malloc.h>
 #include "symtable.h"
 
-#define EMPTY 999
-
 /**
  * Function symbol table. 
  * @param symTable Symbol table which is supposed to initalize.
@@ -70,6 +68,20 @@ void push_stack(tStack *stack, tToken new)
     temp->next = stack->next;
     stack->head = new;
     stack->next = temp;
+}
+
+/**
+ * Function clears whole stack until finds EMPTY flag.
+ * @param stack Stack which will get cleaned.
+ **/
+void clear_stack(tStack *stack)
+{
+    tStack *result = stack;
+    while(result->head.type != EMPTY)
+    {
+        pop_stack(stack);
+        result = result->next;
+    }
 }
 
 /**

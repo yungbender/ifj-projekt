@@ -13,6 +13,9 @@ void print_error_exit(int id)
         case IDF_REDEF:
             fprintf(stderr,"Semantic error, redefinition of function! \n");
             exit(DEF_ERR);
+        case SAME_PARAM:
+            fprintf(stderr,"Semantic error, parameters cannot have same name! \n");
+            exit(DEF_ERR);
         case UNDEF_F:
             fprintf(stderr,"Semantic error, calling undefined function! \n");
             exit(SE_ERR);

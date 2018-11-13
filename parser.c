@@ -283,16 +283,34 @@ void params(tNode *function)
         error(UNEXPECTED_F);
     }
     // Now parser will take every parameter until token is not ID
+    // Clear out the so parser can save params one by one and compare them 
+    clear_stack(pData.stack);
     while(pData.token.type == ID)
     {
         // Need to save the parameter inside instruction list
         insert_param(pData.instrs, pData.token);
         function->paramsNum++;
+        // Now needs to compare, if parameters doesnt have same name
+        tStack *stackHead = pData.stack;
+        // Compare every parameter
+        while(stackHead->head.type != EMPTY)
+        {
+            if((str_cmp_string(&(pData.token.attr.str),&(stackHead->head.attr.str)) == 0))
+            {
+                error(SAME_PARAM);
+            }
+            stackHead = stackHead->next;
+        }
+        // If the parameter is correct push the parameter to get compared with next parameter
+        push_stack(pData.stack,pData.token);
+
         // Expecting comma or close parenth
         GET_TOKEN();
         // If there is no other argument, expect close parenth and return
         if(pData.token.type == CLOSE_PARENTH)
         {
+            // Clear out the stack with parameters
+            clear_stack(pData.stack);
             return;
         }
         // If there was not close parenth, there must be comma and next parameter, else syntax error

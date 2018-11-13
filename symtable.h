@@ -1,6 +1,8 @@
 #include <stdbool.h>
 #include "code_generator.h"
 
+#define EMPTY 999
+
 typedef struct node tNode;
 typedef struct paramList tParamList;
 typedef struct symTable tSymTable;
@@ -40,6 +42,7 @@ typedef struct tokenStack
 
 void init_stack(tStack *stack);
 tToken head_stack(tStack *stack);
+void clear_stack(tStack *stack);
 void pop_stack(tStack *stack);
 void push_stack(tStack *stack, tToken new);
 void init_table(tSymTable *symTable);

@@ -17,6 +17,7 @@
 #define UNEXPECTED_END 105
 #define UNDEF_V 106
 #define WRONG_PARAM 107
+#define SAME_PARAM 108
 // ======= TYPES OF TOKEN =======
 #define IDF     0
 #define ID      1
