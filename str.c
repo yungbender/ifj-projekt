@@ -54,6 +54,20 @@ int str_copy_string(string *s1, string *s2)
 	return STR_SUCCESS;
 }
 
+// Function copies string s2 into s1
+int str_copy_const_string(string *s1, char *s2)
+{
+	int newLength = strlen(s2);
+	if (newLength >= s1->allocSize) {     // Not enough memory, we need to reallocate
+		if ((s1->str = (char*) realloc(s1->str, newLength + 1)) == NULL)
+			return STR_ERROR;
+		s1->allocSize = newLength + 1;
+	}
+	strcpy(s1->str, s2);
+	s1->length = newLength;
+	return STR_SUCCESS;
+}
+
 // Function compares strings s1 and s2
 int str_cmp_string(string *s1, string *s2)
 {

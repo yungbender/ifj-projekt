@@ -8,10 +8,11 @@
 int main()
 {
     set_source_file(stdin);
-
+ 
     parse();
-
+ 
     generate_code();
-
+ 
     return OK;
+
 }

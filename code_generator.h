@@ -1,6 +1,7 @@
 #include "scanner.h"
 
 // Macros for instruction inside instruction list
+#define DEFVAR 228
 // User's functions
 #define FUN_DEF 200
 #define FUN_END 201

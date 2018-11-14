@@ -95,7 +95,7 @@ tNode* create_var(tToken id, int dataType)
 {
     tNode *temp = (tNode *)malloc(sizeof(struct node));
     //TODO unsucc malloc
-
+    str_init(&(temp->id));
     str_copy_string(&(temp->id),&(id.attr.str)); // must be string because its variable identificator
     temp->dataType = dataType;
     temp->wasDefined = true;
@@ -140,7 +140,7 @@ tNode *create_fun(tToken id, int paramsNum, bool wasDefined)
 {
     tNode *temp = (tNode *)malloc(sizeof(struct node));
     //TODO unsucc malloc
-
+    str_init(&(temp->id));
     str_copy_string(&(temp->id),&(id.attr.str)); // must be string because its function identificator
     temp->dataType = 0;
     temp->wasDefined = wasDefined;
@@ -229,7 +229,6 @@ void free_symtable(tSymTable *symTable)
     if(symTable->root != NULL)
     {
         str_free(&(symTable->root->id));
-        free(symTable->root);
     }
     free(symTable);    
 }

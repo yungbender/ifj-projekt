@@ -110,7 +110,7 @@ FILE* generate_head()
 {
     FILE *f = fopen("prog.out","w");
     fprintf(f,".IFJcode18\n");
-    fprintf(f,"CREATEFRAME\n");
+    fprintf(f,"CREATEFRAME\n\n");
     return f;
 }
 
@@ -130,6 +130,79 @@ void generate_if()
 
 }
 
+// FUN_CALL WHERE_RETURNED_VALUE FUNCTION_NAME PARAMETER0 ...
+void generate_funcall(FILE *f, tInstr *instruction)
+{
+    fprintf(f, "# FUNCTION CALL\n");
+    fprintf(f, "PUSHFRAME\n");
+    fprintf(f, "CREATEFRAME\n\n");
+    int paramsNum = 0;
+    tToken ret = instruction->params->param;
+    tToken funName = instruction->params->next->param;
+    tTList *params = instruction->params->next->next;
+    // Define every parameter variable
+    while(params != NULL)
+    {
+        fprintf(f, "DEFVAR TF@$%d\n",paramsNum);
+        paramsNum++;
+        params = params->next;
+    }
+    // Define return value
+    fprintf(f, "DEFVAR TF@$retval\n");
+    fprintf(f, "MOVE TF@$retval nil@nil\n");
+    // Move parameters value to the temporary ($0...)
+    params = instruction->params->next->next;
+    paramsNum = 0;
+    while(params != NULL)
+    {
+        fprintf(f, "MOVE TF@$%d LF@%s\n", paramsNum, params->param.attr.str.str);
+        paramsNum++;
+        params = params->next;
+    }
+    // Now function can be called
+    fprintf(f, "CALL $%s\n",funName.attr.str.str);
+    // Function was called and executed, return value
+    fprintf(f, "MOVE LF@%s TF@$retval\n",ret.attr.str.str);
+    // Everything is done, popping back frame
+    fprintf(f, "POPFRAME\n\n");
+}
+
+// FUN_CALL FUNCTION_NAME PARAMETER0 ...
+void generate_nofuncall(FILE *f, tInstr *instruction)
+{
+    fprintf(f, "# FUNCTION CALL\n");
+    fprintf(f, "PUSHFRAME\n");
+    fprintf(f, "CREATEFRAME\n\n");
+    int paramsNum = 0;
+    tToken funName = instruction->params->param;
+    tTList *params = instruction->params->next;
+    // Define every parameter variable
+    while(params != NULL)
+    {
+        fprintf(f, "DEFVAR TF@$%d\n",paramsNum);
+        paramsNum++;
+        params = params->next;
+    }
+    // Define return value
+    fprintf(f, "DEFVAR TF@$retval\n");
+    fprintf(f, "MOVE TF@$retval nil@nil\n");
+    // Move parameters value to the temporary ($0...)
+    params = instruction->params->next;
+    paramsNum = 0;
+    while(params != NULL)
+    {
+        fprintf(f, "MOVE TF@$%d LF@%s\n", paramsNum, params->param.attr.str.str);
+        paramsNum++;
+        params = params->next;
+    }
+    // Now function can be called
+    fprintf(f, "CALL $%s\n",funName.attr.str.str);
+    // Function was called and executed, return value
+    fprintf(f, "MOVE LF@$noretval TF@$retval\n");
+    // Everything is done, popping back frame
+    fprintf(f, "POPFRAME\n\n");
+}
+
 /**
  * Function generates ONE instruction only.
  * @param f Pointer to the IFJcode2018 source code.
@@ -146,8 +219,64 @@ void generate_instruction(FILE *f, tInstr *instruction)
         case IF_CALL:
             generate_if();
             break;
-        // ...
+        case FUN_CALL:
+            generate_funcall(f,instruction);
+            break;
+        case NOFUN_CALL:
+            generate_nofuncall(f,instruction);
+            break;
+        case NOP:
+            break;
+    }
+}
 
+/**
+ * Function generates ALL defvars inside main.
+ * @params f Pointer to the IFJcode2018 source code.
+ * @params instruction Pointer to the list of instructions.
+ **/
+void generate_defvar_main(FILE *f, tInstr *instruction)
+{
+    while(instruction != NULL)
+    {
+        // If funciton definition is found, skip the whole list until you find end
+        if(instruction->instr == FUN_DEF)
+        {
+            while(instruction->instr != FUN_DEF)
+            {
+                instruction = instruction->next;
+            }
+            instruction = instruction->next;
+        }
+        if(instruction->instr == DEFVAR)
+        {
+            fprintf(f, "DEFVAR TF@%s\n", instruction->params->param.attr.str.str);
+            // replace defvar with nop to skip this instruction next time
+            instruction->instr = NOP;
+        }
+        instruction = instruction->next;
+    }
+}
+
+/**
+ * Function generates ALL defvars inside function.
+ * @params f Pointer to the IFJcode2018 source code.
+ * @params instruction Pointer to the list of instructions.
+ **/
+void generate_defvar_fun(FILE *f, tInstr *instruction)
+{
+    // generating special variable noretval which saves return of nonreturn function, so nonreturn function can return value if was called inside return function
+    fprintf(f, "DEFVAR TF@$noretval\n");
+    fprintf(f, "MOVE TF@$noretval nil@nil\n\n");
+    while(instruction->instr != FUN_END)
+    {
+        if(instruction->instr == DEFVAR)
+        {
+            fprintf(f, "DEFVAR TF@%s\n", instruction->params->param.attr.str.str);
+            // replace defvar with nop to skip this instruction next time
+            instruction->instr = NOP;
+        }
+        instruction = instruction->next;
     }
 }
 
@@ -157,7 +286,67 @@ void generate_instruction(FILE *f, tInstr *instruction)
  **/
 void generate_main(FILE *f)
 {
+    tInstr *begin = ilist->head;
+    // DEFVARS must go first!
+    // generating special variable noretval which saves return of nonreturn function, so nonreturn function can return value if was called inside return function
+    fprintf(f, "DEFVAR TF@$noretval\n\n");
+    fprintf(f, "MOVE TF@$noretval nil@nil\n\n");
+    generate_defvar_main(f,begin);
+    while(begin != NULL)
+    {
+        // If funciton definition is found, skip the whole list until you find end
+        if(begin->instr == FUN_DEF)
+        {
+            while(begin->instr != FUN_DEF)
+            {
+                begin = begin->next;
+            }
+            begin = begin->next;
+        }
+        generate_instruction(f,begin);
+        begin = begin->next;
+    }
+    fprintf(f, "EXIT int@0\n\n");
+    fprintf(f, "# END OF MAIN\n");
+}
 
+/**
+ * Function chooses, which value(token) to return, based on last instruction.
+ * @param instruction Pointer to the last instruction of the funcion.
+ **/
+tToken choose_return(tInstr *instruction)
+{
+    tToken nil;
+    nil.type = NOP;
+    tToken noretval;
+    str_init(&noretval.attr.str);
+    str_copy_const_string(&(noretval.attr.str),"$noretval");
+    switch(instruction->instr)
+    {
+        // these returns last instruction where was result calculated
+        case ADD:
+        case SUB:
+        case MUL:
+        case DIV:
+        case MOV:
+            // return token with name of WHERE was result saved
+            return (instruction->params->param);
+        case DEFVAR:
+        case IF_CALL:
+        case ELSE_CALL:
+        case IF_END:
+        case WHILE_CALL:
+        case WHILE_END:
+        case FUN_END:
+            return nil;
+        case FUN_CALL:
+            // return where the function result was saved
+            return (instruction->params->param);
+        case NOFUN_CALL:
+            // return $noretval
+            return noretval;
+    }
+    return nil;
 }
 
 /**
@@ -166,7 +355,49 @@ void generate_main(FILE *f)
  **/
 void generate_fundef(FILE *f)
 {
-
+    tInstr *begin = ilist->head;
+    tTList *params = NULL;
+    int paramsNum = 0;
+    while(begin != NULL)
+    {
+        if(begin->instr == FUN_DEF)
+        {
+            // Print out label of function
+            fprintf(f, "# START OF FUNCTION %s\n\n",begin->params->param.attr.str.str);
+            fprintf(f, "LABEL $%s\n",begin->params->param.attr.str.str);
+            // Create parameters and move there calling parameters
+            params = begin->params->next;
+            while(params != NULL)
+            {
+                fprintf(f, "DEFVAR %s\n",params->param.attr.str.str);
+                fprintf(f, "MOVE %s $%d\n",params->param.attr.str.str, paramsNum);
+                paramsNum++;
+                params = params->next;
+            }
+            paramsNum = 0;
+            // Get next function instruction
+            begin = begin->next;
+            // Generate all defvars inside function
+            generate_defvar_fun(f, begin);
+            // Generate function body until you hit LAST body instruction
+            while(begin->instr != FUN_END && begin->next->instr != FUN_END)
+            {
+                generate_instruction(f,begin);
+                begin = begin->next;
+            }
+            // Generate the last instruction
+            generate_instruction(f,begin);
+            // Based on last instruction, generator will return value
+            tToken ret = choose_return(begin);
+            if(ret.type != NOP)
+            {
+                fprintf(f, "MOVE TF@$retval TF@%s\n",ret.attr.str.str);
+            }
+            fprintf(f, "RETURN\n\n");
+        }
+        begin = begin->next;
+    }
+    
 }
 
 
