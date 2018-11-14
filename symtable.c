@@ -50,8 +50,9 @@ void pop_stack(tStack *stack)
         return;
     }
 
-    tmp = stack;
-    stack = stack->next;
+    tmp = stack->next;
+    stack->head = stack->next->head;
+    stack->next = stack->next->next;
     free(tmp);
 }
 
@@ -209,22 +210,13 @@ void free_tree(tNode *root)
     {
         return;
     }
-    if(root->lptr != NULL)
+    free_tree(root->rptr);
+    free_tree(root->lptr);
+    if(root->id.str != NULL)
     {
-        free_tree(root->lptr);
+        str_free(&(root->id));
     }
-    if(root->rptr != NULL)
-    {
-        free_tree(root->rptr);
-    }
-    if(root->lptr == NULL && root->rptr == NULL)
-    {
-        if(root->id.str != NULL)
-        {
-            str_free(&(root->id));
-        }
-        free(root);
-    }
+    free(root);
 }
 
 /**

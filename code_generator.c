@@ -180,4 +180,5 @@ void generate_code()
     generate_main(f);
     generate_fundef(f);
     fclose(f);
+    free_ilist(ilist);
 }

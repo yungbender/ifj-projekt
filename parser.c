@@ -254,12 +254,28 @@ void parse_function_definition()
     // Parser needs to save now the local table, to work with a new one inside function definition
     tNode *temp = pData.local->root;
     pData.local->root = NULL;
+    // Parameters of this function are still on stack and needs to get in the new local symtable
+    tStack *stack = pData.stack;
+    while(stack->head.type != EMPTY)
+    {
+        tToken param = head_stack(stack);
+        pop_stack(stack);
+        if(pData.local->root == NULL)
+        {
+            pData.local->root = insert_var(pData.local->root,param,param.type);
+        }
+        else
+        {
+            insert_var(pData.local->root,param,param.type);
+        }
+    }
     // Recursively calling parser
     GET_TOKEN();
     start();
     // Function is parsed without error, saving end keyword
     insert_instr(pData.instrs,FUN_END);
     // Restoring back local table, restoring bool and decrementing scope
+    free_tree(pData.local->root);
     pData.local->root = temp;
     pData.inDefinition = false;
     pData.scopes--;
@@ -302,14 +318,12 @@ void params(tNode *function)
         }
         // If the parameter is correct push the parameter to get compared with next parameter
         push_stack(pData.stack,pData.token);
-
+        // Parameters will stay pushed on the stack so parser, can later add them to the new local table
         // Expecting comma or close parenth
         GET_TOKEN();
         // If there is no other argument, expect close parenth and return
         if(pData.token.type == CLOSE_PARENTH)
         {
-            // Clear out the stack with parameters
-            clear_stack(pData.stack);
             return;
         }
         // If there was not close parenth, there must be comma and next parameter, else syntax error
