@@ -126,11 +126,6 @@ void validate_params(tNode *root)
         {
             int result = OK;
             params = head->params;
-            if(params == NULL)
-            {
-                head = head->next;
-                continue;
-            }
             // If FUN_CALL parser must skip first parameter beacause its where return value is stored
             if(head->instr == FUN_CALL)
             {
@@ -138,14 +133,18 @@ void validate_params(tNode *root)
             }
             // Search the function inside global table to get paramsNum
             // For every paramter token increase counter of function call parameters
-            params = params->next;
+            tToken name = params->param;
+            if(params != NULL)
+            {
+                params = params->next;
+            }
             while(params != NULL)
             {
                 callingNum++;
                 params = params->next;
             }
             // Parser must check first if user called built in function or user defined function
-            result = validate_symbol(params->param.attr.str);
+            result = validate_symbol(name.attr.str);
             // It is built in function, must check its parameters
             if(result != OK)
             {
@@ -194,7 +193,7 @@ void validate_params(tNode *root)
             else
             {
                 // If the function was not found (dead code) or the number of calling parameters is not equal to function parameters number semantic error
-                function = search_table(root,params->param.attr.str);
+                function = search_table(root,name.attr.str);
                 if(function == NULL || function->paramsNum != callingNum)
                 {
                     error(PARAM_NUM);
@@ -420,6 +419,7 @@ void function_call(bool moved)
     if(moved == false)
     {
         insert_instr(pData.instrs,NOFUN_CALL);
+        insert_param(pData.instrs,pData.token);
     }
     // If will be moved
     else
@@ -441,13 +441,15 @@ void function_call(bool moved)
         leftbracket = true;
         GET_TOKEN();
     }
+    // Bool for checking comma
+    bool comma = false;
     // Get parameters
-    while(pData.token.type != END_OF_LINE)
+    while(true)
     {
         // If close parenth, must check if there was open parenth and return
         if(pData.token.type == CLOSE_PARENTH)
         {
-            if(leftbracket == false)
+            if(leftbracket == false || comma == true)
             {
                 error(UNEXPECTED_F);
             }
@@ -458,6 +460,7 @@ void function_call(bool moved)
         // If it is variable search it in local symtable, if int,float,string, just add as paramter
         else if(pData.token.type == ID || pData.token.type == INTEGER || pData.token.type == FLOAT || pData.token.type == STRING)
         {
+            comma = false;
             // Search if the variable is defined, if not, error
             if(pData.token.type == ID)
             {
@@ -471,12 +474,26 @@ void function_call(bool moved)
             insert_param(pData.instrs,pData.token);
         }
         // Unexpected token
+        else if(pData.token.type == END_OF_LINE)
+        {
+            if(comma == true)
+            {
+                error(WRONG_PARAM);
+            }
+            break;
+        }
+        else if(pData.token.type == COMMA)
+        {
+            comma = true;
+        }
         else
         {
             error(WRONG_PARAM);
         }
         // Get next parameter and parse
         GET_TOKEN();
+        // Expecting comma or EOL
+
     }
     // Here is EOL, need to check parenths are allright
     if(leftbracket == true && rightbracket != true)

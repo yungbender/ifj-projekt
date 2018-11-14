@@ -139,6 +139,7 @@ void generate_instruction(FILE *f, tInstr *instruction)
 {
     switch(instruction->instr)
     {
+        // In this case cannot be case for function definition
         case WHILE_CALL:
             generate_while();
             break;
