@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include "code_generator.h"
 
 /**
@@ -155,7 +156,22 @@ void generate_funcall(FILE *f, tInstr *instruction)
     paramsNum = 0;
     while(params != NULL)
     {
-        fprintf(f, "MOVE TF@$%d LF@%s\n", paramsNum, params->param.attr.str.str);
+        if(params->param.type == ID)
+        {
+            fprintf(f, "MOVE TF@$%d LF@%s\n", paramsNum, params->param.attr.str.str);
+        }
+        else if(params->param.type == INTEGER)
+        {
+            fprintf(f, "MOVE TF@%d int@%d\n",paramsNum, params->param.attr.i);
+        }
+        else if(params->param.type == FLOAT)
+        {
+            fprintf(f, "MOVE TF@%d float@%a\n",paramsNum, params->param.attr.f);
+        }
+        else if(params->param.type == STRING)
+        {
+            fprintf(f, "MOVE TF@%d string@%s\n",paramsNum, params->param.attr.str.str);
+        }
         paramsNum++;
         params = params->next;
     }
@@ -191,7 +207,22 @@ void generate_nofuncall(FILE *f, tInstr *instruction)
     paramsNum = 0;
     while(params != NULL)
     {
-        fprintf(f, "MOVE TF@$%d LF@%s\n", paramsNum, params->param.attr.str.str);
+        if(params->param.type == ID)
+        {
+            fprintf(f, "MOVE TF@$%d LF@%s\n", paramsNum, params->param.attr.str.str);
+        }
+        else if(params->param.type == INTEGER)
+        {
+            fprintf(f, "MOVE TF@%d int@%d\n",paramsNum, params->param.attr.i);
+        }
+        else if(params->param.type == FLOAT)
+        {
+            fprintf(f, "MOVE TF@%d float@%a\n",paramsNum, params->param.attr.f);
+        }
+        else if(params->param.type == STRING)
+        {
+            fprintf(f, "MOVE TF@%d string@%s\n",paramsNum, params->param.attr.str.str);
+        }
         paramsNum++;
         params = params->next;
     }
@@ -201,6 +232,141 @@ void generate_nofuncall(FILE *f, tInstr *instruction)
     fprintf(f, "MOVE LF@$noretval TF@$retval\n");
     // Everything is done, popping back frame
     fprintf(f, "POPFRAME\n\n");
+}
+
+/**
+ * Function generates inputs, inputf, inputi, built-in functions into IFJcode2018.
+ * @params f Pointer to the IFJcode2018 source code.
+ * @params instruction Pointer to the single instruction from inside code.
+ * @params moved Bool which signifies if result of the function is going to be moved.
+ **/
+void generate_input(FILE *f, tInstr *instruction, bool moved, int datatype)
+{
+    // input is going to be saved
+    if(moved == true)
+    {
+        // need to check datatype
+        switch(datatype)
+        {
+            case INPUTF_CALL:
+                fprintf(f, "READ TF@%s float\n",instruction->params->param.attr.str.str);
+                break;
+            case INPUTI_CALL:
+                fprintf(f, "READ TF@%s int\n",instruction->params->param.attr.str.str);
+                break;
+            case INPUTS_CALL:
+                fprintf(f, "READ TF@%s string\n",instruction->params->param.attr.str.str);
+                break;
+        }
+    }
+    // input is not going to be moved, need to save it inside noretval if in function
+    else
+    {
+        // need to check datatype
+        switch(datatype)
+        {
+            case INPUTF_CALL:
+                fprintf(f, "READ TF@$noretval float\n");
+                break;
+            case INPUTI_CALL:
+                fprintf(f, "READ TF@$noretval int\n");
+                break;
+            case INPUTS_CALL:
+                fprintf(f, "READ TF@$noretval string\n");
+                break;
+        }
+    }
+}
+
+
+/**
+ * Function generates print built-in functions into IFJcode2018.
+ * @params f Pointer to the IFJcode2018 source code.
+ * @params instruction Pointer to the single instruction from inside code.
+ * @params moved Bool which signifies if result of the function is going to be moved.
+ **/
+void generate_print(FILE *f, tInstr *instruction, bool moved)
+{
+    tToken where;
+    tTList *params = instruction->params;
+    // If return value will be saved, save where and change pointer to the parameters to next one 
+    if(moved == true)
+    {
+        where = params->param;
+        params = params->next;
+    }
+    // Function generates write one parameter by one
+    while(params != NULL)
+    {
+        // need to check what user wants to print out, int, float, string, or variable
+        // first parameter inside instruction is WHERE is result going to be stored second is WHAT is supposed to print out
+        switch(params->param.type)
+        {
+            case INTEGER:
+                fprintf(f, "WRITE %d\n",instruction->params->next->param.attr.i);
+                break;
+            case FLOAT:
+                fprintf(f, "WRITE %a\n",instruction->params->next->param.attr.f);
+                break;
+            case STRING:
+                fprintf(f, "WRITE %s\n",instruction->params->next->param.attr.str.str);
+                break;
+            case ID:
+                fprintf(f, "WRITE TF@%s\n",instruction->params->next->param.attr.str.str);
+                break;
+        }
+        params = params->next;
+    }
+    // If return value will be saved, save there nil because print returns nil
+    if(moved == true)
+    {
+        fprintf(f, "MOVE TF@%s nil@nil\n",where.attr.str.str);
+    }
+    // If return value is not going to be saved, but can be returned from function move it to the noretval
+    else
+    {
+        fprintf(f, "MOVE TF@$noretval nil@nil\n");
+    }
+}
+
+/**
+ * Function generates length built-in functions into IFJcode2018.
+ * @params f Pointer to the IFJcode2018 source code.
+ * @params instruction Pointer to the single instruction from inside code.
+ * @params moved Bool which signifies if result of the function is going to be moved.
+ **/
+void generate_length(FILE *f, tInstr *instruction, bool moved)
+{
+/*     tToken where;
+    tTList *params = instruction->params;
+    // If return value will be saved, save where and change pointer to the parameters to next one 
+    if(moved == true)
+    {
+        where = params->param;
+        params = params->next;
+    }
+    if(moved == true)
+    {
+        switch(params->param.type)
+        {
+            case INTEGER:
+                fprintf(f, "STRLEN %s\n",instruction->params->next->param.attr.i);
+                break;
+            case FLOAT:
+                fprintf(f, "STRLEN %a\n",instruction->params->next->param.attr.f);
+                break;
+            case STRING:
+                fprintf(f, "STRLEN %s\n",instruction->params->next->param.attr.str.str);
+                break;
+            case ID:
+                fprintf(f, "STRLEN TF@%s\n",instruction->params->next->param.attr.str.str);
+                break;
+        }
+    }
+    else
+    {
+
+    } */
 }
 
 /**
@@ -214,16 +380,56 @@ void generate_instruction(FILE *f, tInstr *instruction)
     {
         // In this case cannot be case for function definition
         case WHILE_CALL:
-            generate_while();
+            generate_while(f,instruction);
             break;
         case IF_CALL:
-            generate_if();
+            generate_if(f,instruction);
             break;
         case FUN_CALL:
             generate_funcall(f,instruction);
             break;
         case NOFUN_CALL:
             generate_nofuncall(f,instruction);
+            break;
+        case INPUTF_CALL:
+        case INPUTI_CALL:
+        case INPUTS_CALL:
+            generate_input(f,instruction,true, instruction->instr);
+            break;
+        case NOINPUTF_CALL:
+        case NOINPUTI_CALL:
+        case NOINPUTS_CALL:
+            generate_input(f,instruction,false, instruction->instr);
+            break;
+        case PRINT_CALL:
+            generate_print(f,instruction,true);
+            break;
+        case NOPRINT_CALL:
+            generate_print(f,instruction,false);
+            break;
+        case LENGTH_CALL:
+            generate_length(f,instruction,true);
+            break;
+        case NOLENGTH_CALL:
+            generate_length(f,instruction,false);
+            break;
+        case SUBSTR_CALL:
+            generate_substr(f,instruction,true);
+            break;
+        case NOSUBSTR_CALL:
+            generate_substr(f,instruction,false);
+            break;
+        case ORD_CALL:
+            generate_ord(f,instruction,true);
+            break;
+        case NOORD_CALL:
+            generate_ord(f,instruction,false);
+            break;
+        case CHR_CALL:
+            generate_chr(f,instruction,true);
+            break;
+        case NOCHR_CALL:
+            generate_chr(f,instruction,false);
             break;
         case NOP:
             break;
@@ -338,7 +544,11 @@ tToken choose_return(tInstr *instruction)
         case WHILE_CALL:
         case WHILE_END:
         case FUN_END:
+        case PRINT_CALL:
             return nil;
+        case INPUTF_CALL:
+        case INPUTI_CALL:
+        case INPUTS_CALL:
         case FUN_CALL:
             // return where the function result was saved
             return (instruction->params->param);
@@ -348,6 +558,18 @@ tToken choose_return(tInstr *instruction)
     }
     return nil;
 }
+
+/**
+ * dlz(stepan,mirko,vanko)
+ * INT NOFUN_CALL
+ * 
+ * 1. parameter "dlz"
+ * 2. parameter "stepan"
+ *
+ * 
+ * 
+ * /
+
 
 /**
  * Function finds function definition macro and generates everything until end of the function and continues until end of the list.
@@ -369,8 +591,8 @@ void generate_fundef(FILE *f)
             params = begin->params->next;
             while(params != NULL)
             {
-                fprintf(f, "DEFVAR %s\n",params->param.attr.str.str);
-                fprintf(f, "MOVE %s $%d\n",params->param.attr.str.str, paramsNum);
+                fprintf(f, "DEFVAR TF@%s\n",params->param.attr.str.str);
+                fprintf(f, "MOVE TF@%s $%d\n",params->param.attr.str.str, paramsNum);
                 paramsNum++;
                 params = params->next;
             }
@@ -406,7 +628,10 @@ void generate_fundef(FILE *f)
  **/
 void generate_code()
 {
-    
+    if(ilist == NULL)
+    {
+        return;
+    }
     FILE *f = generate_head();
     generate_main(f);
     generate_fundef(f);

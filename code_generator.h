@@ -1,5 +1,7 @@
 #include "scanner.h"
 
+// This constant is numerical difference between builtin functions with return value moved or not
+#define NOCALL_CALL_DIFFERENCE 22
 // Macros for instruction inside instruction list
 #define DEFVAR 228
 // User's functions
@@ -23,6 +25,14 @@
 #define SUBSTR_CALL 213
 #define ORD_CALL 214
 #define CHR_CALL 215
+#define NOINPUTS_CALL 230
+#define NOINPUTI_CALL 231
+#define NOINPUTF_CALL 232
+#define NOPRINT_CALL 233
+#define NOLENGTH_CALL 234
+#define NOSUBSTR_CALL 235
+#define NOORD_CALL 236
+#define NOCHR_CALL 237
 // Operators
 #define ADD 217 // '+'
 #define SUB 218 // '-'
@@ -35,8 +45,6 @@
 #define GT  225 // '>'
 #define GE  226 // '>='
 #define NE  227 // '!='
-// Exit call
-#define EXIT 217
 // Empty instruction
 #define NOP 218
 

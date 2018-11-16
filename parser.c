@@ -418,30 +418,62 @@ void function_call(bool moved)
 {
     // Check if the called function is in the global table
     tNode *result = search_table(pData.global->root,pData.token.attr.str);
+    int builtin = OK;
     // If parser did not found function inside global symtable and parser is inside main, semantic error
     if(result == NULL && pData.inDefinition == false)
     {
-        error(UNDEF_F);
+        // Check if the called function is not built in function
+        builtin = validate_symbol(pData.token.attr.str);
+        if(result == OK)
+        {
+            error(UNDEF_F);
+        }
     }
     // If parser did not found function, but is inside function definition, parser just creates new function inside global symtable that it was called but not still not defined
     else if(result == NULL && pData.inDefinition == true)
     {
-        insert_fun(pData.global->root,pData.token,0,false);
+        // Check if the called function is not built in function
+        builtin = validate_symbol(pData.token.attr.str);
+        if(builtin == OK)
+        {
+            insert_fun(pData.global->root,pData.token,0,false);
+        }
     }
     // Add function calling as instruction
     // If the function result value will not be moved
     if(moved == false)
     {
-        insert_instr(pData.instrs,NOFUN_CALL);
-        insert_param(pData.instrs,pData.token);
+        // If its not builtin function
+        if(builtin == OK)
+        {
+            insert_instr(pData.instrs,NOFUN_CALL);
+            insert_param(pData.instrs,pData.token);
+        }
+        // If its built int just NOBUILTINCALL (BUILTINCALL + DIFFERENCE)
+        else
+        {
+            insert_instr(pData.instrs,(builtin + NOCALL_CALL_DIFFERENCE));
+        }
     }
     // If will be moved
     else
     {
-        insert_instr(pData.instrs,FUN_CALL);
-        tToken name = head_stack(pData.stack);
-        pop_stack(pData.stack);
-        insert_param(pData.instrs,name);
+        // insert instruction and pop where is it going to bo safed
+        if(builtin == OK)
+        {
+            insert_instr(pData.instrs,FUN_CALL);
+            tToken name = head_stack(pData.stack);
+            pop_stack(pData.stack);
+            insert_param(pData.instrs,name);
+        }
+        // If its builtin function
+        else
+        {
+            insert_instr(pData.instrs,builtin);
+            tToken name = head_stack(pData.stack);
+            pop_stack(pData.stack);
+            insert_param(pData.instrs,name);
+        }
     }
 
     // Bool if leftbracket to check for rightbracket
@@ -561,7 +593,8 @@ void start()
             break;
         // <start> ID = 
         case ID:
-            
+            GET_TOKEN();
+            start();
             break;
         case END_OF_LINE:
             end_of_line();

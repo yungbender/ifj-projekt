@@ -18,15 +18,12 @@ typedef struct node
 {
     // Variable
     string id; // name of the identifier + type
-    int dataType; // current datatype
     // Function
     int paramsNum; // number of parameters of function
     bool wasDefined; // bool which means if the function was defined because IFJ18 supports function calls before definition
-    //tParamList *params; // list of name of parameters
-    //tIList *instrs; // list of instruction of function
     // BST nodes pointers
-    tNode *lptr; // pointer to the next identifier (left side are variables)
-    tNode *rptr; // pointer to the next identifier (right side are function)
+    tNode *lptr; // pointer to the next identifier 
+    tNode *rptr; // pointer to the next identifier
 }node;
 
 typedef struct symTable
@@ -46,10 +43,10 @@ void clear_stack(tStack *stack);
 void pop_stack(tStack *stack);
 void push_stack(tStack *stack, tToken new);
 void init_table(tSymTable *symTable);
-tNode* create_var(tToken id, int dataType);
-tNode* insert_var(tNode *root, tToken id, int dataType);
+tNode* create_var(tToken id);
+tNode* insert_var(tNode *root, tToken id);
 tNode *create_fun(tToken id, int paramsNum, bool wasDefined);
-tNode* insert_fun(tNode* root, tToken id, int paramsNum, bool wasDefined);
+tNode* insert_fun(tNode* root, tToken id, bool wasDefined);
 tNode *search_table(tNode *root, string id);
 void free_stack(tStack *stack);
 void free_params(tParamList *params);

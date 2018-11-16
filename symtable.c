@@ -91,13 +91,12 @@ void clear_stack(tStack *stack)
  * @param dataType Information about which dataType does variable have.
  * @return Function returns pointer to the new node.
  **/
-tNode* create_var(tToken id, int dataType)
+tNode* create_var(tToken id)
 {
     tNode *temp = (tNode *)malloc(sizeof(struct node));
     //TODO unsucc malloc
     str_init(&(temp->id));
     str_copy_string(&(temp->id),&(id.attr.str)); // must be string because its variable identificator
-    temp->dataType = dataType;
     temp->wasDefined = true;
     temp->paramsNum = 0;
     temp->lptr = NULL;
@@ -112,19 +111,19 @@ tNode* create_var(tToken id, int dataType)
  * @param id Token with informations about variable.
  * @param dataType Information about which dataType does variable have.
  **/ 
-tNode* insert_var(tNode *root, tToken id, int dataType)
+tNode* insert_var(tNode *root, tToken id)
 {
     if(root == NULL)
     {
-        return create_var(id, dataType);
+        return create_var(id);
     }
     else if(str_cmp_string(&(id.attr.str),&(root->id)) < 0)
     {
-        root->lptr = insert_var(root->lptr, id, dataType);
+        root->lptr = insert_var(root->lptr, id);
     }
     else if(str_cmp_string(&(id.attr.str),&(root->id)) > 0)
     {
-        root->rptr = insert_var(root->rptr, id, dataType);
+        root->rptr = insert_var(root->rptr, id);
     }
     return root;
 }
@@ -142,7 +141,6 @@ tNode *create_fun(tToken id, int paramsNum, bool wasDefined)
     //TODO unsucc malloc
     str_init(&(temp->id));
     str_copy_string(&(temp->id),&(id.attr.str)); // must be string because its function identificator
-    temp->dataType = 0;
     temp->wasDefined = wasDefined;
     temp->paramsNum = paramsNum;
     temp->lptr = NULL;  
@@ -226,10 +224,7 @@ void free_tree(tNode *root)
 void free_symtable(tSymTable *symTable)
 {
     free_tree(symTable->root);
-    if(symTable->root != NULL)
-    {
-        str_free(&(symTable->root->id));
-    }
+
     free(symTable);    
 }
 
