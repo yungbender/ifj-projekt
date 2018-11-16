@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include <stdbool.h>
 #include "scanner.h"
+#include "error.h"
 
 
 int line = 0; // Line counter
@@ -78,6 +79,9 @@ struct token get_token()
 	int state = 0;
 	int c;
 	int i = 0;
+	unsigned int convertedDecimal;
+	char decimal[3] = {0,};
+	char hexa[2] = {0,}; // Variable used to store hexadecimal escape sequence, we need it so we can convert it into decimal
 
 	string attr; 
 	if(str_init(&attr) == STR_ERROR) // Memory allocation for string failed
@@ -115,8 +119,16 @@ struct token get_token()
 						}
 						if(i == 5) // =begin string found
 						{
+								
 							ungetc(c, source);
-							state = BC;
+							if(isspace(c))
+							{
+								state = BC;	
+							}
+							else
+							{
+								fseek(source, (-1-i), SEEK_CUR);
+							}
 						}
 						else // =begin string wasnt found, reverting read characters
 						{
@@ -176,7 +188,16 @@ struct token get_token()
 					}
 					if(i == 3)
 					{
-						state = END_C;
+						c = getc(source);
+						if(isspace(c) || c == EOF)
+						{
+							ungetc(c, source);
+							state = END_C;
+						}
+						else
+						{
+							state = TMP_C;
+						}
 					}
 					else
 					{
@@ -208,7 +229,12 @@ struct token get_token()
 					}
 					if(i == 3)
 					{
-						state = END_C;
+						c = getc(source);
+						if(isspace(c) || c == EOF)
+						{
+							state = END_C;
+						}
+						ungetc(c, source);
 					}
 				}
 				else if(c == EOF)
@@ -264,7 +290,6 @@ struct token get_token()
 				}
 				else if(c == '\"')
 				{
-					str_add_char(&attr, c);
 					state = TMP_SL; // string literal
 				}
 				else if(c == EOF)
@@ -638,16 +663,25 @@ struct token get_token()
 				if(c == '\\') // escape sequence
 				{
 					state = ES;
-					str_add_char(&attr, c);
 				}
 				else if(c == '\"') //string ending
 				{
 					state = SL;
-					str_add_char(&attr, c);
 				}
 				else if(c > 31) // accepting characters with ASCII value over 31
 				{
-					str_add_char(&attr, c);
+					if(c == 32)
+					{
+						str_add_string(&attr, "\\032");	
+					}
+					else if(c == '#')
+					{
+						str_add_string(&attr, "\\035");	// Hash sign has to be written as escape sequence
+					}
+					else
+					{
+						str_add_char(&attr, c);		
+					}
 				}
 				else
 				{
@@ -662,12 +696,30 @@ struct token get_token()
 				if(c == 'x')
 				{
 					state = X_ES;
-					str_add_char(&attr, c);
 				}
 				else if(c == '\"' || c == '\\' || c == 'n' || c == 't' || c == 's') // Accepted escape sequences
 				{
 					state = TMP_SL;
-					str_add_char(&attr, c);
+					if(c == '\"')
+					{
+						str_add_string(&attr, "\\034");
+					}
+					else if(c == '\\')
+					{
+						str_add_string(&attr, "\\092");
+					}
+					else if(c == 'n')
+					{
+						str_add_string(&attr, "\\010");
+					}
+					else if(c == 't')
+					{
+						str_add_string(&attr, "\\009");
+					}
+					else if(c == 's')
+					{
+						str_add_string(&attr, "\\032");
+					}
 				}
 				else
 				{
@@ -682,7 +734,9 @@ struct token get_token()
 				if((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F')) // Accepted hexadecimal alphanumericals
 				{
 					state = XHH_ES;
-					str_add_char(&attr, c);
+					hexa[0] = c; // We save the first digit of hexa number
+					hexa[1] = 0;
+					hexa[2] = '\0';
 				}
 				else
 				{
@@ -697,17 +751,18 @@ struct token get_token()
 				if(c == '\\')
 				{
 					state = ES;
-					str_add_char(&attr, c);
 				}
 				else if(c == '\"')
 				{
 					state = SL;
-					str_add_char(&attr, c);
 				}
 				else if(c > 31)
 				{
 					state = TMP_SL;
-					str_add_char(&attr, c);
+					if((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F')) // Accepted hexadecimal alphanumericals
+					{
+						hexa[1] = c; // We save the second digit of hexa number
+					}
 				}
 				else
 				{
@@ -716,6 +771,26 @@ struct token get_token()
 					str_free(&attr);
 					return T1;
 				}
+
+				// We need to convert hexa number into decimal and store it
+				sscanf(hexa, "%x", &convertedDecimal); //Convert hexa string into decimal
+				sprintf(decimal, "%d", convertedDecimal); //Convert decimal number into string
+				str_add_char(&attr, '\\'); // Start escape sequence
+				if(atoi(decimal) < 100)
+				{
+					str_add_char(&attr, '0'); // If the number consists of less than 3 digits, we need to add zero 
+				}
+				if(atoi(decimal) < 10)
+				{
+					str_add_char(&attr, '0'); // If the number consists of less than 2 digits, we need to add another zero
+				}
+				str_add_string(&attr, decimal);
+
+				if(!((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || c == '\"' || c == '\\'))
+				{
+					str_add_char(&attr, c);	// If we have short hexa sequence, dont forget the letter that ended the sequence
+				}				
+
 				break;
 
 			case SL: // FS: string literal

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "error.h"
+#include "scanner.h"
 
 
 void print_error_exit(int id)
@@ -43,5 +44,11 @@ void print_error_exit(int id)
         case L_ERR:
             fprintf(stderr,"Lexical error, wrong lexem structure! \n");
             exit(L_ER);
+        case UNEXPECTED_IF:
+            fprintf(stderr,"Syntax error, unexpected token inside if! \n");
+            exit(SY_ERR);
+        case UNEXPECTED_ELSE:
+            fprintf(stderr,"Syntax error, unexpected else! \n");
+            exit(SY_ERR);
     }
 }
