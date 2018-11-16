@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "code_generator.h"
+#include "error.h"
+
+// this counter is used, every time that new temporary hidden variable is made, its to prevent DEFVAR for already DEFVARed variable
+int uniqueCounter = 0;
 
 /**
  * Function initializes instruction list for first use.
@@ -303,16 +307,16 @@ void generate_print(FILE *f, tInstr *instruction, bool moved)
         switch(params->param.type)
         {
             case INTEGER:
-                fprintf(f, "WRITE %d\n",instruction->params->next->param.attr.i);
+                fprintf(f, "WRITE %d\n",params->param.attr.i);
                 break;
             case FLOAT:
-                fprintf(f, "WRITE %a\n",instruction->params->next->param.attr.f);
+                fprintf(f, "WRITE %a\n",params->param.attr.f);
                 break;
             case STRING:
-                fprintf(f, "WRITE %s\n",instruction->params->next->param.attr.str.str);
+                fprintf(f, "WRITE %s\n",params->param.attr.str.str);
                 break;
             case ID:
-                fprintf(f, "WRITE TF@%s\n",instruction->params->next->param.attr.str.str);
+                fprintf(f, "WRITE TF@%s\n",params->param.attr.str.str);
                 break;
         }
         params = params->next;
@@ -337,7 +341,7 @@ void generate_print(FILE *f, tInstr *instruction, bool moved)
  **/
 void generate_length(FILE *f, tInstr *instruction, bool moved)
 {
-/*     tToken where;
+    tToken where;
     tTList *params = instruction->params;
     // If return value will be saved, save where and change pointer to the parameters to next one 
     if(moved == true)
@@ -345,28 +349,58 @@ void generate_length(FILE *f, tInstr *instruction, bool moved)
         where = params->param;
         params = params->next;
     }
-    if(moved == true)
+    switch(params->param.type)
     {
-        switch(params->param.type)
-        {
-            case INTEGER:
-                fprintf(f, "STRLEN %s\n",instruction->params->next->param.attr.i);
-                break;
-            case FLOAT:
-                fprintf(f, "STRLEN %a\n",instruction->params->next->param.attr.f);
-                break;
-            case STRING:
-                fprintf(f, "STRLEN %s\n",instruction->params->next->param.attr.str.str);
-                break;
-            case ID:
-                fprintf(f, "STRLEN TF@%s\n",instruction->params->next->param.attr.str.str);
-                break;
-        }
+        // Cannot strlen number or float
+        case INTEGER:
+        case FLOAT:
+            fprintf(stderr, "Semantic error, wrong datatype as function parameter \"length()\"!\n");
+            exit(DATA_ERR);
+            break;
+        // String is everytime allright
+        case STRING:
+            if(moved == true)
+            {
+                fprintf(f, "STRLEN TF@%s string@%s\n",where.attr.str.str, params->param.attr.str.str);
+            }
+            else
+            {
+                fprintf(f, "STRLEN TF@$noretval string@%s\n", params->param.attr.str.str);
+            }
+            break;
+        // Need to check if its really string
+        case ID:
+            fprintf(f, "DEFVAR TF@%s$%d$type\n",params->param.attr.str.str, uniqueCounter);
+            fprintf(f, "TYPE TF@%s$%d$type TF@%s\n",params->param.attr.str.str, uniqueCounter, params->param.attr.str.str);
+            fprintf(f, "JUMPIFEQ $%s$%d$OK TF@%s$%d$type string@string\n", params->param.attr.str.str, uniqueCounter, params->param.attr.str.str, uniqueCounter);
+            fprintf(f, "EXIT int@4\n");
+            fprintf(f, "LABEL $%s$%d$OK\n", params->param.attr.str.str, uniqueCounter);
+            if(moved == true)
+            {
+                fprintf(f, "STRLEN TF@%s TF@%s\n",where.attr.str.str, params->param.attr.str.str);
+            }
+            else
+            {
+                fprintf(f, "STRLEN TF@$noretval TF@%s\n", params->param.attr.str.str);
+            }
+            uniqueCounter++;
+            break;
     }
-    else
-    {
+}
 
-    } */
+void generate_substr(FILE *f, tInstr *instruction, bool moved)
+{
+
+}
+
+void generate_ord(FILE *f, tInstr *instruction, bool moved)
+{
+    
+}
+
+void generate_chr(FILE *f, tInstr *instruction, bool moved)
+{
+    
 }
 
 /**
@@ -558,18 +592,6 @@ tToken choose_return(tInstr *instruction)
     }
     return nil;
 }
-
-/**
- * dlz(stepan,mirko,vanko)
- * INT NOFUN_CALL
- * 
- * 1. parameter "dlz"
- * 2. parameter "stepan"
- *
- * 
- * 
- * /
-
 
 /**
  * Function finds function definition macro and generates everything until end of the function and continues until end of the list.
