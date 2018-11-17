@@ -97,6 +97,10 @@ void free_ilist(tIList *instrs)
         while(instrs->head->params != NULL)
         {
             tmp = instrs->head->params->next;
+            if(instrs->head->params->param.type == STRING || instrs->head->params->param.type == ID || instrs->head->params->param.type == IDF)
+            {
+                str_free(&instrs->head->params->param.attr.str);
+            }
             free(instrs->head->params);
             instrs->head->params = tmp;
         }
