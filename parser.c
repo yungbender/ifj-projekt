@@ -603,6 +603,7 @@ void while_loop()
     // While was successfully parsed
     insert_instr(pData.instrs, WHILE_END);
     pData.scopes--;
+    GET_TOKEN();
     start();
 }
 
