@@ -575,6 +575,43 @@ void end_of_file()
     ilist = pData.instrs;
 }
 
+void while_loop()
+{
+    int tokenType = pData.token.type;
+    // Got into while scope
+    pData.scopes++;
+    insert_instr(pData.instrs, WHILE_CALL);
+    GET_TOKEN();
+    // If is in condition something else then variable, float, int or string constant
+    if(tokenType != ID && tokenType != INTEGER && tokenType != FLOAT && tokenType != STRING)
+    {
+        error(DATA_ERR);
+    } 
+
+    //TODO: spracovanie výrazu;
+
+    GET_TOKEN();
+    // Expecting DO after condition
+    if(tokenType != DO)
+    {
+        error(EXPECTED_DO);
+    }
+
+    GET_TOKEN();
+    // Expecting EOL after DO
+    if(pData.token.type != END_OF_LINE)
+    {
+        error(UNEXPECTED_W);
+    }
+    // Parsing body of while
+    GET_TOKEN();
+    start();
+    // While was successfully parsed
+    insert_instr(pData.instrs, WHILE_END);
+    pData.scopes--;
+    start();
+}
+
 void end_of_line()
 {
     GET_TOKEN();
@@ -607,6 +644,9 @@ void start()
         // <end> -> <if>
         // <end> -> <else>
         // <end> -> <while>
+        case WHILE_CALL:
+            while_loop();
+            break;
         case END:
             // If there no scopes, and END is called = syntax error
             if(pData.scopes == 0)

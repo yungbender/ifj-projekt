@@ -43,5 +43,15 @@ void print_error_exit(int id)
         case L_ERR:
             fprintf(stderr,"Lexical error, wrong lexem structure! \n");
             exit(L_ER);
+        case COND_ERR:
+            fprintf(stderr,"Semantic error, wrong data type in condition! \n");
+            exit(DATA_ERR);
+        case EXPECTED_DO:
+            fprintf(stderr, "Syntax error, expecting do after condition in while \n");
+            exit(SY_ERR);
+        case UNEXPECTED_W:
+            fprintf(stderr, "Syntax error, unexpected token after keyword do \n");
+            exit(SY_ERR);
+
     }
 }
