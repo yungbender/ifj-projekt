@@ -639,8 +639,11 @@ void start()
         // <end> -> <if>
         // <end> -> <else>
         // <end> -> <while>
-        case WHILE_CALL:
+        case WHILE:
             while_loop();
+            break;
+        case IF:
+            //if_condition();
             break;
         case END:
             // If there no scopes, and END is called = syntax error

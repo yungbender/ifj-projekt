@@ -4,8 +4,11 @@
 #include "code_generator.h"
 #include "error.h"
 
-// this counter is used, every time that new temporary hidden variable is made, its to prevent DEFVAR for already DEFVARed variable
-int uniqueCounter = 0;
+// These bools, signifies, if builtin functions needs to be generated, so they cannot generate two times, or will not generate at all if thy were not called
+bool lengthGenerated = false;
+bool substrGenerated = false;
+bool ordGenerated = false;
+bool chrGenerated = false;
 
 /**
  * Function initializes instruction list for first use.
@@ -179,8 +182,31 @@ void generate_funcall(FILE *f, tInstr *instruction)
         paramsNum++;
         params = params->next;
     }
-    // Now function can be called
-    fprintf(f, "CALL $%s\n",funName.attr.str.str);
+    // now funciton can be called
+    // if its not builtin function, call function name label
+    if(instruction->instr == FUN_CALL)
+    {
+        fprintf(f, "CALL $%s\n",funName.attr.str.str);
+    }
+    // If its builtin function, need to call correct builtin function label
+    else
+    {
+        switch(instruction->instr)
+        {
+            case NOLENGTH_CALL:
+                fprintf(f, "CALL $length\n");
+                break;
+            case NOSUBSTR_CALL:
+                fprintf(f, "CALL $substr\n");
+                break;
+            case NOORD_CALL:
+                fprintf(f, "CALL $ord\n");
+                break;
+            case NOCHR_CALL:
+                fprintf(f, "CALL $chr\n");
+                break;
+        }
+    }
     // Function was called and executed, return value
     fprintf(f, "MOVE LF@%s TF@$retval\n",ret.attr.str.str);
     // Everything is done, popping back frame
@@ -217,21 +243,44 @@ void generate_nofuncall(FILE *f, tInstr *instruction)
         }
         else if(params->param.type == INTEGER)
         {
-            fprintf(f, "MOVE TF@%d int@%d\n",paramsNum, params->param.attr.i);
+            fprintf(f, "MOVE TF@$%d int@%d\n",paramsNum, params->param.attr.i);
         }
         else if(params->param.type == FLOAT)
         {
-            fprintf(f, "MOVE TF@%d float@%a\n",paramsNum, params->param.attr.f);
+            fprintf(f, "MOVE TF@$%d float@%a\n",paramsNum, params->param.attr.f);
         }
         else if(params->param.type == STRING)
         {
-            fprintf(f, "MOVE TF@%d string@%s\n",paramsNum, params->param.attr.str.str);
+            fprintf(f, "MOVE TF@$%d string@%s\n",paramsNum, params->param.attr.str.str);
         }
         paramsNum++;
         params = params->next;
     }
     // Now function can be called
-    fprintf(f, "CALL $%s\n",funName.attr.str.str);
+    // if its not builtin function, call function name label
+    if(instruction->instr == NOFUN_CALL)
+    {
+        fprintf(f, "CALL $%s\n",funName.attr.str.str);
+    }
+    // If its builtin function, need to call correct builtin function label
+    else
+    {
+        switch(instruction->instr)
+        {
+            case LENGTH_CALL:
+                fprintf(f, "CALL $length\n");
+                break;
+            case SUBSTR_CALL:
+                fprintf(f, "CALL $substr\n");
+                break;
+            case ORD_CALL:
+                fprintf(f, "CALL $ord\n");
+                break;
+            case CHR_CALL:
+                fprintf(f, "CALL $chr\n");
+                break;
+        }
+    }
     // Function was called and executed, return value
     fprintf(f, "MOVE LF@$noretval TF@$retval\n");
     // Everything is done, popping back frame
@@ -334,73 +383,194 @@ void generate_print(FILE *f, tInstr *instruction, bool moved)
 }
 
 /**
- * Function generates length built-in functions into IFJcode2018.
+ * Function generates length(s) built-in functions into IFJcode2018.
  * @params f Pointer to the IFJcode2018 source code.
- * @params instruction Pointer to the single instruction from inside code.
- * @params moved Bool which signifies if result of the function is going to be moved.
  **/
-void generate_length(FILE *f, tInstr *instruction, bool moved)
+void generate_length(FILE *f)
 {
-    tToken where;
-    tTList *params = instruction->params;
-    // If return value will be saved, save where and change pointer to the parameters to next one 
-    if(moved == true)
-    {
-        where = params->param;
-        params = params->next;
-    }
-    switch(params->param.type)
-    {
-        // Cannot strlen number or float
-        case INTEGER:
-        case FLOAT:
-            fprintf(stderr, "Semantic error, wrong datatype as function parameter \"length()\"!\n");
-            exit(DATA_ERR);
-            break;
-        // String is everytime allright
-        case STRING:
-            if(moved == true)
-            {
-                fprintf(f, "STRLEN TF@%s string@%s\n",where.attr.str.str, params->param.attr.str.str);
-            }
-            else
-            {
-                fprintf(f, "STRLEN TF@$noretval string@%s\n", params->param.attr.str.str);
-            }
-            break;
-        // Need to check if its really string
-        case ID:
-            fprintf(f, "DEFVAR TF@%s$%d$type\n",params->param.attr.str.str, uniqueCounter);
-            fprintf(f, "TYPE TF@%s$%d$type TF@%s\n",params->param.attr.str.str, uniqueCounter, params->param.attr.str.str);
-            fprintf(f, "JUMPIFEQ $%s$%d$OK TF@%s$%d$type string@string\n", params->param.attr.str.str, uniqueCounter, params->param.attr.str.str, uniqueCounter);
-            fprintf(f, "EXIT int@4\n");
-            fprintf(f, "LABEL $%s$%d$OK\n", params->param.attr.str.str, uniqueCounter);
-            if(moved == true)
-            {
-                fprintf(f, "STRLEN TF@%s TF@%s\n",where.attr.str.str, params->param.attr.str.str);
-            }
-            else
-            {
-                fprintf(f, "STRLEN TF@$noretval TF@%s\n", params->param.attr.str.str);
-            }
-            uniqueCounter++;
-            break;
-    }
+    fprintf(f, "# DEFINITION OF BUILTIN FUNCTION LENGTH()\n\n");
+    // Generate correct function label
+    fprintf(f, "LABEL $length\n\n");
+    fprintf(f, "DEFVAR TF@string\n");
+    fprintf(f, "DEFVAR TF@string$type\n\n");
+    fprintf(f, "MOVE TF@string TF@$0\n\n");
+    fprintf(f, "TYPE TF@string$type TF@string\n");
+    fprintf(f, "JUMPIFEQ $string$OK TF@string$type string@string\n");
+    fprintf(f, "EXIT int@4\n\n");
+    fprintf(f, "LABEL $string$OK\n");
+    fprintf(f, "STRLEN TF@$retval TF@string\n\n");
+    fprintf(f, "RETURN\n");
+    fprintf(f, "# END OF DEFINITION OF BUILTIN FUNCTION LENGTH()\n\n");
 }
 
-void generate_substr(FILE *f, tInstr *instruction, bool moved)
+/**
+ * Function generates substr(s, i, n) built-infunction into IFJcode2018.
+ * @params f Pointer to the IFJcode2018 source code.
+ **/
+void generate_substr(FILE *f)
 {
+    fprintf(f, "# DEFINITION OF BUILTIN FUNCTION SUBSTR()\n\n");
+    // Generate correct funcion label
+    fprintf(f, "LABEL $substr\n\n");
+    fprintf(f, "MOVE TF@$retval string@\n");
+    fprintf(f, "DEFVAR TF@string\n");
+    fprintf(f, "DEFVAR TF@string$type\n");
+    fprintf(f, "DEFVAR TF@from\n");
+    fprintf(f, "DEFVAR TF@from$type\n");
+    fprintf(f, "DEFVAR TF@from$BOOL\n");
+    fprintf(f, "DEFVAR TF@to\n");
+    fprintf(f, "DEFVAR TF@to$type\n");
+    fprintf(f, "DEFVAR TF@string$length\n");
+    fprintf(f, "DEFVAR TF@$tmpstr\n");
+    fprintf(f, "DEFVAR TF@$cnt\n");
+    fprintf(f, "DEFVAR TF@$max\n\n");
+    // Get params
+    fprintf(f, "MOVE TF@string TF@$0\n");
+    fprintf(f, "MOVE TF@from TF@$1\n");
+    fprintf(f, "MOVE TF@to TF@$2\n");
+    // Check types
+    fprintf(f, "TYPE TF@string$type TF@string\n");
+    fprintf(f, "JUMPIFEQ $string$OK TF@string$type string@string\n");
+    fprintf(f, "EXIT int@4\n\n");
+    // Get length of string
+    fprintf(f, "LABEL $string$OK\n");
+    fprintf(f, "STRLEN TF@string$length TF@string\n\n");
+    // Check types, if int its ok, if float, change to float
+    fprintf(f, "TYPE TF@from$type TF@from\n");
+    fprintf(f, "JUMPIFEQ $from$FLOAT TF@from$type string@float\n");
+    fprintf(f, "JUMPIFEQ $from$LT TF@from$type string@int\n");
+    fprintf(f, "EXIT int@4\n\n");
+    fprintf(f, "LABEL $from$FLOAT\n");
+    fprintf(f, "FLOAT2INT TF@from TF@from\n\n");
+    fprintf(f, "LABEL $from$LT\n");
+    // If i is lower than 0 return nil
+    fprintf(f, "LT TF@from$BOOL TF@from int@0\n");
+    fprintf(f, "JUMPIFEQ $from$GT TF@from$BOOL bool@false\n");
+    fprintf(f, "MOVE TF@$retval nil@nil\n");
+    fprintf(f, "RETURN\n\n");
+    // If i is higher than length of the string, also return nil
+    fprintf(f, "LABEL $from$GT\n");
+    fprintf(f, "GT TF@from$BOOL TF@from TF@string$length\n");
+    fprintf(f, "JUMPIFEQ $from$OK TF@from$BOOL bool@false\n");
+    fprintf(f, "MOVE TF@$retval nil@nil\n");
+    fprintf(f, "RETURN\n\n");
+    // Check n datatype, if float retype, if string exit, if int is ok
+    fprintf(f, "LABEL $from$OK\n");
+    fprintf(f, "TYPE TF@to$type TF@to\n");
+    fprintf(f, "JUMPIFEQ $to$FLOAT TF@to$type string@float\n");
+    fprintf(f, "JUMPIFEQ $LT$length TF@to$type string@int\n");
+    fprintf(f, "EXIT int@4\n\n");
 
+    fprintf(f, "LABEL $to$FLOAT\n");
+    fprintf(f, "FLOAT2INT TF@to TF@to\n\n");
+    // Check if i is less than 1, if yes, return empty string
+    fprintf(f, "LABEL $LT$length\n");
+    fprintf(f, "LT TF@from$BOOL TF@to int@1\n");
+    fprintf(f, "JUMPIFEQ $to$OK TF@from$BOOL bool@false\n");
+    fprintf(f, "RETURN\n\n");
+    // If n < lenstr(s), max = n, cnt = 0 
+    fprintf(f, "LABEL $to$OK\n");
+    fprintf(f, "LT TF@from$BOOL TF@to TF@string$length\n");
+    fprintf(f, "JUMPIFEQ $if$else TF@from$BOOL bool@false\n");
+    fprintf(f, "MOVE TF@$max TF@to\n");
+    fprintf(f, "MOVE TF@$cnt int@0\n");
+    fprintf(f, "JUMP $endif$substr\n\n");
+    // If n => lenstr(s), max = lenstr(s), cnt = i
+    fprintf(f, "LABEL $if$else\n");
+    fprintf(f, "MOVE TF@$max TF@string$length\n");
+    fprintf(f, "MOVE TF@$cnt Tf@from\n\n");
+    // End if
+    fprintf(f, "LABEL $endif$substr\n\n");
+    // While(cnt != max)
+    fprintf(f, "LABEL $while$substr\n");
+    fprintf(f, "EQ TF@from$BOOL TF@$cnt TF@$max\n");
+    fprintf(f, "JUMPIFEQ $while$end$substr TF@from$BOOL bool@true\n");
+    // tmpstr = Getchar(s, from)
+    fprintf(f, "GETCHAR TF@$tmpstr TF@string TF@from\n");
+    // retval = retval + tmpstr
+    fprintf(f, "CONCAT TF@$retval TF@$retval TF@$tmpstr\n");
+    // from++ cnt++
+    fprintf(f, "ADD TF@from TF@from int@1\n");
+    fprintf(f, "ADD TF@$cnt TF@$cnt int@1\n");
+    // GOTO while
+    fprintf(f, "JUMP $while$substr\n");
+    // End of while
+    fprintf(f, "LABEL $while$end$substr\n\n");
+    fprintf(f, "# END OF DEFINITION OF BUILTIN FUNCTION SUBSTR()\n\n");
 }
 
-void generate_ord(FILE *f, tInstr *instruction, bool moved)
+/**
+ * Function generates ord(s, i) built-infunction into IFJcode2018.
+ * @params f Pointer to the IFJcode2018 source code.
+ **/
+void generate_ord(FILE *f)
 {
-    
+    fprintf(f, "# DEFINITION OF BUILTIN FUNCTION ORD()\n\n");
+    // Generate correct function label
+    fprintf(f, "LABEL $ord\n");
+    fprintf(f, "DEFVAR TF@string\n");
+    fprintf(f, "DEFVAR TF@int\n");
+    fprintf(f, "DEFVAR TF@string$type\n");
+    fprintf(f, "DEFVAR TF@int$type\n\n");
+    fprintf(f, "MOVE TF@string TF@$0\n");
+    fprintf(f, "MOVE TF@int TF@$1\n\n");
+    fprintf(f, "TYPE TF@string$type TF@string\n");
+    fprintf(f, "TYPE TF@int$type TF@int\n");
+    fprintf(f, "JUMPIFEQ $string$OK TF@string$type string@string\n");
+    fprintf(f, "EXIT int@4\n\n");
+    fprintf(f, "LABEL $string$OK\n");
+    // If int everything is allright
+    fprintf(f, "JUMPIFEQ $int$OK TF@int$type string@int\n");
+    // If float, need to FLOAT2INT
+    fprintf(f, "JUMPIFEQ $int$FLOAT TF@int$type string@float\n");
+    fprintf(f, "EXIT int@4\n\n");
+    fprintf(f, "LABEL $int$FLOAT\n");
+    fprintf(f, "FLOAT2INT TF@int TF@int\n\n");
+    fprintf(f, "LABEL $int$OK\n");
+    fprintf(f, "DEFVAR TF@string$length\n");
+    fprintf(f, "STRLEN TF@string$length TF@string\n\n");
+    fprintf(f, "DEFVAR TF@int$BOOL\n");
+    fprintf(f, "LF TF@int$BOOL TF@int TF@string$length\n");
+    fprintf(f, "JUMPIFEQ $int$TRUE TF@int$BOOL bool@true\n");
+    fprintf(f, "MOVE TF@$retval nil@nil\n");
+    fprintf(f, "RETURN\n\n");
+    fprintf(f, "LABEL $int$TRUE\n");
+    fprintf(f, "STRI2INT TF@$retval TF@string TF@int\n");
+    fprintf(f, "RETURN\n\n");
+    fprintf(f, "# END OF DEFINITION OF BUILTIN FUNCTION ORD()\n\n");
 }
 
-void generate_chr(FILE *f, tInstr *instruction, bool moved)
+/**
+ * Function generates chr(i) built-infunction into IFJcode2018.
+ * @params f Pointer to the IFJcode2018 source code.
+ **/
+void generate_chr(FILE *f)
 {
-    
+    fprintf(f, "# DEFINITION OF BUILTIN FUNCTION CHR()\n\n");
+    // Generate correct funcion label
+    fprintf(f, "LABEL $chr\n\n");
+    fprintf(f, "DEFVAR TF@int\n");
+    fprintf(f, "DEFVAR TF@int$type\n");
+    fprintf(f, "DEFVAR TF@int$BOOL\n");
+    fprintf(f, "MOVE TF@int TF@$0\n\n");
+    fprintf(f, "TYPE TF@int$type TF@int\n");
+    fprintf(f, "JUMPIFEQ $int$LT TF@int$type string@int\n");
+    fprintf(f, "JUMPIFEQ $int$FLOAT TF@int$type string@float\n");
+    fprintf(f, "EXIT int@4\n\n");
+    fprintf(f, "LABEL $int$FLOAT\n");
+    fprintf(f, "FLOAT2INT TF@int TF@int\n\n");
+    fprintf(f, "LABEL $int$LT\n");
+    fprintf(f, "LT TF@int$BOOL TF@int int@256\n");
+    fprintf(f, "JUMPIFEQ $int$GT TF@int$BOOL bool@true\n");
+    fprintf(f, "EXIT int@4\n\n");
+    fprintf(f, "LABEL $int$GT\n");
+    fprintf(f, "GT TF@int$BOOL TF@int int@-1\n");
+    fprintf(f, "JUMPIFEQ $int$OK TF@int$BOOL bool@true\n");
+    fprintf(f, "EXIT int@4\n\n");
+    fprintf(f, "LABEL $int$OK\n");
+    fprintf(f, "INT2CHAR TF@$retval TF@int\n");
+    fprintf(f, "RETURN\n\n");
+    fprintf(f, "# END OF DEFINITION OF BUILTIN FUNCTION CHR()\n\n");
 }
 
 /**
@@ -420,11 +590,20 @@ void generate_instruction(FILE *f, tInstr *instruction)
             generate_if(f,instruction);
             break;
         case FUN_CALL:
+        case LENGTH_CALL:
+        case SUBSTR_CALL:
+        case ORD_CALL:
+        case CHR_CALL:
             generate_funcall(f,instruction);
             break;
         case NOFUN_CALL:
+        case NOSUBSTR_CALL:
+        case NOORD_CALL:
+        case NOCHR_CALL:
+        case NOLENGTH_CALL:
             generate_nofuncall(f,instruction);
             break;
+        // Built in function which can be generated inside main
         case INPUTF_CALL:
         case INPUTI_CALL:
         case INPUTS_CALL:
@@ -440,30 +619,6 @@ void generate_instruction(FILE *f, tInstr *instruction)
             break;
         case NOPRINT_CALL:
             generate_print(f,instruction,false);
-            break;
-        case LENGTH_CALL:
-            generate_length(f,instruction,true);
-            break;
-        case NOLENGTH_CALL:
-            generate_length(f,instruction,false);
-            break;
-        case SUBSTR_CALL:
-            generate_substr(f,instruction,true);
-            break;
-        case NOSUBSTR_CALL:
-            generate_substr(f,instruction,false);
-            break;
-        case ORD_CALL:
-            generate_ord(f,instruction,true);
-            break;
-        case NOORD_CALL:
-            generate_ord(f,instruction,false);
-            break;
-        case CHR_CALL:
-            generate_chr(f,instruction,true);
-            break;
-        case NOCHR_CALL:
-            generate_chr(f,instruction,false);
             break;
         case NOP:
             break;
@@ -563,14 +718,6 @@ tToken choose_return(tInstr *instruction)
     str_copy_const_string(&(noretval.attr.str),"$noretval");
     switch(instruction->instr)
     {
-        // these returns last instruction where was result calculated
-        case ADD:
-        case SUB:
-        case MUL:
-        case DIV:
-        case MOV:
-            // return token with name of WHERE was result saved
-            return (instruction->params->param);
         case DEFVAR:
         case IF_CALL:
         case ELSE_CALL:
@@ -579,14 +726,31 @@ tToken choose_return(tInstr *instruction)
         case WHILE_END:
         case FUN_END:
         case PRINT_CALL:
+        case NOPRINT_CALL:
             return nil;
+        case ADD:
+        case SUB:
+        case MUL:
+        case DIV:
+        case MOV:
+        case FUN_CALL:
         case INPUTF_CALL:
         case INPUTI_CALL:
         case INPUTS_CALL:
-        case FUN_CALL:
+        case LENGTH_CALL:
+        case SUBSTR_CALL:
+        case ORD_CALL:
+        case CHR_CALL: 
             // return where the function result was saved
             return (instruction->params->param);
         case NOFUN_CALL:
+        case NOINPUTF_CALL:
+        case NOINPUTI_CALL:
+        case NOINPUTS_CALL:
+        case NOLENGTH_CALL:
+        case NOSUBSTR_CALL:
+        case NOORD_CALL:
+        case NOCHR_CALL:
             // return $noretval
             return noretval;
     }
@@ -614,7 +778,7 @@ void generate_fundef(FILE *f)
             while(params != NULL)
             {
                 fprintf(f, "DEFVAR TF@%s\n",params->param.attr.str.str);
-                fprintf(f, "MOVE TF@%s $%d\n",params->param.attr.str.str, paramsNum);
+                fprintf(f, "MOVE TF@%s TF@$%d\n",params->param.attr.str.str, paramsNum);
                 paramsNum++;
                 params = params->next;
             }
@@ -638,6 +802,28 @@ void generate_fundef(FILE *f)
                 fprintf(f, "MOVE TF@$retval TF@%s\n",ret.attr.str.str);
             }
             fprintf(f, "RETURN\n\n");
+        }
+        // If built in function was called, must check if it was generated already, if it was not generate it, else do nothing
+        else if(begin->instr == LENGTH_CALL || begin->instr == NOLENGTH_CALL && lengthGenerated == false)
+        {
+            generate_length(f);
+            // function was generated, set bool to true so function will not be generated again
+            lengthGenerated = true;
+        }
+        else if(begin->instr == SUBSTR_CALL || begin->instr == NOSUBSTR_CALL && substrGenerated == false)
+        {
+            generate_substr(f);
+            substrGenerated = true;
+        }
+        else if(begin->instr == ORD_CALL || begin->instr == NOORD_CALL && ordGenerated == false)
+        {
+            generate_ord(f);
+            ordGenerated = true;
+        }
+        else if(begin->instr == CHR_CALL || begin->instr == NOCHR_CALL && chrGenerated == false)
+        {
+            generate_chr(f);
+            chrGenerated = true;
         }
         begin = begin->next;
     }
