@@ -804,23 +804,23 @@ void generate_fundef(FILE *f)
             fprintf(f, "RETURN\n\n");
         }
         // If built in function was called, must check if it was generated already, if it was not generate it, else do nothing
-        else if(begin->instr == LENGTH_CALL || begin->instr == NOLENGTH_CALL && lengthGenerated == false)
+        else if((begin->instr == LENGTH_CALL || begin->instr == NOLENGTH_CALL) && lengthGenerated == false)
         {
             generate_length(f);
             // function was generated, set bool to true so function will not be generated again
             lengthGenerated = true;
         }
-        else if(begin->instr == SUBSTR_CALL || begin->instr == NOSUBSTR_CALL && substrGenerated == false)
+        else if((begin->instr == SUBSTR_CALL || begin->instr == NOSUBSTR_CALL) && substrGenerated == false)
         {
             generate_substr(f);
             substrGenerated = true;
         }
-        else if(begin->instr == ORD_CALL || begin->instr == NOORD_CALL && ordGenerated == false)
+        else if((begin->instr == ORD_CALL || begin->instr == NOORD_CALL) && ordGenerated == false)
         {
             generate_ord(f);
             ordGenerated = true;
         }
-        else if(begin->instr == CHR_CALL || begin->instr == NOCHR_CALL && chrGenerated == false)
+        else if((begin->instr == CHR_CALL || begin->instr == NOCHR_CALL) && chrGenerated == false)
         {
             generate_chr(f);
             chrGenerated = true;
