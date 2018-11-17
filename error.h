@@ -20,10 +20,11 @@
 #define WRONG_PARAM 107
 #define SAME_PARAM 108
 #define UNEXPECTED_IF 109
-#define UNEXPECTED_ELSE 110
+#define EXPECTED_ELSE 110
 #define COND_ERR 112
 #define EXPECTED_DO 113
-#define UNEXPECTED_W 114
+#define EXPECTED_EOL 114
+#define EXPECTED_END 115
 
 
 void print_error_exit(int id);
