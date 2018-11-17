@@ -272,6 +272,15 @@ void parse_function_definition()
     // Recursively calling parser
     GET_TOKEN();
     start();
+    if(pData.token.type != END)
+    {
+        error(EXPECTED_END);
+    }
+    GET_TOKEN();
+    if(pData.token.type != END_OF_FILE && pData.token.type != END_OF_LINE)
+    {
+        error(UNEXPECTED_END);
+    }
     // Function is parsed without error, saving end keyword
     insert_instr(pData.instrs,FUN_END);
     // Restoring back local table, restoring bool and decrementing scope
@@ -539,7 +548,6 @@ void function_call(bool moved)
         // Get next parameter and parse
         GET_TOKEN();
         // Expecting comma or EOL
-
     }
     // Here is EOL, need to check parenths are allright
     if(leftbracket == true && rightbracket != true)
@@ -547,6 +555,115 @@ void function_call(bool moved)
         error(WRONG_PARAM);
     }
     // Function call is parsed, get next token and continue parsing.
+    GET_TOKEN();
+    start();
+}
+
+void while_loop()
+{
+    // Got into while scope
+    pData.scopes++;
+    insert_instr(pData.instrs, WHILE_CALL);
+    GET_TOKEN();
+    // If is in condition something else then variable, float, int or string constant
+    if(pData.token.type != ID && pData.token.type != INTEGER && pData.token.type != FLOAT && pData.token.type != STRING)
+    {
+        error(COND_ERR);
+    } 
+
+    //TODO: spracovanie výrazu;
+
+    GET_TOKEN();
+    // Expecting DO after condition
+    if(pData.token.type != DO)
+    {
+        error(EXPECTED_DO);
+    }
+
+    GET_TOKEN();
+    // Expecting EOL after DO
+    if(pData.token.type != END_OF_LINE)
+    {
+        error(EXPECTED_EOL);
+    }
+    // Parsing body of while
+    GET_TOKEN();
+    start();
+    if(pData.token.type != END)
+    {
+        error(EXPECTED_END);
+    }
+    GET_TOKEN();
+    if(pData.token.type != END_OF_FILE && pData.token.type != END_OF_LINE)
+    {
+        error(UNEXPECTED_END);
+    }
+    // While was successfully parsed
+    insert_instr(pData.instrs, WHILE_END);
+    pData.scopes--;
+    GET_TOKEN();
+    start();
+}
+
+void if_condition()
+{
+    pData.scopes++;
+    GET_TOKEN(); // Expression starts with one of the following tokens
+    if(pData.token.type != ID && pData.token.type != INTEGER && pData.token.type != FLOAT && pData.token.type != STRING)
+    {
+        error(COND_ERR);
+    }
+
+    // TODO: Expression parsing
+
+    // Expression returns token which should contain THEN keyword
+    GET_TOKEN(); // TODO: <- so this this is just placeholder for testing
+    if(pData.token.type != THEN)
+    {
+        error(UNEXPECTED_IF);
+    }
+    GET_TOKEN();
+    if(pData.token.type != END_OF_LINE)
+    {
+        error(EXPECTED_EOL);
+    }
+    insert_instr(pData.instrs, IF_CALL);
+
+    GET_TOKEN();
+    start(); // Parsing first part of if
+
+    if(pData.token.type != ELSE)
+    {
+        error(EXPECTED_ELSE);
+    }
+    GET_TOKEN();
+    if(pData.token.type != END_OF_LINE)
+    {
+        error(EXPECTED_EOL);
+    }
+    insert_instr(pData.instrs, ELSE_CALL);
+
+    GET_TOKEN(); 
+    start(); // Parsing 'else' part of if condition
+
+    if(pData.token.type != END)
+    {
+        error(EXPECTED_END);
+    }
+    GET_TOKEN();
+    if(pData.token.type != END_OF_FILE && pData.token.type != END_OF_LINE)
+    {
+        error(UNEXPECTED_END);
+    }
+    insert_instr(pData.instrs, IF_END);
+    pData.scopes--;
+
+    GET_TOKEN();
+    start(); // Continue parsing
+}
+
+void end_of_line()
+{
     GET_TOKEN();
     start();
 }
@@ -567,50 +684,6 @@ void end_of_file()
     free_stack(pData.stack);
     // Give the final instruction list to the code generator
     ilist = pData.instrs;
-}
-
-void while_loop()
-{
-    int tokenType = pData.token.type;
-    // Got into while scope
-    pData.scopes++;
-    insert_instr(pData.instrs, WHILE_CALL);
-    GET_TOKEN();
-    // If is in condition something else then variable, float, int or string constant
-    if(tokenType != ID && tokenType != INTEGER && tokenType != FLOAT && tokenType != STRING)
-    {
-        error(DATA_ERR);
-    } 
-
-    //TODO: spracovanie výrazu;
-
-    GET_TOKEN();
-    // Expecting DO after condition
-    if(tokenType != DO)
-    {
-        error(EXPECTED_DO);
-    }
-
-    GET_TOKEN();
-    // Expecting EOL after DO
-    if(pData.token.type != END_OF_LINE)
-    {
-        error(UNEXPECTED_W);
-    }
-    // Parsing body of while
-    GET_TOKEN();
-    start();
-    // While was successfully parsed
-    insert_instr(pData.instrs, WHILE_END);
-    pData.scopes--;
-    GET_TOKEN();
-    start();
-}
-
-void end_of_line()
-{
-    GET_TOKEN();
-    start();
 }
 
 void start()
@@ -635,32 +708,28 @@ void start()
         case IDF:
             function_call(false);
             break;
-        // <end> -> <f_def>
-        // <end> -> <if>
-        // <end> -> <else>
-        // <end> -> <while>
+        // <start> WHILE <expr> DO EOL
         case WHILE:
             while_loop();
             break;
+        // <start> IF <expr> THEN EOL
         case IF:
-            //if_condition();
+            if_condition();
             break;
+        // <start> ELSE EOL
+        case ELSE:
+            break;
+        // <end> -> <f_def>
+        // <end> -> <else>
+        // <end> -> <while>
         case END:
             // If there no scopes, and END is called = syntax error
             if(pData.scopes == 0)
             {
                 error(SY_ERR);
             }
-            // Expecting EOL or EOF
-            GET_TOKEN();
-            if(pData.token.type != END_OF_FILE && pData.token.type != END_OF_LINE)
-            {
-                error(UNEXPECTED_END);
-            }
             // If there are scopes, end just returns back to the parsing function (parser_function_definition, while_function, if_function)
             return;
-            // This break instruction is dead code, there is no possibility that parser reaches this break!
-            break;
             // <EOF> -> end
         case END_OF_FILE:
             // Need to check if we are not in function, check if all scopes are 0 and if all called functions got their own definition

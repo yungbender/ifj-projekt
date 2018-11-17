@@ -24,7 +24,7 @@ void print_error_exit(int id)
             fprintf(stderr,"Semantic error, wrong number of parameters inside function call! \n");
             exit(SE_ERR);
         case UNDEF_V:
-            fprintf(stderr,"Semtantic error, using undefined variable! \n");
+            fprintf(stderr,"Semantic error, using undefined variable! \n");
             exit(SE_ERR);
         case UNEXPECTED_F:
             fprintf(stderr,"Syntax error, unexpected token inside function! \n");
@@ -50,14 +50,17 @@ void print_error_exit(int id)
         case EXPECTED_DO:
             fprintf(stderr, "Syntax error, expecting do after condition in while \n");
             exit(SY_ERR);
-        case UNEXPECTED_W:
-            fprintf(stderr, "Syntax error, unexpected token after keyword do \n");
+        case EXPECTED_EOL:
+            fprintf(stderr, "Syntax error, expected EOL after keyword \n");
             exit(SY_ERR);
         case UNEXPECTED_IF:
-            fprintf(stderr,"Syntax error, unexpected token inside if! \n");
+            fprintf(stderr,"Syntax error, unexpected token inside if condition! \n");
             exit(SY_ERR);
-        case UNEXPECTED_ELSE:
-            fprintf(stderr,"Syntax error, unexpected else! \n");
+        case EXPECTED_ELSE:
+            fprintf(stderr,"Syntax error, expected else keyword! \n");
+            exit(SY_ERR);
+        case EXPECTED_END:
+            fprintf(stderr,"Syntax error, expected end keyword! \n");
             exit(SY_ERR);
     }
 }

@@ -25,3 +25,16 @@ typedef struct parserdata
 void parse();
 void start();
 void parser_init();
+void if_condition();
+void end_of_line();
+void while_loop();
+void end_of_file();
+void function_call(bool moved);
+void function_declaration();
+void params(tNode *function);
+void parse_function_definition();
+bool validate_variable(string name);
+void validate_calls(tNode *root);
+void validate_params(tNode *root);
+int validate_symbol(string name);
+void error(int id);
