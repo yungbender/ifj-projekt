@@ -238,7 +238,7 @@ void free_stack(tStack *stack)
     {
         return;
     }
-    tStack *temp;
+    tStack *temp = stack;
     while(temp != NULL)
     {
         temp = stack->next;
