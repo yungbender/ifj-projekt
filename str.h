@@ -18,6 +18,7 @@ int str_init(string *s);
 void str_free(string *s);
 
 void str_clear(string *s);
+int str_add_string(string *s1, char* c);
 int str_add_char(string *s1, char c);
 int str_copy_string(string *s1, string *s2);
 int str_cmp_string(string *s1, string *s2);

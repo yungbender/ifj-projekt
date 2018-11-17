@@ -38,21 +38,10 @@ typedef struct token{
 	int type;
 	union {
 		int i;
-		float f;
+		double f;
 		string str;
 	} attr ;
 }tToken;
-
-
-// ======= ERRORS =======
-#define L_ERR     111
-#define SY_ERR	  2
-#define DEF_ERR	  3 // not defined var,function, redefinition, etc.
-#define DATA_ERR  4 // wrong data type operations (string++, etc.)
-#define ARG_ERR   5 // calling parameters count != defined parameters count
-#define SE_ERR	  6 // other semanthic errors
-#define ZERO_DIV  9 // division by zero
-#define INT_ERR	  99
 
 // ======= TYPES OF TOKEN =======
 #define IDF     0

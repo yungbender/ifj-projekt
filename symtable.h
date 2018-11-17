@@ -46,7 +46,7 @@ void init_table(tSymTable *symTable);
 tNode* create_var(tToken id);
 tNode* insert_var(tNode *root, tToken id);
 tNode *create_fun(tToken id, int paramsNum, bool wasDefined);
-tNode* insert_fun(tNode* root, tToken id, bool wasDefined);
+tNode* insert_fun(tNode* root, tToken id, int paramsNum, bool wasDefined);
 tNode *search_table(tNode *root, string id);
 void free_stack(tStack *stack);
 void free_params(tParamList *params);

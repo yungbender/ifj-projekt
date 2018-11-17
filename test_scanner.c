@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <string.h>
 #include "scanner.c"
+#include "error.h"
 
 FILE *f;
 extern int line;
@@ -14,7 +16,7 @@ void print_lex(struct token LEX)
 		fprintf(stderr, "ERROR: Internal compiler error\n");
 		//return INT_ERR;
 	}
-	if(LEX.type == -1)
+	if(LEX.type == L_ERR)
 	{
 		fprintf(stderr,"ERROR: Lexical analyzer error at line: %d\n", line);
 		//return 1;
@@ -30,11 +32,10 @@ void print_lex(struct token LEX)
 	else if(LEX.type == IDF || LEX.type == ID || LEX.type == STRING)
 	{
 		printf("Lexem je typu %d s hodnotou %s\n", LEX.type, LEX.attr.str.str);
-		str_free(&LEX.attr.str);
 	}
 	else
 	{
-		printf("Lexem je typu %d\n", LEX.type);
+		printf("Lexem je typu %d, hodnota je %d\n", LEX.type, LEX.attr.i);
 	}
 }
 
@@ -52,11 +53,11 @@ int main()
 {
 	struct token LEX;
 
-	open_file("tests_scanner/test01");
+	/*open_file("tests_scanner/test01");
 	puts("TEST01 -- Empty file");
 	LEX = get_token();
 	assert(LEX.type == END_OF_FILE && LEX.attr.i == 0);
-	fclose(f);
+	fclose(f);*/
 
 	open_file("tests_scanner/test02");
 	puts("TEST02 -- Comment with text on the first and last line");
@@ -98,7 +99,7 @@ int main()
 	open_file("tests_scanner/test07");
 	puts("TEST07 -- Empty string");
 	LEX = get_token();
-	assert(LEX.type == STRING && str_cmp_const_str(&LEX.attr.str, "\"\"") == 0);
+	assert(LEX.type == STRING && str_cmp_const_str(&LEX.attr.str, "") == 0);
 	str_free(&LEX.attr.str);
 	LEX = get_token();
 	assert(LEX.type == END_OF_FILE && LEX.attr.i == 1);
@@ -107,7 +108,7 @@ int main()
 	open_file("tests_scanner/test08");
 	puts("TEST08 -- Normal string");
 	LEX = get_token();
-	assert(LEX.type == STRING && str_cmp_const_str(&LEX.attr.str, "\"abcdef\"") == 0);
+	assert(LEX.type == STRING && str_cmp_const_str(&LEX.attr.str, "abcdef") == 0);
 	str_free(&LEX.attr.str);
 	LEX = get_token();
 	assert(LEX.type == END_OF_FILE && LEX.attr.i == 1);
@@ -116,7 +117,7 @@ int main()
 	open_file("tests_scanner/test09");
 	puts("TEST09 -- String with various escape sequences");
 	LEX = get_token();
-	assert(LEX.type == STRING && str_cmp_const_str(&LEX.attr.str, "\"abcdef\\\"\\\\\\n\\t\"") == 0);
+	assert(LEX.type == STRING && str_cmp_const_str(&LEX.attr.str, "abcdef\\034\\092\\010\\009") == 0);
 	str_free(&LEX.attr.str);
 	LEX = get_token();
 	assert(LEX.type == END_OF_FILE && LEX.attr.i == 1);
@@ -125,7 +126,7 @@ int main()
 	open_file("tests_scanner/test10");
 	puts("TEST10 -- Short hexadecimal sequence");
 	LEX = get_token();
-	assert(LEX.type == STRING && str_cmp_const_str(&LEX.attr.str, "\"ahoj\\x1\"") == 0);
+	assert(LEX.type == STRING && str_cmp_const_str(&LEX.attr.str, "ahoj\\001") == 0);
 	str_free(&LEX.attr.str);
 	LEX = get_token();
 	assert(LEX.type == END_OF_FILE && LEX.attr.i == 1);
@@ -134,7 +135,7 @@ int main()
 	open_file("tests_scanner/test11");
 	puts("TEST11 -- Long hexadecimal sequence");
 	LEX = get_token();
-	assert(LEX.type == STRING && str_cmp_const_str(&LEX.attr.str, "\"ahoj\\x11\"") == 0);
+	assert(LEX.type == STRING && str_cmp_const_str(&LEX.attr.str, "ahoj\\017") == 0);
 	str_free(&LEX.attr.str);
 	LEX = get_token();
 	assert(LEX.type == END_OF_FILE && LEX.attr.i == 1);
@@ -143,7 +144,7 @@ int main()
 	open_file("tests_scanner/test12");
 	puts("TEST12 -- Short hexadecimal sequence, text after");
 	LEX = get_token();
-	assert(LEX.type == STRING && str_cmp_const_str(&LEX.attr.str, "\"ahoj\\x1testovic\"") == 0);
+	assert(LEX.type == STRING && str_cmp_const_str(&LEX.attr.str, "ahoj\\001testovic") == 0);
 	str_free(&LEX.attr.str);
 	LEX = get_token();
 	assert(LEX.type == END_OF_FILE && LEX.attr.i == 1);
@@ -152,7 +153,7 @@ int main()
 	open_file("tests_scanner/test13");
 	puts("TEST13 -- Long hexadecimal sequence, text after");
 	LEX = get_token();
-	assert(LEX.type == STRING && str_cmp_const_str(&LEX.attr.str, "\"ahoj\\x11testovic\"") == 0);
+	assert(LEX.type == STRING && str_cmp_const_str(&LEX.attr.str, "ahoj\\017testovic") == 0);
 	str_free(&LEX.attr.str);
 	LEX = get_token();
 	assert(LEX.type == END_OF_FILE && LEX.attr.i == 1);
@@ -161,7 +162,7 @@ int main()
 	open_file("tests_scanner/test14");
 	puts("TEST14 -- Many zeros should produce error");
 	LEX = get_token();
-	assert(LEX.type == -1 && LEX.attr.i == 1);
+	assert(LEX.type == L_ERR && LEX.attr.i == 1);
 	fclose(f);
 
 	open_file("tests_scanner/test15");
@@ -194,7 +195,7 @@ int main()
 
 	open_file("tests_scanner/test18");
 	puts("TEST18 -- Various floats beginning with integer");
-	LEX = get_token();
+	LEX = get_token(); 
 	assert(LEX.type == FLOAT && LEX.attr.f == (double)1.1);
 	LEX = get_token();
 	assert(LEX.type == END_OF_LINE && LEX.attr.i == 1);
@@ -477,9 +478,15 @@ int main()
 	fclose(f);
 
 	open_file("tests_scanner/test39");
-	puts("TEST39 -- ERROR: Text right after =begin");
+	puts("TEST39 -- Text right after =begin");
 	LEX = get_token();
-	assert(LEX.type == L_ERR && LEX.attr.i == 1);
+	assert(LEX.type == ASSIGNMENT);
+	LEX = get_token();
+	assert(LEX.type == ID && str_cmp_const_str(&LEX.attr.str, "beginneco") == 0);
+	LEX = get_token();
+	assert(LEX.type == END_OF_LINE && LEX.attr.i == 1);
+	LEX = get_token();
+	assert(LEX.type == END_OF_FILE && LEX.attr.i == 4);
 	fclose(f);
 
 	open_file("tests_scanner/test40");
@@ -504,6 +511,156 @@ int main()
 
 	open_file("tests_scanner/test43");
 	puts("TEST43 -- Empty line comment");
+	LEX = get_token();
+	assert(LEX.type == END_OF_FILE && LEX.attr.i == 1);
+	fclose(f);
+
+	open_file("tests_scanner/test44");
+	puts("TEST44 -- \"=end_\" in comment");
+	LEX = get_token();
+	assert(LEX.type == END_OF_FILE && LEX.attr.i == 4);
+	fclose(f);
+
+	open_file("tests_scanner/test45");
+	puts("TEST45 -- Example 8.1 from assignment -- testing longer files with multiple token types");
+	LEX = get_token();
+	assert(LEX.type == END_OF_LINE && LEX.attr.i == 1);
+	LEX = get_token();
+	assert(LEX.type == ID && str_cmp_const_str(&LEX.attr.str, "print") == 0);
+	LEX = get_token();
+	assert(LEX.type == STRING && str_cmp_const_str(&LEX.attr.str, "Zadejte\\032cislo\\032pro\\032vypocet\\032faktorialu:\\032") == 0);
+	LEX = get_token();
+	assert(LEX.type == END_OF_LINE && LEX.attr.i == 2);
+	LEX = get_token();
+	assert(LEX.type == ID && str_cmp_const_str(&LEX.attr.str, "a") == 0);
+	LEX = get_token();
+	assert(LEX.type == ASSIGNMENT);
+	LEX = get_token();
+	assert(LEX.type == ID && str_cmp_const_str(&LEX.attr.str, "inputi") == 0);
+	LEX = get_token();
+	assert(LEX.type == END_OF_LINE && LEX.attr.i == 3);
+	LEX = get_token();
+	assert(LEX.type == IF);
+	LEX = get_token();
+	assert(LEX.type == ID && str_cmp_const_str(&LEX.attr.str, "a") == 0);
+	LEX = get_token();
+	assert(LEX.type == LESS_THAN);
+	LEX = get_token();
+	assert(LEX.type == INTEGER && LEX.attr.i == 0);
+	LEX = get_token();
+	assert(LEX.type == THEN);
+	LEX = get_token();
+	assert(LEX.type == END_OF_LINE && LEX.attr.i == 4);
+	LEX = get_token();
+	assert(LEX.type == ID && str_cmp_const_str(&LEX.attr.str, "print") == 0);
+	LEX = get_token();
+	assert(LEX.type == OPEN_PARENTH);
+	LEX = get_token();
+	assert(LEX.type == STRING && str_cmp_const_str(&LEX.attr.str, "\\010Faktorial\\032nelze\\032spocitat\\010") == 0);
+	LEX = get_token();
+	assert(LEX.type == CLOSE_PARENTH);
+	LEX = get_token();
+	assert(LEX.type == END_OF_LINE && LEX.attr.i == 5);
+	LEX = get_token();
+	assert(LEX.type == ELSE);
+	LEX = get_token();
+	assert(LEX.type == END_OF_LINE && LEX.attr.i == 6);
+	LEX = get_token();
+	assert(LEX.type == ID && str_cmp_const_str(&LEX.attr.str, "vysl") == 0);
+	LEX = get_token();
+	assert(LEX.type == ASSIGNMENT);
+	LEX = get_token();
+	assert(LEX.type == INTEGER && LEX.attr.i == 1);
+	LEX = get_token();
+	assert(LEX.type == END_OF_LINE && LEX.attr.i == 7);
+	LEX = get_token();
+	assert(LEX.type == WHILE);
+	LEX = get_token();
+	assert(LEX.type == ID && str_cmp_const_str(&LEX.attr.str, "a") == 0);
+	LEX = get_token();
+	assert(LEX.type == GREATER_THAN);
+	LEX = get_token();
+	assert(LEX.type == INTEGER && LEX.attr.i == 0);
+	LEX = get_token();
+	assert(LEX.type == DO);
+	LEX = get_token();
+	assert(LEX.type == END_OF_LINE && LEX.attr.i == 8);
+	LEX = get_token();
+	assert(LEX.type == ID && str_cmp_const_str(&LEX.attr.str, "vysl") == 0);
+	LEX = get_token();
+	assert(LEX.type == ASSIGNMENT);
+	LEX = get_token();
+	assert(LEX.type == ID && str_cmp_const_str(&LEX.attr.str, "vysl") == 0);
+	LEX = get_token();
+	assert(LEX.type == ASTERISK);
+	LEX = get_token();
+	assert(LEX.type == ID && str_cmp_const_str(&LEX.attr.str, "a") == 0);
+	LEX = get_token();
+	assert(LEX.type == END_OF_LINE && LEX.attr.i == 9);
+	LEX = get_token();
+	assert(LEX.type == ID && str_cmp_const_str(&LEX.attr.str, "a") == 0);
+	LEX = get_token();
+	assert(LEX.type == ASSIGNMENT);
+	LEX = get_token();
+	assert(LEX.type == ID && str_cmp_const_str(&LEX.attr.str, "a") == 0);
+	LEX = get_token();
+	assert(LEX.type == MINUS);
+	LEX = get_token();
+	assert(LEX.type == INTEGER && LEX.attr.i == 1);
+	LEX = get_token();
+	assert(LEX.type == END_OF_LINE && LEX.attr.i == 10);
+	LEX = get_token();
+	assert(LEX.type == END);
+	LEX = get_token();
+	assert(LEX.type == END_OF_LINE && LEX.attr.i == 11);
+	LEX = get_token();
+	assert(LEX.type == ID && str_cmp_const_str(&LEX.attr.str, "print") == 0);
+	LEX = get_token();
+	assert(LEX.type == STRING && str_cmp_const_str(&LEX.attr.str, "\\010Vysledek\\032je:") == 0);
+	LEX = get_token();
+	assert(LEX.type == COMMA);
+	LEX = get_token();
+	assert(LEX.type == ID && str_cmp_const_str(&LEX.attr.str, "vysl") == 0);
+	LEX = get_token();
+	assert(LEX.type == COMMA);
+	LEX = get_token();
+	assert(LEX.type == STRING && str_cmp_const_str(&LEX.attr.str, "\\010") == 0);
+	LEX = get_token();
+	assert(LEX.type == END_OF_LINE && LEX.attr.i == 12);
+	LEX = get_token();
+	assert(LEX.type == END);
+	LEX = get_token();
+	assert(LEX.type == END_OF_FILE && LEX.attr.i == 13);
+	fclose(f);
+
+	open_file("tests_scanner/test46");
+	puts("TEST46 -- IFJcode2018 string rules -- Space in string");
+	LEX = get_token();
+	assert(LEX.type == STRING && str_cmp_const_str(&LEX.attr.str, "Mezera\\032ve\\032stringu") == 0);
+	LEX = get_token();
+	assert(LEX.type == END_OF_FILE && LEX.attr.i == 1);
+	fclose(f);
+
+	open_file("tests_scanner/test47");
+	puts("TEST47 -- IFJcode2018 string rules -- Ruby escape sequences");
+	LEX = get_token();
+	assert(LEX.type == STRING && str_cmp_const_str(&LEX.attr.str, "String\\032s\\032ruby\\032sekvencemi\\032-\\034,\\010,\\009,\\032,\\092,\\035") == 0);
+	LEX = get_token();
+	assert(LEX.type == END_OF_FILE && LEX.attr.i == 1);
+	fclose(f);
+
+	open_file("tests_scanner/test48");
+	puts("TEST48 -- IFJcode2018 string rules -- Example from assignment");
+	LEX = get_token();
+	assert(LEX.type == STRING && str_cmp_const_str(&LEX.attr.str, "retezec\\032s\\032lomitkem\\032\\092\\032a\\010novym\\035radkem") == 0);
+	LEX = get_token();
+	assert(LEX.type == END_OF_FILE && LEX.attr.i == 1);
+	fclose(f);
+
+	open_file("tests_scanner/test49");
+	puts("TEST49 -- IFJcode2018 string rules -- Hexadecimal escape sequences");
+	LEX = get_token();
+	assert(LEX.type == STRING && str_cmp_const_str(&LEX.attr.str, "\\001\\001\\080\\010\\010\\255\\000") == 0);
 	LEX = get_token();
 	assert(LEX.type == END_OF_FILE && LEX.attr.i == 1);
 	fclose(f);

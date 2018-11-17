@@ -26,6 +26,17 @@ void str_clear(string *s)
 	s->length = 0;
 }
 
+// Function adds char array on the end of string s1
+int str_add_string(string *s1, char* c)
+{
+	int length = strlen(c);
+	for(int i = 0; i < length; i++)
+	{
+		str_add_char(s1, c[i]);
+	}
+	return STR_SUCCESS;
+}
+
 // Function adds one char on the end of string s1
 int str_add_char(string *s1, char c)
 {

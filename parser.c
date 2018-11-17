@@ -262,11 +262,11 @@ void parse_function_definition()
         pop_stack(stack);
         if(pData.local->root == NULL)
         {
-            pData.local->root = insert_var(pData.local->root,param,param.type);
+            pData.local->root = insert_var(pData.local->root,param);
         }
         else
         {
-            insert_var(pData.local->root,param,param.type);
+            insert_var(pData.local->root,param);
         }
     }
     // Recursively calling parser
@@ -561,12 +561,6 @@ void end_of_file()
     // Check if there is some function that was called but not defined
     validate_calls(pData.global->root);
     validate_params(pData.global->root);
-    // Generate successful exit (EXIT 0)
-    insert_instr(pData.instrs,EXIT);
-    tToken number;
-    number.type = INTEGER;
-    number.attr.i = 0;
-    insert_param(pData.instrs,number);
     // Free out the symtables and stack
     free_symtable(pData.global);
     free_symtable(pData.local);
