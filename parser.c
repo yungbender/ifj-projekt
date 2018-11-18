@@ -4,6 +4,7 @@
 #include "parser.h"
 
 tPData pData;
+bool endoffile = false;
 
 #define GET_TOKEN() \
     pData.token = get_token(); \
@@ -423,17 +424,21 @@ void function_declaration()
     start();
 }
 
-void function_call(bool moved)
+// POINTER TO TOKEN IS ONLY USED IF BOOL TRUE BECAUSE PARSER NEEDED 4 TOKENS TO KNOW WHAT THE FUCK WAS IT
+void function_call(bool moved, bool pushed)
 {
     // Check if the called function is in the global table
     tNode *result = search_table(pData.global->root,pData.token.attr.str);
     int builtin = OK;
+    // Bool if leftbracket to check for rightbracket
+    bool leftbracket = false;
+    bool rightbracket = false;
     // If parser did not found function inside global symtable and parser is inside main, semantic error
     if(result == NULL && pData.inDefinition == false)
     {
         // Check if the called function is not built in function
         builtin = validate_symbol(pData.token.attr.str);
-        if(result == OK)
+        if(builtin == OK)
         {
             error(UNDEF_F);
         }
@@ -467,28 +472,65 @@ void function_call(bool moved)
     // If will be moved
     else
     {
-        // insert instruction and pop where is it going to bo safed
+        tToken param; 
+        if(pushed == true)
+        {
+            param = head_stack(pData.stack);
+            pop_stack(pData.stack);
+        }
+        tToken name = head_stack(pData.stack);
+        pop_stack(pData.stack);
+        // Need to search if the variable exists already, if not need to define it
+        tNode *result = search_table(pData.local->root,name.attr.str);
+        if(result == NULL)
+        {
+            if(pData.local->root == NULL)
+            {
+                pData.local->root = insert_var(pData.local->root, name);
+            }
+            else
+            {
+                insert_var(pData.local->root, name);
+            }
+            insert_instr(pData.instrs,DEFVAR);
+            insert_param(pData.instrs,name);
+        }
         if(builtin == OK)
         {
             insert_instr(pData.instrs,FUN_CALL);
-            tToken name = head_stack(pData.stack);
-            pop_stack(pData.stack);
-            insert_param(pData.instrs,name);
         }
-        // If its builtin function
+        // If function is builtin, need to save the macro of builtin fuinction
         else
         {
             insert_instr(pData.instrs,builtin);
-            tToken name = head_stack(pData.stack);
-            pop_stack(pData.stack);
-            insert_param(pData.instrs,name);
+        }
+        insert_param(pData.instrs,name);
+        insert_param(pData.instrs,pData.token);
+        if(pushed == true)
+        {
+            // If parser, took open parenth before function definition was called, need to correct it
+            if(param.type == OPEN_PARENTH)
+            {
+                leftbracket = true;
+                GET_TOKEN();
+            }
+            // If parser, took function parameter before function definition was called, need to correct it
+            else if(param.type == ID || param.type == FLOAT || param.type == INTEGER || param.type == STRING)
+            {
+                insert_param(pData.instrs,param);
+                GET_TOKEN();
+            }
+            else if(param.type == END_OF_LINE || param.type == END_OF_FILE)
+            {
+                pData.token.type = END_OF_LINE;
+            }
+            clear_stack(pData.stack);
         }
     }
-
-    // Bool if leftbracket to check for rightbracket
-    bool leftbracket = false;
-    bool rightbracket = false;
-    GET_TOKEN();
+    if(pushed != true)
+    {
+        GET_TOKEN();
+    }
     // Expecting leftbracket or ID or EOF
     // If leftbracket, activate bool and get next token
     if(pData.token.type == OPEN_PARENTH)
@@ -529,7 +571,7 @@ void function_call(bool moved)
             insert_param(pData.instrs,pData.token);
         }
         // Unexpected token
-        else if(pData.token.type == END_OF_LINE)
+        else if(pData.token.type == END_OF_LINE || pData.token.type == END_OF_FILE)
         {
             if(comma == true)
             {
@@ -670,20 +712,118 @@ void end_of_line()
 
 void end_of_file()
 {
-    // Check for unexpected end of file (in definition or in while)
-    if(pData.inDefinition == true || pData.scopes > 0)
+    if(endoffile == false)
     {
-        error(UNEXPECTED_EOF);
+        // Check for unexpected end of file (in definition or in while)
+        if(pData.inDefinition == true || pData.scopes > 0)
+        {
+            error(UNEXPECTED_EOF);
+        }
+        // Check if there is some function that was called but not defined
+        validate_calls(pData.global->root);
+        validate_params(pData.global->root);
+        // Free out the symtables and stack
+        free_symtable(pData.global);
+        free_symtable(pData.local);
+        free_stack(pData.stack);
+        // Give the final instruction list to the code generator
+        ilist = pData.instrs;
+        endoffile = true;
     }
-    // Check if there is some function that was called but not defined
-    validate_calls(pData.global->root);
-    validate_params(pData.global->root);
-    // Free out the symtables and stack
-    free_symtable(pData.global);
-    free_symtable(pData.local);
-    free_stack(pData.stack);
-    // Give the final instruction list to the code generator
-    ilist = pData.instrs;
+}
+
+void assignment()
+{
+    // Left assignment side, is still on stack
+    GET_TOKEN();
+    // Need to check the if the token after assignment is ID_F
+    if(pData.token.type == ID_F)
+    {
+        // its function call, need to call it true, because result is going to be save
+        function_call(true, false);
+        return;
+    }
+    // If its ID, need to check if its function
+    tNode *result = NULL;
+    if(pData.token.type == ID)
+    {
+        tToken temp;
+        // If it is function, its function call
+        result = search_table(pData.global->root, pData.token.attr.str);
+        int builtin = validate_symbol(pData.token.attr.str);
+        if(result != NULL || builtin != OK)
+        {
+            function_call(true, false);
+            return;
+        }
+        // If parser is in main, and result is NULL, it cannot be function call, it can be only expression or error
+        // Need to check if the ID is not variable, if it is, its expression, if its not, its error
+        if(result == NULL && pData.inDefinition == false)
+        {
+            result = search_table(pData.local->root, pData.token.attr.str);
+            // if its not found, it is error
+            if(result == NULL)
+            {
+                error(UNDEFINED_VAR);
+            }
+        }
+        // If parser is inside function, it still can be a function call, but user is calling undefined function need to get next token and determine what is it
+        else if(result == NULL && pData.inDefinition == true)
+        {
+            // Need to save the previous token, if was function call, need to put it back to pData.token
+            temp = pData.token;
+            GET_TOKEN();
+            switch(pData.token.type)
+            {
+                case OPEN_PARENTH:
+                case END_OF_FILE:
+                case END_OF_LINE:
+                case ID:
+                case STRING:
+                case FLOAT:
+                case INTEGER:
+                    clear_stack(pData.stack);
+                    push_stack(pData.stack,pData.token);
+                    pData.token = temp;
+                    function_call(true, true);
+                    return;
+            }
+        }
+        //TODO: if here the parser will see that it is not function call, parser is one token off        
+    }
+    // TODO: call expression parsing
+}
+
+/**
+ * Function analyses ID and chooses what to do next.
+ **/
+void analyse_id()
+{
+    // push the ID on the stack
+    push_stack(pData.stack,pData.token);
+    // Search global table, if found, its function_call with no result saved
+    tNode *result = search_table(pData.global->root,pData.token.attr.str);
+    int builtin = validate_symbol(pData.token.attr.str);
+    if(result != NULL || builtin != OK)
+    {
+        function_call(false, false);
+        return;
+    }
+    GET_TOKEN();
+    // If EOL or EOF, function, check if parser is inside function
+    if(pData.token.type == END_OF_LINE || pData.token.type == END_OF_FILE)
+    {
+        function_call(false, false);
+        return;
+    }
+    // If "=" its assignment
+    else if(pData.token.type == ASSIGNMENT)
+    {
+        assignment();
+    }
+    // Parse next
+    GET_TOKEN();
+    start();
 }
 
 void start()
@@ -698,15 +838,14 @@ void start()
             break;
         // <start> ID = 
         case ID:
-            GET_TOKEN();
-            start();
+            analyse_id();
             break;
         case END_OF_LINE:
             end_of_line();
             break;
         // <start> IDF -> <f_call>
         case IDF:
-            function_call(false);
+            function_call(false, false);
             break;
         // <start> WHILE <expr> DO EOL
         case WHILE:

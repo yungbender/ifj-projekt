@@ -62,5 +62,8 @@ void print_error_exit(int id)
         case EXPECTED_END:
             fprintf(stderr,"Syntax error, expected end keyword! \n");
             exit(SY_ERR);
+        case UNDEFINED_VAR:
+            fprintf(stderr,"Semantic error, undefined variable inside expression or function call!\n");
+            exit(DATA_ERR);
     }
 }

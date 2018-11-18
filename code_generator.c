@@ -322,13 +322,13 @@ void generate_input(FILE *f, tInstr *instruction, bool moved, int datatype)
         // need to check datatype
         switch(datatype)
         {
-            case INPUTF_CALL:
+            case NOINPUTF_CALL:
                 fprintf(f, "READ TF@$noretval float\n");
                 break;
-            case INPUTI_CALL:
+            case NOINPUTI_CALL:
                 fprintf(f, "READ TF@$noretval int\n");
                 break;
-            case INPUTS_CALL:
+            case NOINPUTS_CALL:
                 fprintf(f, "READ TF@$noretval string\n");
                 break;
         }
@@ -696,7 +696,7 @@ void generate_main(FILE *f)
         // If funciton definition is found, skip the whole list until you find end
         if(begin->instr == FUN_DEF)
         {
-            while(begin->instr != FUN_DEF)
+            while(begin->instr != FUN_END)
             {
                 begin = begin->next;
             }

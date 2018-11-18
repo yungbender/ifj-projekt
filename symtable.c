@@ -243,5 +243,6 @@ void free_stack(tStack *stack)
     {
         temp = stack->next;
         free(stack);
+        stack = temp;
     }
 }
