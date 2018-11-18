@@ -4,6 +4,9 @@
 #include "code_generator.h"
 #include "error.h"
 
+// Unique number used for generating labels
+int uniqueCounter;
+
 // These bools, signifies, if builtin functions needs to be generated, so they cannot generate two times, or will not generate at all if thy were not called
 bool lengthGenerated = false;
 bool substrGenerated = false;
@@ -129,15 +132,147 @@ FILE* generate_head()
 /**
  * Function generates while operation inside code.
  **/
-void generate_while()
+void generate_add(FILE *f, tInstr *instruction)
 {
+
+}
+
+/**
+ * Function generates while operation inside code.
+ **/
+void generate_sub(FILE *f, tInstr *instruction)
+{
+
+}
+
+/**
+ * Function generates while operation inside code.
+ **/
+void generate_mul(FILE *f, tInstr *instruction)
+{
+
+}
+
+/**
+ * Function generates while operation inside code.
+ **/
+void generate_div(FILE *f, tInstr *instruction)
+{
+
+}
+
+/**
+ * Function generates while operation inside code.
+ **/
+void generate_move(FILE *f, tInstr *instruction)
+{
+
+}
+
+/**
+ * Function generates while operation inside code.
+ **/
+void generate_while(FILE *f, tInstr *instruction)
+{
+    tInstr *actualInstr = instruction;
+    int instr;
+    int scopeWhile = 0;
+    scopeWhile++;
+
+    while(scopeWhile != 0)
+    {
+        if(instruction->instr == DEFVAR)
+        {
+            fprintf(f, "DEFVAR TF@%s\n", instruction->params->param.attr.str.str);
+        }
+
+        if(instruction->instr == END)
+        {
+            scopeWhile--;
+        }
+
+        if(instruction->instr == WHILE_CALL)
+        {
+            scopeWhile++;
+        }
+
+        actualInstr = actualInstr->next;
+    }
+
+    instr = instruction->next->instr;
+    //TODO: while
+    while(instr != EQ && instr != NE && instr != LT && instr != GT && instr != GE && instr != LE && instr != FLOAT && instr != INTEGER && instr != STRING)
+    {
+        generate_instruction(f, instruction);
+    }
+
+    switch(instr)
+    {
+        case EQ:
+            fprintf(f, "JUMPIFNEQS $while%d\n", uniqueCounter);
+            break;
+        case NE:
+            fprintf(f, "JUMPIFEQS $while%d\n", uniqueCounter);
+            break;
+        case LT: //x < y ..... x >= y
+            fprintf(f, "DEFVAR TF@result1-%d\n", uniqueCounter);
+            fprintf(f, "DEFVAR TF@result2%-d\n", uniqueCounter);
+            fprintf(f, "DEFVAR TF@result3%-d\n", uniqueCounter);
+            fprintf(f, "DEFVAR TF@x%d\n", uniqueCounter);
+            fprintf(f, "DEFVAR TF@y%d\n", uniqueCounter);
+            fprintf(f, "DEFVAR TF@x$type%d\n", uniqueCounter);
+            fprintf(f, "DEFVAR TF@y$type%d\n", uniqueCounter);
+            fprintf(f, "POPS TF@y%d\n", uniqueCounter);
+            fprintf(f, "POPS TF@x%d\n", uniqueCounter);
+            //checking type
+            fprintf(f, "TYPE TF@x%d$type TF@x%d\n", uniqueCounter, uniqueCounter);
+            fprintf(f, "TYPE TF@y%d$type TF@Y%d\n", uniqueCounter, uniqueCounter);
+            fprintf(f, "JUMPIFNEQ $while_not_string%d string@string TF@y%d$type\n", uniqueCounter, uniqueCounter);
+            fprintf(f, "JUMPIFNEQ $while_not_string%d TF@x%d$type string@string\n", uniqueCounter, uniqueCounter);
+            fprintf(f, "EXIT int@4\n\n");
+            fprintf(f, "LABEL $while_not_string%d\n", uniqueCounter);
+            fprintf(f, "JUMPIFEQ $while_ok%d TF@x%d$type TF@y%d$type\n", uniqueCounter, uniqueCounter, uniqueCounter);
+            fprintf(f, "JUMPIFEQ $while_retype%d TF@x%d$type string@int\n", uniqueCounter, uniqueCounter);
+            fprintf(f, "INT2FLOAT TF@x%d\n", uniqueCounter);
+            fprintf(f, "JUMP $while_ok%d\n", uniqueCounter);
+            fprintf(f, "LABEL $while_retype%d\n", uniqueCounter);
+            fprintf(f, "INT2FLOAT TF@y%d\n", uniqueCounter);
+            //condition
+            fprintf(f, "LABEL $while_ok%d\n", uniqueCounter);
+            fprintf(f, "GT TF@result1-%d TF@x%d TF@y%d\n", uniqueCounter, uniqueCounter, uniqueCounter);
+            fprintf(f, "EQ TF@result2-%d TF@x%d TF@y%d\n", uniqueCounter, uniqueCounter, uniqueCounter);
+            fprintf(f, "AND TF@result3-%d TF@result1%d TF@result2%d\n", uniqueCounter, uniqueCounter, uniqueCounter);
+            fprintf(f, "JUMPIFEQ $while%d TF@result3%d bool@true\n", uniqueCounter, uniqueCounter);
+            break;
+        case GT:
+            break;
+        case LE:
+            break;
+        case GE:
+            break;
+        case INTEGER:
+            break;
+        case FLOAT:
+            break;
+        case STRING:
+            break;
+    }
+
+    while(instruction->instr != END)
+    {
+        generate_instruction(f, instruction);
+        instruction = instruction->next;
+    }
+
+    fprintf(f, "LABEL $while%d\n", uniqueCounter);
+    uniqueCounter++;
 
 }
 
 /**
  * Function generates if operation inside code.
  **/
-void generate_if()
+void generate_if(FILE *f, tInstr *instruction)
 {
 
 }
@@ -624,6 +759,21 @@ void generate_instruction(FILE *f, tInstr *instruction)
         case NOPRINT_CALL:
             generate_print(f,instruction,false);
             break;
+        case ADD:
+            generate_add(f, instruction);
+            break;
+        case SUB:
+            generate_sub(f, instruction);
+            break;
+        case MUL:
+            generate_sub(f, instruction);
+            break;
+        case DIV:
+            generate_div(f, instruction);
+            break;
+        case MOVE:
+            generate_move(f, instruction);
+            break;
         case NOP:
             break;
     }
@@ -736,7 +886,7 @@ tToken choose_return(tInstr *instruction)
         case SUB:
         case MUL:
         case DIV:
-        case MOV:
+        case MOVE:
         case FUN_CALL:
         case INPUTF_CALL:
         case INPUTI_CALL:

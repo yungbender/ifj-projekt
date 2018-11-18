@@ -26,6 +26,7 @@
 #define EXPECTED_EOL 114
 #define EXPECTED_END 115
 #define UNDEFINED_VAR 116
+#define UNEXPECTED_W 117
 
 
 void print_error_exit(int id);
