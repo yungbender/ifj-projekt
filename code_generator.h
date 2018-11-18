@@ -38,7 +38,7 @@
 #define SUB 218 // '-'
 #define MUL 219 // '*'
 #define DIV 220 // '/'
-#define MOV 221 // '='
+#define MOVE 221 // '='
 #define EQ  222 // '=='
 #define LT  223 // '<'
 #define LE  224 // '<='
@@ -46,7 +46,11 @@
 #define GE  226 // '>='
 #define NE  227 // '!='
 // Empty instruction
+<<<<<<< HEAD
 #define NOP 299
+=======
+#define NOP 228
+>>>>>>> 9f7c4ca061bdc9effe9573104a9ed3ada257348e
 
 typedef struct tokenList tTList;
 typedef struct instructionList tIList;
