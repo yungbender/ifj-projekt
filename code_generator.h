@@ -45,6 +45,17 @@
 #define GT  225 // '>'
 #define GE  226 // '>='
 #define NE  227 // '!='
+// Data stack instructions
+#define ADDS 241
+#define SUBS 242
+#define MULS 243
+#define DIVS 244
+#define IDIVS 245
+#define LTS 246
+#define GTS 247
+#define EQS 248
+#define PUSHS 249
+#define POPS 250
 // Empty instruction
 #define NOP 240
 
