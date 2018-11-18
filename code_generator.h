@@ -79,3 +79,4 @@ void insert_instr(tIList *instrs, int instr);
 void insert_param(tIList *instrs, tToken param);
 void free_ilist(tIList *instrs);
 void generate_code();
+void generate_instruction(FILE *f, tInstr *instruction);
