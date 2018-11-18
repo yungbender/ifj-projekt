@@ -143,15 +143,22 @@ void generate_if()
 }
 
 // FUN_CALL WHERE_RETURNED_VALUE FUNCTION_NAME PARAMETER0 ...
-void generate_funcall(FILE *f, tInstr *instruction)
+void generate_funcall(FILE *f, tInstr *instruction, bool builtin)
 {
     fprintf(f, "# FUNCTION CALL\n");
     fprintf(f, "PUSHFRAME\n");
     fprintf(f, "CREATEFRAME\n\n");
     int paramsNum = 0;
     tToken ret = instruction->params->param;
-    tToken funName = instruction->params->next->param;
-    tTList *params = instruction->params->next->next;
+    // Expecting builtin function
+    tToken funName;
+    tTList *params = instruction->params->next;
+    // If its user custom function, need to get its name and correct parameters list
+    if(builtin != true)
+    {
+        params = instruction->params->next->next;
+        funName = instruction->params->next->param;
+    }
     // Define every parameter variable
     while(params != NULL)
     {
@@ -162,8 +169,12 @@ void generate_funcall(FILE *f, tInstr *instruction)
     // Define return value
     fprintf(f, "DEFVAR TF@$retval\n");
     fprintf(f, "MOVE TF@$retval nil@nil\n");
+    params = instruction->params->next;
+    if(builtin != true)
+    {
+        params = instruction->params->next->next;
+    }
     // Move parameters value to the temporary ($0...)
-    params = instruction->params->next->next;
     paramsNum = 0;
     while(params != NULL)
     {
@@ -197,16 +208,16 @@ void generate_funcall(FILE *f, tInstr *instruction)
     {
         switch(instruction->instr)
         {
-            case NOLENGTH_CALL:
+            case LENGTH_CALL:
                 fprintf(f, "CALL $length\n");
                 break;
-            case NOSUBSTR_CALL:
+            case SUBSTR_CALL:
                 fprintf(f, "CALL $substr\n");
                 break;
-            case NOORD_CALL:
+            case ORD_CALL:
                 fprintf(f, "CALL $ord\n");
                 break;
-            case NOCHR_CALL:
+            case CHR_CALL:
                 fprintf(f, "CALL $chr\n");
                 break;
         }
@@ -218,14 +229,19 @@ void generate_funcall(FILE *f, tInstr *instruction)
 }
 
 // FUN_CALL FUNCTION_NAME PARAMETER0 ...
-void generate_nofuncall(FILE *f, tInstr *instruction)
+void generate_nofuncall(FILE *f, tInstr *instruction, bool builtin)
 {
     fprintf(f, "# FUNCTION CALL\n");
     fprintf(f, "PUSHFRAME\n");
     fprintf(f, "CREATEFRAME\n\n");
     int paramsNum = 0;
-    tToken funName = instruction->params->param;
-    tTList *params = instruction->params->next;
+    tToken funName;
+    tTList *params = instruction->params;
+    if(builtin != true)
+    {
+        params = instruction->params->next;
+        funName = instruction->params->param;
+    }
     // Define every parameter variable
     while(params != NULL)
     {
@@ -237,7 +253,11 @@ void generate_nofuncall(FILE *f, tInstr *instruction)
     fprintf(f, "DEFVAR TF@$retval\n");
     fprintf(f, "MOVE TF@$retval nil@nil\n");
     // Move parameters value to the temporary ($0...)
-    params = instruction->params->next;
+    params = instruction->params;
+    if(builtin != true)
+    {
+        params = instruction->params->next;
+    }
     paramsNum = 0;
     while(params != NULL)
     {
@@ -271,16 +291,16 @@ void generate_nofuncall(FILE *f, tInstr *instruction)
     {
         switch(instruction->instr)
         {
-            case LENGTH_CALL:
+            case NOLENGTH_CALL:
                 fprintf(f, "CALL $length\n");
                 break;
-            case SUBSTR_CALL:
+            case NOSUBSTR_CALL:
                 fprintf(f, "CALL $substr\n");
                 break;
-            case ORD_CALL:
+            case NOORD_CALL:
                 fprintf(f, "CALL $ord\n");
                 break;
-            case CHR_CALL:
+            case NOCHR_CALL:
                 fprintf(f, "CALL $chr\n");
                 break;
         }
@@ -360,13 +380,13 @@ void generate_print(FILE *f, tInstr *instruction, bool moved)
         switch(params->param.type)
         {
             case INTEGER:
-                fprintf(f, "WRITE %d\n",params->param.attr.i);
+                fprintf(f, "WRITE int@%d\n",params->param.attr.i);
                 break;
             case FLOAT:
-                fprintf(f, "WRITE %a\n",params->param.attr.f);
+                fprintf(f, "WRITE float@%a\n",params->param.attr.f);
                 break;
             case STRING:
-                fprintf(f, "WRITE %s\n",params->param.attr.str.str);
+                fprintf(f, "WRITE string@%s\n",params->param.attr.str.str);
                 break;
             case ID:
                 fprintf(f, "WRITE TF@%s\n",params->param.attr.str.str);
@@ -487,7 +507,7 @@ void generate_substr(FILE *f)
     fprintf(f, "LABEL $endif$substr\n\n");
     // While(cnt != max)
     fprintf(f, "LABEL $while$substr\n");
-    fprintf(f, "EQ TF@from$BOOL TF@$cnt TF@$max\n");
+    fprintf(f, "GT TF@from$BOOL TF@$cnt TF@$max\n");
     fprintf(f, "JUMPIFEQ $while$end$substr TF@from$BOOL bool@true\n");
     // tmpstr = Getchar(s, from)
     fprintf(f, "GETCHAR TF@$tmpstr TF@string TF@from\n");
@@ -500,6 +520,7 @@ void generate_substr(FILE *f)
     fprintf(f, "JUMP $while$substr\n");
     // End of while
     fprintf(f, "LABEL $while$end$substr\n\n");
+    fprintf(f, "RETURN\n\n");
     fprintf(f, "# END OF DEFINITION OF BUILTIN FUNCTION SUBSTR()\n\n");
 }
 
@@ -594,18 +615,22 @@ void generate_instruction(FILE *f, tInstr *instruction)
             generate_if(f,instruction);
             break;
         case FUN_CALL:
+            generate_funcall(f,instruction,false);
+            break;
         case LENGTH_CALL:
         case SUBSTR_CALL:
         case ORD_CALL:
         case CHR_CALL:
-            generate_funcall(f,instruction);
+            generate_funcall(f,instruction,true);
             break;
         case NOFUN_CALL:
+            generate_funcall(f,instruction,false);
+            break;
         case NOSUBSTR_CALL:
         case NOORD_CALL:
         case NOCHR_CALL:
         case NOLENGTH_CALL:
-            generate_nofuncall(f,instruction);
+            generate_nofuncall(f,instruction, true);
             break;
         // Built in function which can be generated inside main
         case INPUTF_CALL:
@@ -848,5 +873,6 @@ void generate_code()
     generate_main(f);
     generate_fundef(f);
     fclose(f);
-    free_ilist(ilist);
+    // This part is segfaulting, will fix
+    //free_ilist(ilist);
 }

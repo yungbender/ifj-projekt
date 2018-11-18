@@ -424,7 +424,6 @@ void function_declaration()
     start();
 }
 
-// POINTER TO TOKEN IS ONLY USED IF BOOL TRUE BECAUSE PARSER NEEDED 4 TOKENS TO KNOW WHAT THE FUCK WAS IT
 void function_call(bool moved, bool pushed)
 {
     // Check if the called function is in the global table
@@ -498,14 +497,15 @@ void function_call(bool moved, bool pushed)
         if(builtin == OK)
         {
             insert_instr(pData.instrs,FUN_CALL);
+            insert_param(pData.instrs,name);
+            insert_param(pData.instrs,pData.token);
         }
         // If function is builtin, need to save the macro of builtin fuinction
         else
         {
             insert_instr(pData.instrs,builtin);
+            insert_param(pData.instrs,name);
         }
-        insert_param(pData.instrs,name);
-        insert_param(pData.instrs,pData.token);
         if(pushed == true)
         {
             // If parser, took open parenth before function definition was called, need to correct it

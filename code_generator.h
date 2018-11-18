@@ -46,7 +46,7 @@
 #define GE  226 // '>='
 #define NE  227 // '!='
 // Empty instruction
-#define NOP 218
+#define NOP 299
 
 typedef struct tokenList tTList;
 typedef struct instructionList tIList;
