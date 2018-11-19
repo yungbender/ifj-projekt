@@ -177,27 +177,24 @@ void generate_while(FILE *f, tInstr *instruction)
     tInstr *actualInstr = instruction;
     int instr;
     int scopeWhile = 0;
-    scopeWhile++;
 
-    while(scopeWhile != 0)
+    do
     {
-        if(instruction->instr == DEFVAR)
+        if(actualInstr->instr == DEFVAR)
         {
             fprintf(f, "DEFVAR TF@%s\n", instruction->params->param.attr.str.str);
         }
-
-        if(instruction->instr == END)
+        else if(actualInstr->instr == WHILE_END)
         {
             scopeWhile--;
         }
-
-        if(instruction->instr == WHILE_CALL)
+        else if(actualInstr->instr == WHILE_CALL)
         {
             scopeWhile++;
         }
 
         actualInstr = actualInstr->next;
-    }
+    } while(scopeWhile != 0);
 
     instr = instruction->next->instr;
     //TODO: while
@@ -369,6 +366,7 @@ void generate_nofuncall(FILE *f, tInstr *instruction, bool builtin)
     fprintf(f, "# FUNCTION CALL\n");
     fprintf(f, "PUSHFRAME\n");
     fprintf(f, "CREATEFRAME\n\n");
+
     int paramsNum = 0;
     tToken funName;
     tTList *params = instruction->params;
@@ -759,7 +757,7 @@ void generate_instruction(FILE *f, tInstr *instruction)
             generate_funcall(f,instruction,true);
             break;
         case NOFUN_CALL:
-            generate_funcall(f,instruction,false);
+            generate_nofuncall(f,instruction,false);
             break;
         case NOSUBSTR_CALL:
         case NOORD_CALL:
@@ -877,8 +875,11 @@ void generate_main(FILE *f)
             }
             begin = begin->next;
         }
-        generate_instruction(f,begin);
-        begin = begin->next;
+        else
+        {
+            generate_instruction(f,begin);
+            begin = begin->next;
+        }
     }
     fprintf(f, "EXIT int@0\n\n");
     fprintf(f, "# END OF MAIN\n");
