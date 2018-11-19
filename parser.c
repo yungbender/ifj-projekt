@@ -125,7 +125,6 @@ void validate_params(tNode *root)
         // NOFUN_CALL has first parameter name of function, other parameters are fucntion parameters
         if(head->instr == FUN_CALL || head->instr == NOFUN_CALL)
         {
-            int result = OK;
             params = head->params;
             // If FUN_CALL parser must skip first parameter beacause its where return value is stored
             if(head->instr == FUN_CALL)
@@ -144,63 +143,112 @@ void validate_params(tNode *root)
                 callingNum++;
                 params = params->next;
             }
-            // Parser must check first if user called built in function or user defined function
-            result = validate_symbol(name.attr.str);
-            // It is built in function, must check its parameters
-            if(result != OK)
+            // Its user defined function, must check number of parameters from global symbol table
+            // If the function was not found (dead code) or the number of calling parameters is not equal to function parameters number semantic error
+            function = search_table(root,name.attr.str);
+            if(function == NULL || function->paramsNum != callingNum)
             {
-                // These functions cant have any calling parameter
-                if(result == INPUTF_CALL || result == INPUTI_CALL || result == INPUTS_CALL)
+                error(PARAM_NUM);
+            }
+        }
+        // Built in function call with not saved result
+        else if(head->instr == NOINPUTF_CALL || head->instr == NOINPUTI_CALL || head->instr == NOINPUTS_CALL || head->instr == NOCHR_CALL || head->instr == NOLENGTH_CALL || head->instr == NOORD_CALL || head->instr == NOPRINT_CALL || head->instr == NOSUBSTR_CALL)
+        {
+            int result = head->instr;
+            params = head->params;
+            while(params != NULL)
+            {
+                callingNum++;
+                params = params->next;
+            }
+                            
+            if(result == NOINPUTF_CALL || result == NOINPUTI_CALL || result == NOINPUTS_CALL)
+            {
+                if(callingNum != 0)
                 {
-                    if(callingNum != 0)
-                    {
-                        error(PARAM_NUM);
-                    }
-                }
-                // These functions must have only one parameter
-                else if(result == LENGTH_CALL || result == CHR_CALL)
-                {
-                    if(callingNum != 1)
-                    {
-                        error(PARAM_NUM);
-                    }
-                }
-                // These functions must have only two parameters
-                else if(result == ORD_CALL)
-                {
-                    if(callingNum != 2)
-                    {
-                        error(PARAM_NUM);
-                    }
-                }
-                // These functions must have only three parameters
-                else if(result == SUBSTR_CALL)
-                {
-                    if(callingNum != 3)
-                    {
-                        error(PARAM_NUM);
-                    }
-                }
-                // These functions must have more than zero parameters
-                else if(result == PRINT_CALL)
-                {
-                    if(callingNum == 0)
-                    {
-                        error(PARAM_NUM);
-                    }
+                    error(PARAM_NUM);
                 }
             }
-            // Its user defined function, must check number of parameters from global symbol table
-            else
+            else if(result == NOLENGTH_CALL || result == NOCHR_CALL)
             {
-                // If the function was not found (dead code) or the number of calling parameters is not equal to function parameters number semantic error
-                function = search_table(root,name.attr.str);
-                if(function == NULL || function->paramsNum != callingNum)
+                if(callingNum != 1)
+                {
+                    error(PARAM_NUM);
+                }
+            }
+            else if(result == NOORD_CALL)
+            {
+                if(callingNum != 2)
+                {
+                    error(PARAM_NUM);
+                }
+            }
+            else if(result == NOSUBSTR_CALL)
+            {
+                if(callingNum != 3)
+                {
+                    error(PARAM_NUM);
+                }
+            }
+            else if(result == NOPRINT_CALL)
+            {
+                if(callingNum == 0)
                 {
                     error(PARAM_NUM);
                 }
             }
 
+        }
+        // Built in function call with saved result
+        else if(head->instr == INPUTF_CALL || head->instr == INPUTI_CALL || head->instr == INPUTS_CALL || head->instr == LENGTH_CALL || head->instr == CHR_CALL || head->instr == ORD_CALL || head->instr == SUBSTR_CALL || head->instr == PRINT_CALL)
+        {
+            int result = head->instr;
+            params = head->params;
+            while(params != NULL)
+            {
+                callingNum++;
+                params = params->next;
+            }
+            // These functions cant have any calling parameter
+            if(result == INPUTF_CALL || result == INPUTI_CALL || result == INPUTS_CALL)
+            {
+                if(callingNum != 1)
+                {
+                    error(PARAM_NUM);
+                }
+            }
+            // These functions must have only one parameter
+            else if(result == LENGTH_CALL || result == CHR_CALL)
+            {
+                if(callingNum != 2)
+                {
+                    error(PARAM_NUM);
+                }
+            }
+            // These functions must have only two parameters
+            else if(result == ORD_CALL)
+            {
+                if(callingNum != 3)
+                {
+                    error(PARAM_NUM);
+                }
+            }
+            // These functions must have only three parameters
+            else if(result == SUBSTR_CALL)
+            {
+                if(callingNum != 4)
+                {
+                    error(PARAM_NUM);
+                }
+            }
+            // These functions must have more than zero parameters
+            else if(result == PRINT_CALL)
+            {
+                if(callingNum == 1)
+                {
+                    error(PARAM_NUM);
+                }
+            }
         }
         callingNum = 0;
         head = head->next;
