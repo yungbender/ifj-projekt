@@ -127,14 +127,18 @@ struct token get_token()
 							}
 							else
 							{
-								fseek(source, (-1-i), SEEK_CUR);
+								T1.type = L_ERR;
+								T1.attr.i = line;
+								str_free(&attr);
+								return T1;
 							}
 						}
 						else // =begin string wasnt found, reverting read characters
 						{
-							ungetc(c, source); // We return the char
-							fseek(source, (-1-i), SEEK_CUR); // And set back the position before the '=' character
-							state = 0;
+							T1.type = L_ERR;
+							T1.attr.i = line;
+							str_free(&attr);
+							return T1;
 						}
 					}
 					else

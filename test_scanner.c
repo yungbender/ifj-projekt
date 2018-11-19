@@ -317,17 +317,24 @@ int main()
 
 	open_file("tests_scanner/test24");
 	puts("TEST24 -- Operators");
-	for(int i = 0; i < 10; i++)
+	for(int i = 0; i < 4; i++)
 	{
 		LEX = get_token();
 		assert(LEX.type == 20 + i);
 		LEX = get_token();
 		assert(LEX.type == END_OF_LINE && LEX.attr.i == i + 1);
 	}
+	for(int i = 0; i < 4; i++)
+	{
+		LEX = get_token();
+		assert(LEX.type == 26 + i);
+		LEX = get_token();
+		assert(LEX.type == END_OF_LINE && LEX.attr.i == i + 5);
+	}
 	LEX = get_token();
 	assert(LEX.type == 30);
 	LEX = get_token();
-	assert(LEX.type == END_OF_FILE && LEX.attr.i == 11);
+	assert(LEX.type == END_OF_FILE && LEX.attr.i == 9);
 	fclose(f);
 
 	open_file("tests_scanner/test25");
@@ -424,43 +431,23 @@ int main()
 	open_file("tests_scanner/test36a");
 	puts("TEST36 -- ERROR: =begin not finished");
 	LEX = get_token();
-	assert(LEX.type == ASSIGNMENT);
-	LEX = get_token();
-	assert(LEX.type == ID && str_cmp_const_str(&LEX.attr.str, "begi") == 0);
-	str_free(&LEX.attr.str);
-	LEX = get_token();
-	assert(LEX.type == END_OF_FILE && LEX.attr.i == 1);
+	assert(LEX.type == L_ERR && LEX.attr.i == 1);
 	fclose(f);
 	open_file("tests_scanner/test36b");
 	LEX = get_token();
-	assert(LEX.type == ASSIGNMENT);
-	LEX = get_token();
-	assert(LEX.type == ID && str_cmp_const_str(&LEX.attr.str, "beg") == 0);
-	str_free(&LEX.attr.str);
-	LEX = get_token();
-	assert(LEX.type == END_OF_FILE && LEX.attr.i == 1);
+	assert(LEX.type == L_ERR && LEX.attr.i == 1);
 	fclose(f);
 	open_file("tests_scanner/test36c");
 	LEX = get_token();
-	assert(LEX.type == ASSIGNMENT);
-	LEX = get_token();
-	assert(LEX.type == ID && str_cmp_const_str(&LEX.attr.str, "be") == 0);
-	str_free(&LEX.attr.str);
-	LEX = get_token();
-	assert(LEX.type == END_OF_FILE && LEX.attr.i == 1);
+	assert(LEX.type == L_ERR && LEX.attr.i == 1);
 	fclose(f);
 	open_file("tests_scanner/test36d");
 	LEX = get_token();
-	assert(LEX.type == ASSIGNMENT);
-	LEX = get_token();
-	assert(LEX.type == ID && str_cmp_const_str(&LEX.attr.str, "b") == 0);
-	str_free(&LEX.attr.str);
-	LEX = get_token();
-	assert(LEX.type == END_OF_FILE && LEX.attr.i == 1);
+	assert(LEX.type == L_ERR && LEX.attr.i == 1);
 	fclose(f);
 
 	open_file("tests_scanner/test37");
-	puts("TEST37 -- ERROR: =end misspelled");
+	puts("TEST37 -- =end misspelled");
 	LEX = get_token();
 	assert(LEX.type == END_OF_FILE && LEX.attr.i == 5);
 	fclose(f);
@@ -470,23 +457,13 @@ int main()
 	LEX = get_token();
 	assert(LEX.type == END_OF_LINE && LEX.attr.i == 3);
 	LEX = get_token();
-	assert(LEX.type == ASSIGNMENT);
-	LEX = get_token();
-	assert(LEX.type == END);
-	LEX = get_token();
-	assert(LEX.type == END_OF_FILE && LEX.attr.i == 4);
+	assert(LEX.type == L_ERR && LEX.attr.i == 4);
 	fclose(f);
 
 	open_file("tests_scanner/test39");
 	puts("TEST39 -- Text right after =begin");
 	LEX = get_token();
-	assert(LEX.type == ASSIGNMENT);
-	LEX = get_token();
-	assert(LEX.type == ID && str_cmp_const_str(&LEX.attr.str, "beginneco") == 0);
-	LEX = get_token();
-	assert(LEX.type == END_OF_LINE && LEX.attr.i == 1);
-	LEX = get_token();
-	assert(LEX.type == END_OF_FILE && LEX.attr.i == 4);
+	assert(LEX.type == L_ERR && LEX.attr.i == 1);
 	fclose(f);
 
 	open_file("tests_scanner/test40");
