@@ -103,7 +103,7 @@ void free_ilist(tIList *instrs)
         while(instrs->head->params != NULL)
         {
             tmp = instrs->head->params->next;
-            if(instrs->head->params->param.type == STRING || instrs->head->params->param.type == ID || instrs->head->params->param.type == IDF)
+            if((instrs->head->instr == DEFVAR || instrs->head->instr == FUN_DEF) && (instrs->head->params->param.type == STRING || instrs->head->params->param.type == ID || instrs->head->params->param.type == IDF))
             {
                 str_free(&instrs->head->params->param.attr.str);
             }
@@ -1025,5 +1025,5 @@ void generate_code()
     generate_fundef(f);
     fclose(f);
     // This part is segfaulting, will fix
-    //free_ilist(ilist);
+    free_ilist(ilist);
 }
