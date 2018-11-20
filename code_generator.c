@@ -1025,5 +1025,5 @@ void generate_code()
     generate_fundef(f);
     fclose(f);
     // This part is segfaulting, will fix
-    free_ilist(ilist);
+    //free_ilist(ilist);
 }
