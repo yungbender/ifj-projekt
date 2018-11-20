@@ -9,7 +9,10 @@ bool endoffile = false;
 #define GET_TOKEN() \
     pData.token = get_token(); \
     if(pData.token.type == L_ERR) \
-        error(L_ERR);
+    { \
+        fprintf(stderr,"Lexical error, wrong lexem structure at line %d! \n", pData.token.attr.i);\
+        error(L_ERR); \
+    }; \
 
 void parser_init()
 {

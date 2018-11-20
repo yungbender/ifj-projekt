@@ -42,7 +42,6 @@ void print_error_exit(int id)
             fprintf(stderr,"Syntax error, unexpected token inside function call! \n");
             exit(SY_ERR);
         case L_ERR:
-            fprintf(stderr,"Lexical error, wrong lexem structure! \n");
             exit(L_ER);
         case COND_ERR:
             fprintf(stderr,"Semantic error, wrong data type in condition! \n");
