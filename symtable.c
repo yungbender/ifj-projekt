@@ -210,10 +210,6 @@ void free_tree(tNode *root)
     }
     free_tree(root->rptr);
     free_tree(root->lptr);
-    if(root->id.str != NULL)
-    {
-        str_free(&(root->id));
-    }
     free(root);
 }
 

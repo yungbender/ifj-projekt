@@ -53,6 +53,11 @@ void insert_instr(tIList *instrs, int instr)
     instrs->active->next = NULL;
 }
 
+/**
+ * Function appends parameter inside one instruction.
+ * @param instrs Pointer to the instruction list.
+ * @param param Parameter of function which is represented by token.
+ **/
 void insert_param(tIList *instrs, tToken param)
 {
     // This situation cannot occur, but just in case there is no SEGFAULT
@@ -93,6 +98,9 @@ void free_ilist(tIList *instrs)
     {
         return;
     }
+    // Initialize list for freeing pointers which are used by multiple tokens
+    tPList *freeList = (tPList *)malloc(sizeof(struct pointerList));
+    init_plist(freeList);
 
     tInstr *temp;
     tTList *tmp;
@@ -103,9 +111,13 @@ void free_ilist(tIList *instrs)
         while(instrs->head->params != NULL)
         {
             tmp = instrs->head->params->next;
-            if((instrs->head->instr == DEFVAR || instrs->head->instr == FUN_DEF) && (instrs->head->params->param.type == STRING || instrs->head->params->param.type == ID || instrs->head->params->param.type == IDF))
+            if(instrs->head->params->param.type == STRING || instrs->head->params->param.type == ID || instrs->head->params->param.type == IDF)
             {
-                str_free(&instrs->head->params->param.attr.str);
+                if(!search_ptr(freeList,&(instrs->head->params->param.attr.str)))
+                {
+                    str_free(&instrs->head->params->param.attr.str);
+                    insert_ptr(freeList, &instrs->head->params->param.attr.str);
+                }
             }
             free(instrs->head->params);
             instrs->head->params = tmp;
@@ -115,6 +127,92 @@ void free_ilist(tIList *instrs)
         instrs->head = temp;
     }
     free(instrs);
+    free_plist(freeList);
+}
+
+/**
+ * Function initialize pointer list, which prevents compiler from double free.
+ * @param plist Pointer to the pointer list.
+ **/
+void init_plist(tPList *plist)
+{
+    plist->active = NULL;
+    plist->head = NULL;
+}
+
+/**
+ * Function appends pointer, at the end of list.
+ * @param plist Pointer to the pointer list.
+ * @param freed Pointer to the freed string.
+ * @warning This string pointer, is always free, do not reference it.
+ **/
+void insert_ptr(tPList *plist, string *freed)
+{
+    if(plist == NULL)
+    {
+        return;
+    }
+    if(plist->head == NULL)
+    {
+        plist->head = (tPtr *)malloc(sizeof(struct pointerNode));
+        plist->head->freed = freed;
+        plist->active = plist->head;
+        return;
+    }
+    else
+    {
+        plist->active->next = (tPtr *)malloc(sizeof(struct pointerNode));
+        plist->active = plist->active->next;
+        plist->active->freed = freed;
+        plist->active->next = NULL;
+    }
+}
+
+/**
+ * Function searches allocated pointers and returns if pointer was free'd or not.
+ * @param plist Pointer to the pointer list.
+ * @param freed Pointer to the freed string.
+ * @return Function returns true pointer was free'd, false if not.
+ **/
+bool search_ptr(tPList *plist, string *freed)
+{
+    if(plist == NULL)
+    {
+        return false;
+    }
+    tPtr *tmp = plist->head;
+    while(tmp != NULL)
+    {
+        if(tmp->freed == freed)
+        {
+            return true;
+        }
+        tmp = tmp->next;
+    }
+    return false;
+}
+
+/**
+ * Function free's up whole list of pointers.
+ * @param plist Pointer to the pointer list.
+ **/
+void free_plist(tPList *plist)
+{
+    if(plist == NULL)
+    {
+        return;
+    }
+    if(plist->head != NULL)
+    {
+        tPtr *tmp = plist->head;
+        while(tmp != NULL)
+        {
+            tmp = plist->head->next;
+            free(plist->head);
+            plist->head = tmp;
+        }
+    }
+    free(plist);
 }
 
 /**
@@ -131,6 +229,8 @@ FILE* generate_head()
 
 /**
  * Function generates while operation inside code.
+ * @param f Pointer to the IFJcode2018 source code.
+ * @param instruction Pointer to the single instruction from inside code.
  **/
 void generate_add(FILE *f, tInstr *instruction)
 {
@@ -139,6 +239,8 @@ void generate_add(FILE *f, tInstr *instruction)
 
 /**
  * Function generates while operation inside code.
+ * @param f Pointer to the IFJcode2018 source code.
+ * @param instruction Pointer to the single instruction from inside code.
  **/
 void generate_sub(FILE *f, tInstr *instruction)
 {
@@ -147,6 +249,8 @@ void generate_sub(FILE *f, tInstr *instruction)
 
 /**
  * Function generates while operation inside code.
+ * @param f Pointer to the IFJcode2018 source code.
+ * @param instruction Pointer to the single instruction from inside code.
  **/
 void generate_mul(FILE *f, tInstr *instruction)
 {
@@ -155,6 +259,8 @@ void generate_mul(FILE *f, tInstr *instruction)
 
 /**
  * Function generates while operation inside code.
+ * @param f Pointer to the IFJcode2018 source code.
+ * @param instruction Pointer to the single instruction from inside code.
  **/
 void generate_div(FILE *f, tInstr *instruction)
 {
@@ -163,6 +269,8 @@ void generate_div(FILE *f, tInstr *instruction)
 
 /**
  * Function generates while operation inside code.
+ * @param f Pointer to the IFJcode2018 source code.
+ * @param instruction Pointer to the single instruction from inside code.
  **/
 void generate_move(FILE *f, tInstr *instruction)
 {
@@ -171,6 +279,8 @@ void generate_move(FILE *f, tInstr *instruction)
 
 /**
  * Function generates while operation inside code.
+ * @param f Pointer to the IFJcode2018 source code.
+ * @param instruction Pointer to the single instruction from inside code.
  **/
 void generate_while(FILE *f, tInstr *instruction)
 {
@@ -268,13 +378,20 @@ void generate_while(FILE *f, tInstr *instruction)
 
 /**
  * Function generates if operation inside code.
+ * @param f Pointer to the IFJcode2018 source code.
+ * @param instruction Pointer to the single instruction from inside code.
  **/
 void generate_if(FILE *f, tInstr *instruction)
 {
 
 }
 
-// FUN_CALL WHERE_RETURNED_VALUE FUNCTION_NAME PARAMETER0 ...
+/**
+ * Function generates function call with return value which is going to be saved, inside source code.
+ * @param f Pointer to the IFJcode2018 source code.
+ * @param instruction Pointer to the single instruction from inside code.
+ * @param builtin Signifies if called function is builtin or user-defined.
+ **/
 void generate_funcall(FILE *f, tInstr *instruction, bool builtin)
 {
     fprintf(f, "# FUNCTION CALL\n");
@@ -360,7 +477,12 @@ void generate_funcall(FILE *f, tInstr *instruction, bool builtin)
     fprintf(f, "POPFRAME\n\n");
 }
 
-// FUN_CALL FUNCTION_NAME PARAMETER0 ...
+/**
+ * Function generates function call which return value is not going to be saved, inside source code.
+ * @param f Pointer to the IFJcode2018 source code.
+ * @param instruction Pointer to the single instruction from inside code.
+ * @param builtin Signifies if called function is builtin or user-defined.
+ **/
 void generate_nofuncall(FILE *f, tInstr *instruction, bool builtin)
 {
     fprintf(f, "# FUNCTION CALL\n");

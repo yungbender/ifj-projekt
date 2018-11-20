@@ -62,6 +62,23 @@
 typedef struct tokenList tTList;
 typedef struct instructionList tIList;
 typedef struct instructionNode tInstr;
+typedef struct pointerNode tPtr;
+typedef struct pointerList tPList;
+
+
+// List of pointers to string to prevent double free
+typedef struct pointerList
+{
+    tPtr *head;
+    tPtr *active;
+}pointerList;
+
+// One member of pointer list
+typedef struct pointerNode
+{
+    string *freed;
+    tPtr *next;
+}pointerNode;
 
 // List of token parameters inside function instruction
 typedef struct tokenList
@@ -69,6 +86,7 @@ typedef struct tokenList
     tToken param;
     tTList *next;
 }tokenList;
+
 // List of instruction which contains list of token of its parameters
 typedef struct instructionNode
 {
@@ -76,6 +94,7 @@ typedef struct instructionNode
     tTList *params; // instruction parameters
     tInstr *next; // next instruction
 }instructionNode;
+
 // Instruction list (single linked list) which contains head of the list and active member which is used to insert token for current instruction (without searching everytime)
 typedef struct instructionList 
 {
@@ -85,9 +104,13 @@ typedef struct instructionList
 
 tIList *ilist;
 
+void init_plist(tPList *plist);
 void init_ilist(tIList *instrs);
 void insert_instr(tIList *instrs, int instr);
 void insert_param(tIList *instrs, tToken param);
+void insert_ptr(tPList *plist, string *freed);
+bool search_ptr(tPList *ptr, string *freed);
 void free_ilist(tIList *instrs);
+void free_plist(tPList *plist);
 void generate_code();
 void generate_instruction(FILE *f, tInstr *instruction);
