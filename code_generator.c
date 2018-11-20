@@ -1029,7 +1029,7 @@ tToken choose_return(tInstr *instruction)
         case FUN_END:
         case PRINT_CALL:
         case NOPRINT_CALL:
-            return nil;
+            break;
         case ADD:
         case SUB:
         case MUL:
@@ -1044,6 +1044,7 @@ tToken choose_return(tInstr *instruction)
         case ORD_CALL:
         case CHR_CALL: 
             // return where the function result was saved
+            str_free(&noretval.attr.str);
             return (instruction->params->param);
         case NOFUN_CALL:
         case NOINPUTF_CALL:
@@ -1054,8 +1055,10 @@ tToken choose_return(tInstr *instruction)
         case NOORD_CALL:
         case NOCHR_CALL:
             // return $noretval
+            noretval.type = NORETVAL;
             return noretval;
     }
+    str_free(&noretval.attr.str);
     return nil;
 }
 
@@ -1067,6 +1070,7 @@ void generate_fundef(FILE *f)
 {
     tInstr *begin = ilist->head;
     tTList *params = NULL;
+    tToken ret;
     int paramsNum = 0;
     while(begin != NULL)
     {
@@ -1098,7 +1102,7 @@ void generate_fundef(FILE *f)
             // Generate the last instruction
             generate_instruction(f,begin);
             // Based on last instruction, generator will return value
-            tToken ret = choose_return(begin);
+            ret = choose_return(begin);
             if(ret.type != NOP)
             {
                 fprintf(f, "MOVE TF@$retval TF@%s\n",ret.attr.str.str);
@@ -1129,7 +1133,10 @@ void generate_fundef(FILE *f)
         }
         begin = begin->next;
     }
-    
+    if(ret.type == NORETVAL) // If we stored string in ret token, we need to free it
+    {
+        str_free(&ret.attr.str);
+    }
 }
 
 

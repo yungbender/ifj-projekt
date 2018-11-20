@@ -52,6 +52,7 @@ typedef struct token{
 
 #define END_OF_FILE 5
 #define END_OF_LINE 6
+#define NORETVAL	7
 
 // KEYWORDS
 #define DEF   10
