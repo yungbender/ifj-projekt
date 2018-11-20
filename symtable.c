@@ -81,7 +81,7 @@ void clear_stack(tStack *stack)
     while(result->head.type != EMPTY)
     {
         pop_stack(stack);
-        result = result->next;
+        result = stack;
     }
 }
 

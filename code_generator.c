@@ -814,7 +814,7 @@ void generate_defvar_main(FILE *f, tInstr *instruction)
         // If funciton definition is found, skip the whole list until you find end
         if(instruction->instr == FUN_DEF)
         {
-            while(instruction->instr != FUN_DEF)
+            while(instruction->instr != FUN_END)
             {
                 instruction = instruction->next;
             }
@@ -1025,5 +1025,5 @@ void generate_code()
     generate_fundef(f);
     fclose(f);
     // This part is segfaulting, will fix
-    //free_ilist(ilist);
+    free_ilist(ilist);
 }

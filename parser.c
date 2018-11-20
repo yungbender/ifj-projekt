@@ -509,6 +509,9 @@ void function_call(bool moved, bool pushed)
         {
             insert_instr(pData.instrs,NOFUN_CALL);
             insert_param(pData.instrs,pData.token);
+            // The first argument was eaten up to get information which function is it
+            pData.token = head_stack(pData.stack);
+            pop_stack(pData.stack);
         }
         // If its built int just NOBUILTINCALL (BUILTINCALL + DIFFERENCE)
         else
@@ -830,7 +833,6 @@ void assignment()
                 case STRING:
                 case FLOAT:
                 case INTEGER:
-                    clear_stack(pData.stack);
                     push_stack(pData.stack,pData.token);
                     pData.token = temp;
                     function_call(true, true);
@@ -861,13 +863,38 @@ void analyse_id()
     // If EOL or EOF, function, check if parser is inside function
     if(pData.token.type == END_OF_LINE || pData.token.type == END_OF_FILE)
     {
-        function_call(false, false);
+        // Need to get function name back
+        tToken temp = head_stack(pData.stack);
+        pop_stack(pData.stack);
+        // Now need to push the first argument
+        push_stack(pData.stack, pData.token);
+        // Return function ID
+        pData.token = temp;
+        function_call(false, true);
         return;
     }
     // If "=" its assignment
     else if(pData.token.type == ASSIGNMENT)
     {
         assignment();
+        return;
+    }
+    // If is in definition it still can be function call with no return value saved
+    else if(result == NULL && pData.inDefinition == true)
+    {
+        // Need to get function name back
+        tToken temp = head_stack(pData.stack);
+        pop_stack(pData.stack);
+        // Now need to push the first argument
+        push_stack(pData.stack, pData.token);
+        // Return function ID
+        pData.token = temp;
+        function_call(false, true);
+        return;
+    }
+    else
+    {
+        error(WRONG_PARAM);
     }
     // Parse next
     GET_TOKEN();
