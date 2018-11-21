@@ -113,10 +113,9 @@ void free_ilist(tIList *instrs)
             tmp = instrs->head->params->next;
             if(instrs->head->params->param.type == STRING || instrs->head->params->param.type == ID || instrs->head->params->param.type == IDF)
             {
-                if(!search_ptr(freeList,&(instrs->head->params->param.attr.str)))
+                if(search_ptr(freeList, instrs->head->params->param.attr.str) == false)
                 {
-                    str_free(&instrs->head->params->param.attr.str);
-                    insert_ptr(freeList, &instrs->head->params->param.attr.str);
+                    insert_ptr(freeList, instrs->head->params->param.attr.str);
                 }
             }
             free(instrs->head->params);
@@ -146,7 +145,7 @@ void init_plist(tPList *plist)
  * @param freed Pointer to the freed string.
  * @warning This string pointer, is always free, do not reference it.
  **/
-void insert_ptr(tPList *plist, string *freed)
+void insert_ptr(tPList *plist, string freed)
 {
     if(plist == NULL)
     {
@@ -157,7 +156,7 @@ void insert_ptr(tPList *plist, string *freed)
         plist->head = (tPtr *)malloc(sizeof(struct pointerNode));
         plist->head->freed = freed;
         plist->active = plist->head;
-        return;
+        plist->head->next = NULL;
     }
     else
     {
@@ -174,7 +173,7 @@ void insert_ptr(tPList *plist, string *freed)
  * @param freed Pointer to the freed string.
  * @return Function returns true pointer was free'd, false if not.
  **/
-bool search_ptr(tPList *plist, string *freed)
+bool search_ptr(tPList *plist, string freed)
 {
     if(plist == NULL)
     {
@@ -183,7 +182,7 @@ bool search_ptr(tPList *plist, string *freed)
     tPtr *tmp = plist->head;
     while(tmp != NULL)
     {
-        if(tmp->freed == freed)
+        if(tmp->freed.str == freed.str)
         {
             return true;
         }
@@ -208,6 +207,7 @@ void free_plist(tPList *plist)
         while(tmp != NULL)
         {
             tmp = plist->head->next;
+            str_free(&plist->head->freed);
             free(plist->head);
             plist->head = tmp;
         }

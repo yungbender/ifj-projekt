@@ -76,7 +76,7 @@ typedef struct pointerList
 // One member of pointer list
 typedef struct pointerNode
 {
-    string *freed;
+    string freed;
     tPtr *next;
 }pointerNode;
 
@@ -108,8 +108,8 @@ void init_plist(tPList *plist);
 void init_ilist(tIList *instrs);
 void insert_instr(tIList *instrs, int instr);
 void insert_param(tIList *instrs, tToken param);
-void insert_ptr(tPList *plist, string *freed);
-bool search_ptr(tPList *ptr, string *freed);
+void insert_ptr(tPList *plist, string freed);
+bool search_ptr(tPList *ptr, string freed);
 void free_ilist(tIList *instrs);
 void free_plist(tPList *plist);
 void generate_code();
