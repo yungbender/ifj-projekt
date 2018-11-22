@@ -67,6 +67,7 @@
 #define EQS 248
 #define PUSHS 249
 #define POPS 250
+#define NOTS 251
 // Empty instruction
 #define NOP 240
 

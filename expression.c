@@ -21,6 +21,7 @@ typedef enum {
 	E, 			// = equal
 	N4,	  		// error number 4
 	N2,			// error number 2
+	K			// expression OK
 } T_sign;
 
 typedef enum {
@@ -44,7 +45,7 @@ int prec_table[8][8] = {
 	{  S,  S,  S,  S,  S,  E,  S,  N2 }, // (
 	{  R,  R,  R,  R,  N2, R,  N2, R  }, // )
 	{  R,  R,  R,  R,  N2, R,  N2, R  }, // i
-	{  S,  S,  S,  S,  S,  N2, S,  N2 }  // $
+	{  S,  S,  S,  S,  S,  N2, S,  K }  // $
 };
 
 #define DOLLAR 200	// $
@@ -81,6 +82,7 @@ PT_idx table_index(tToken token)
 		case STRING:
 		case ID:
 		case IDF:
+		case NONTERM:
 			return I_data;
 		default:
 			return I_dollar;
@@ -190,8 +192,8 @@ void reduce_by_rule(tStack *tmp_stack)
 			{
 				pop_stack(tmp_stack);
 				push_stack(pData.stack, rule_token);
-				//insert_instr(pData.instrs,NOTS);
-				//insert_instr(pData.instrs,EQS);
+				insert_instr(pData.instrs,NOTS);
+				insert_instr(pData.instrs,EQS);
 			}
 		}
 		//E->E>E
@@ -227,8 +229,8 @@ void reduce_by_rule(tStack *tmp_stack)
 			{
 				pop_stack(tmp_stack);
 				push_stack(pData.stack, rule_token);
-				//insert_instr(pData.instrs,NOTS);
-				//insert_instr(pData.instrs,LTS);
+				insert_instr(pData.instrs,NOTS);
+				insert_instr(pData.instrs,LTS);
 				// NOTS LTS || GTS ORS EQS ?
 			}
 		}
@@ -241,8 +243,8 @@ void reduce_by_rule(tStack *tmp_stack)
 			{
 				pop_stack(tmp_stack);
 				push_stack(pData.stack, rule_token);
-				//insert_instr(pData.instrs,NOTS);
-				//insert_instr(pData.instrs,GTS);
+				insert_instr(pData.instrs,NOTS);
+				insert_instr(pData.instrs,GTS);
 				// NOTS GTS || LTS ORS EQS ?
 			}
 		}
@@ -267,7 +269,7 @@ void opt_reduce()
 		push_stack(&tmp_stack, tmp);
 		pop_stack(pData.stack);
 		head = head_stack(pData.stack);
-	} while(head.type != stop_token.type);
+	} while(head.type != STOP);
 	pop_stack(pData.stack);
 	tmp_head = head_stack(pData.stack);
 	reduce_by_rule(&tmp_stack);
@@ -287,57 +289,17 @@ void opt_switch()
 		error(L_ERR);
 	}
 }
-
-// insert token to the end of the list
-void insert_list(tTList **list, tToken token)
-{
-	if(*list == NULL)
-	{
-		*list = malloc(sizeof(struct tokenList));
-		(*list)->param = token;
-		(*list)->next = NULL;
-	}
-	else
-	{
-		tTList *tmp = (*list)->next;
-		tTList *prev = tmp;
-		while(tmp != NULL)
-		{
-			prev = tmp;
-			tmp = tmp->next;
-		}
-		prev->next = malloc(sizeof(struct tokenList));
-		prev->next->param = token;
-		prev->next->next = NULL;
-	}
-}
-
-// copy contents to main stack
-void copy_list_to_stack(tTList *list)
-{
-	while(list != NULL)
-	{
-		push_stack(pData.stack, list->param);
-		tTList *tmp = list;
-		list = list->next;
-		free(tmp);
-	}
-}
-
 // operation equal '='  ==========================================================
 void opt_eq()
-{
-	// temporary list
-	tTList *list_head = NULL;
+{	
 	tToken head;
 	do{
-		tToken tmp = head_stack(pData.stack);
-		insert_list(&list_head, tmp);
 		pop_stack(pData.stack);
 		head = head_stack(pData.stack);
-	} while(head.type != stop_token.type);
+	}while(head.type != STOP);
 	pop_stack(pData.stack);
-	copy_list_to_stack(list_head);
+	pData.token = get_token();
+	tmp_head = head_stack(pData.stack);
 }
 
 void pars_expression()
@@ -346,32 +308,33 @@ void pars_expression()
 	tToken stack_end;	
 	stack_end.type = DOLLAR;
 	push_stack(pData.stack, stack_end);
-
+	tmp_head.type = DOLLAR;
 	while (1) 
 	{
 		PT_idx activ = table_index(pData.token);
-		tToken top_stack = head_stack(pData.stack);
-		PT_idx top = table_index(top_stack);
-		if((prec_table[activ][top]) == S)
-		{
+		PT_idx top = table_index(tmp_head);
+		if((prec_table[top][activ]) == S)
+		{	
 			opt_switch();
 		}
-		else if((prec_table[activ][top]) == R)
+		else if((prec_table[top][activ]) == R)
 		{
 			opt_reduce();
 		}
-		else if((prec_table[activ][top]) == E)
+		else if((prec_table[top][activ]) == E)
 		{
 			opt_eq();
 		}
-		else if((prec_table[activ][top]) == N4)
+		else if((prec_table[top][activ]) == N4)
 		{
 			error(DATA_ERR);
 		}
-		else
+		else if((prec_table[top][activ]) == N2)
 		{
 			error(UNEXPECTED_EXPR);
 		}
+		else
+			return;
 	}
 }
 

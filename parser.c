@@ -777,10 +777,10 @@ void if_condition()
         error(COND_ERR);
     }
 
-    //pars_expression();
+    pars_expression();
 
     // Expression returns token which should contain THEN keyword
-    GET_TOKEN(); // TODO: <- so this this is just placeholder for testing
+    //GET_TOKEN(); // TODO: <- so this this is just placeholder for testing
     if(pData.token.type != THEN)
     {
         error(UNEXPECTED_IF);
