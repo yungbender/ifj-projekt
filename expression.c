@@ -54,8 +54,10 @@ tToken tmp_head;
 tToken stop_token;
 
 //get precedence table index
-PT_idx table_index(tToken token){
-	switch (token.type){
+PT_idx table_index(tToken token)
+{
+	switch (token.type)
+	{
 		case PLUS:
 		case MINUS:
 			return I_plus_minus;
@@ -86,88 +88,106 @@ PT_idx table_index(tToken token){
 }
 
  
-void reduce_by_rule(tStack *tmp_stack){
+void reduce_by_rule(tStack *tmp_stack)
+{
 	tToken rule_token;
 	rule_token.type = NONTERM;
 	tToken head = head_stack(tmp_stack);
 	//E->i
-	if ( head.type == ID || head.type == INTEGER || head.type == FLOAT || head.type == STRING ){
+	if(head.type == ID || head.type == INTEGER || head.type == FLOAT || head.type == STRING)
+	{
 		insert_instr(pData.instrs, PUSHS);
 		insert_param(pData.instrs, head);
 		pop_stack(tmp_stack);
 		push_stack(pData.stack, rule_token);
 	}
-	else if( head.type == OPEN_PARENTH ){
+	else if(head.type == OPEN_PARENTH)
+	{
 		//E->(E)
 		pop_stack(tmp_stack);
 		head = head_stack(tmp_stack);
-		if (head.type == NONTERM){
+		if(head.type == NONTERM)
+		{
 			pop_stack(tmp_stack);
 			head = head_stack(tmp_stack);
-			if (head.type == CLOSE_PARENTH){
+			if(head.type == CLOSE_PARENTH)
+			{
 				pop_stack(tmp_stack);
 				push_stack(pData.stack, rule_token);
 			}
 		}
 	}
-	else if( head.type == NONTERM ){
+	else if(head.type == NONTERM)
+	{
 		pop_stack(tmp_stack);
 		head = head_stack(tmp_stack);
 		//E->E+E
-		if (head.type == PLUS){
+		if(head.type == PLUS)
+		{
 			pop_stack(tmp_stack);
 			head = head_stack(tmp_stack);
-			if (head.type == NONTERM){
+			if(head.type == NONTERM)
+			{
 				pop_stack(tmp_stack);
 				push_stack(pData.stack, rule_token);
 				insert_instr(pData.instrs, ADDS);
 			}
 		}
 		//E->E-E
-		else if(head.type == MINUS){
+		else if(head.type == MINUS)
+		{
 			pop_stack(tmp_stack);
 			head = head_stack(tmp_stack);
-			if (head.type == NONTERM){
+			if(head.type == NONTERM)
+			{
 				pop_stack(tmp_stack);
 				push_stack(pData.stack, rule_token);
 				insert_instr(pData.instrs, SUBS);
 			}
 		}
 		//E->E*E
-		else if(head.type == ASTERISK){
+		else if(head.type == ASTERISK)
+		{
 			pop_stack(tmp_stack);
 			head = head_stack(tmp_stack);
-			if (head.type == NONTERM){
+			if(head.type == NONTERM)
+			{
 				pop_stack(tmp_stack);
 				push_stack(pData.stack, rule_token);
 				insert_instr(pData.instrs, MULS);
 			}
 		}
 		//E->E/E
-		else if(head.type == SLASH){
+		else if(head.type == SLASH)
+		{
 			pop_stack(tmp_stack);
 			head = head_stack(tmp_stack);
-			if (head.type == NONTERM){
+			if(head.type == NONTERM)
+			{
 				pop_stack(tmp_stack);
 				push_stack(pData.stack, rule_token);
 				insert_instr(pData.instrs, DIVS);
 			}
 		}
 		//E->E==E
-		else if(head.type == EQUAL){
+		else if(head.type == EQUAL)
+		{
 			pop_stack(tmp_stack);
 			head = head_stack(tmp_stack);
-			if (head.type == NONTERM){
+			if(head.type == NONTERM)
+			{
 				pop_stack(tmp_stack);
 				push_stack(pData.stack, rule_token);
 				insert_instr(pData.instrs, EQS);
 			}
 		}
 		//E->E!=E
-		else if(head.type == NOT_EQUAL){
+		else if(head.type == NOT_EQUAL)
+		{
 			pop_stack(tmp_stack);
 			head = head_stack(tmp_stack);
-			if (head.type == NONTERM){
+			if(head.type == NONTERM)
+			{
 				pop_stack(tmp_stack);
 				push_stack(pData.stack, rule_token);
 				//insert_instr(pData.instrs,NOTS);
@@ -175,30 +195,36 @@ void reduce_by_rule(tStack *tmp_stack){
 			}
 		}
 		//E->E>E
-		else if(head.type == GREATER_THAN){
+		else if(head.type == GREATER_THAN)
+		{
 			pop_stack(tmp_stack);
 			head = head_stack(tmp_stack);
-			if (head.type == NONTERM){
+			if(head.type == NONTERM)
+			{
 				pop_stack(tmp_stack);
 				push_stack(pData.stack, rule_token);
 				insert_instr(pData.instrs, GTS);
 			}
 		}
 		//E->E<E
-		else if(head.type == LESS_THAN){
+		else if(head.type == LESS_THAN)
+		{
 			pop_stack(tmp_stack);
 			head = head_stack(tmp_stack);
-			if (head.type == NONTERM){
+			if(head.type == NONTERM)
+			{
 				pop_stack(tmp_stack);
 				push_stack(pData.stack, rule_token);
 				insert_instr(pData.instrs, LTS);
 			}
 		}
 		//E->E>=E
-		else if(head.type == GREATER_EQUAL){
+		else if(head.type == GREATER_EQUAL)
+		{
 			pop_stack(tmp_stack);
 			head = head_stack(tmp_stack);
-			if (head.type == NONTERM){
+			if(head.type == NONTERM)
+			{
 				pop_stack(tmp_stack);
 				push_stack(pData.stack, rule_token);
 				//insert_instr(pData.instrs,NOTS);
@@ -207,10 +233,12 @@ void reduce_by_rule(tStack *tmp_stack){
 			}
 		}
 		//E->E<=E
-		else if(head.type == LESS_EQUAL){
+		else if(head.type == LESS_EQUAL)
+		{
 			pop_stack(tmp_stack);
 			head = head_stack(tmp_stack);
-			if (head.type == NONTERM){
+			if(head.type == NONTERM)
+			{
 				pop_stack(tmp_stack);
 				push_stack(pData.stack, rule_token);
 				//insert_instr(pData.instrs,NOTS);
@@ -220,13 +248,16 @@ void reduce_by_rule(tStack *tmp_stack){
 		}
 	}
 	head = head_stack(tmp_stack);
-	if (head.type != EMPTY)
-		error(SY_ERR);
+	if(head.type != EMPTY)
+	{
+		error(UNEXPECTED_EXPR);
+	}
 }
 
 
 // operation reduce '>'  =========================================================
-void opt_reduce(){
+void opt_reduce()
+{
 	tStack tmp_stack;
 	init_stack(&tmp_stack);
 	tToken head;
@@ -236,36 +267,42 @@ void opt_reduce(){
 		push_stack(&tmp_stack, tmp);
 		pop_stack(pData.stack);
 		head = head_stack(pData.stack);
-	}while( head.type != stop_token.type );
+	} while(head.type != stop_token.type);
 	pop_stack(pData.stack);
 	tmp_head = head_stack(pData.stack);
 	reduce_by_rule(&tmp_stack);
 }
 
 // operation switch '<'  =========================================================
-void opt_switch(){
+void opt_switch()
+{
 	stop_token.type = STOP;
 	push_stack(pData.stack, stop_token);
 	push_stack(pData.stack, pData.token);
 	tmp_head = head_stack(pData.stack);
 	pData.token = get_token();
-	if(pData.token.type == L_ERR){
+	if(pData.token.type == L_ERR)
+	{
 		fprintf(stderr,"Lexical error, wrong lexem structure at line %d! \n",pData.token.attr.i);
 		error(L_ERR);
 	}
 }
 
 // insert token to the end of the list
-void insert_list(tTList **list, tToken token){
-	if (*list == NULL){
+void insert_list(tTList **list, tToken token)
+{
+	if(*list == NULL)
+	{
 		*list = malloc(sizeof(struct tokenList));
 		(*list)->param = token;
 		(*list)->next = NULL;
 	}
-	else{
+	else
+	{
 		tTList *tmp = (*list)->next;
 		tTList *prev = tmp;
-		while(tmp != NULL){
+		while(tmp != NULL)
+		{
 			prev = tmp;
 			tmp = tmp->next;
 		}
@@ -276,8 +313,10 @@ void insert_list(tTList **list, tToken token){
 }
 
 // copy contents to main stack
-void copy_list_to_stack(tTList *list){
-	while(list != NULL){
+void copy_list_to_stack(tTList *list)
+{
+	while(list != NULL)
+	{
 		push_stack(pData.stack, list->param);
 		tTList *tmp = list;
 		list = list->next;
@@ -286,7 +325,8 @@ void copy_list_to_stack(tTList *list){
 }
 
 // operation equal '='  ==========================================================
-void opt_eq(){
+void opt_eq()
+{
 	// temporary list
 	tTList *list_head = NULL;
 	tToken head;
@@ -295,31 +335,43 @@ void opt_eq(){
 		insert_list(&list_head, tmp);
 		pop_stack(pData.stack);
 		head = head_stack(pData.stack);
-	}while( head.type != stop_token.type );
+	} while(head.type != stop_token.type);
 	pop_stack(pData.stack);
 	copy_list_to_stack(list_head);
 }
 
-void pars_expression(){
+void pars_expression()
+{
 	// push end of stack = dollar
 	tToken stack_end;	
 	stack_end.type = DOLLAR;
 	push_stack(pData.stack, stack_end);
 
-	while (1) {
+	while (1) 
+	{
 		PT_idx activ = table_index(pData.token);
 		tToken top_stack = head_stack(pData.stack);
 		PT_idx top = table_index(top_stack);
-		if((prec_table[activ][top])==S)
-				opt_switch();
-		else if((prec_table[activ][top])==R)
-				opt_reduce();
-		else if((prec_table[activ][top])==E)
-				opt_eq();
-		else if((prec_table[activ][top])==N4)
-				error(DATA_ERR);
+		if((prec_table[activ][top]) == S)
+		{
+			opt_switch();
+		}
+		else if((prec_table[activ][top]) == R)
+		{
+			opt_reduce();
+		}
+		else if((prec_table[activ][top]) == E)
+		{
+			opt_eq();
+		}
+		else if((prec_table[activ][top]) == N4)
+		{
+			error(DATA_ERR);
+		}
 		else
-				error(UNEXPECTED_EXPR);
+		{
+			error(UNEXPECTED_EXPR);
+		}
 	}
 }
 
