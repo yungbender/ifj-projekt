@@ -29,6 +29,8 @@ typedef struct parserdata
     bool inDefinition; //< Bool which signifies if parser is inside function definition.
 }tPData;
 
+extern tPData pData;
+
 void parse();
 void start();
 void parser_init();

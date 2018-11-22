@@ -1,3 +1,5 @@
+#ifndef _SYM_H
+#define _SYM_H
 /************************************************************************
  * 
  * Compiler implementation for imperative programming language IFJ18
@@ -63,3 +65,4 @@ void free_stack(tStack *stack);
 void free_params(tParamList *params);
 void free_tree(tNode *root);
 void free_symtable(tSymTable *symTable);
+#endif // _SYM_H

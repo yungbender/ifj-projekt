@@ -1,3 +1,5 @@
+#ifndef _ERR_H
+#define _ERR_H
 /************************************************************************
  * 
  * Compiler implementation for imperative programming language IFJ18
@@ -40,3 +42,4 @@
 #define UNEXPECTED_W 117
 
 void print_error_exit(int id);
+#endif // _ERR_H

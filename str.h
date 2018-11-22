@@ -1,3 +1,5 @@
+#ifndef _STR_H
+#define _STR_H
 /************************************************************************
  * 
  * Compiler implementation for imperative programming language IFJ18
@@ -37,3 +39,4 @@ int str_cmp_const_str(string *s1, char *s2);
 int str_copy_const_string(string *s1, char *s2);
 char *str_get_str(string *s);
 int str_get_length(string *s);
+#endif // _STR_H

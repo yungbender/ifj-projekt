@@ -1,3 +1,5 @@
+#ifndef _SCAN_H
+#define _SCAN_H
 /************************************************************************
  * 
  * Compiler implementation for imperative programming language IFJ18
@@ -101,3 +103,4 @@ typedef struct token{
 // Function headers
 void set_source_file(FILE *f);
 struct token get_token();
+#endif // _SCAN_H
