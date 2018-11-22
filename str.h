@@ -6,7 +6,7 @@
  * Sasák Tomáš - xsasak01
  * Venkrbec Tomáš - xvenkr01
  * Krajči Martin - xkrajc21
- * Natália Dižová - xdizov00 
+ * Dižová Natália - xdizov00 
  * 
  ***********************************************************************/
 /* 
