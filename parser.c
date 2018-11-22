@@ -120,7 +120,7 @@ int validate_symbol(string name)
     {
         return PRINT_CALL;
     }
-    else if (str_cmp_const_str(&(name),"lengths") == 0)
+    else if (str_cmp_const_str(&(name),"length") == 0)
     {
         return LENGTH_CALL;
     }
@@ -563,14 +563,22 @@ void function_call(bool moved, bool pushed)
             insert_instr(pData.instrs,NOFUN_CALL);
             insert_param(pData.instrs,pData.token);
             // The first argument was eaten up to get information which function is it
-            pData.token = head_stack(pData.stack);
-            pop_stack(pData.stack);
+            if(pushed == true)
+            {
+                pData.token = head_stack(pData.stack);
+                pop_stack(pData.stack);
+            }
         }
         // If its built int just NOBUILTINCALL (BUILTINCALL + DIFFERENCE)
         else
         {
             insert_instr(pData.instrs,(builtin + NOCALL_CALL_DIFFERENCE));
             str_free(&pData.token.attr.str); // We dont need to save the name of builtin function
+            if(pushed == true)
+            {
+                pData.token = head_stack(pData.stack);
+                pop_stack(pData.stack);
+            }
         }
     }
     // If will be moved
@@ -822,7 +830,6 @@ void if_condition()
  */
 void end_of_line()
 {
-
     GET_TOKEN();
     start();
 }
@@ -930,7 +937,19 @@ void analyse_id()
     int builtin = validate_symbol(pData.token.attr.str);
     if(result != NULL || builtin != OK)
     {
-        function_call(false, false);
+        // Now parser needs to check if user is not assigning to the function
+        push_stack(pData.stack, pData.token);
+        GET_TOKEN();
+        if(pData.token.type == ASSIGNMENT)
+        {
+            error(UNEXPECTED_TOKEN);
+        }
+        tToken temp = head_stack(pData.stack);
+        pop_stack(pData.stack);
+        push_stack(pData.stack, pData.token);
+        pData.token = temp;
+        // Parser is again one token off and parameter is on stack
+        function_call(false, true);
         return;
     }
     GET_TOKEN();

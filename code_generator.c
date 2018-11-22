@@ -23,10 +23,10 @@ int uniqueCounter = 0;
 /** @name These bools, signifies, if builtin functions needs to be generated, so they cannot generate two times, or will not generate at all if thy were not called
 */
 //@{
-bool lengthGenerated = false;
-bool substrGenerated = false;
-bool ordGenerated = false;
-bool chrGenerated = false;
+bool lengthRequest = false;
+bool substrRequest = false;
+bool ordRequest = false;
+bool chrRequest = false;
 //@}
 
 /**
@@ -474,15 +474,19 @@ void generate_funcall(FILE *f, tInstr *instruction, bool builtin)
         {
             case LENGTH_CALL:
                 fprintf(f, "CALL $length\n");
+                lengthRequest = true;
                 break;
             case SUBSTR_CALL:
                 fprintf(f, "CALL $substr\n");
+                substrRequest = true;
                 break;
             case ORD_CALL:
                 fprintf(f, "CALL $ord\n");
+                ordRequest = true;
                 break;
             case CHR_CALL:
                 fprintf(f, "CALL $chr\n");
+                chrRequest = true;
                 break;
         }
     }
@@ -563,15 +567,20 @@ void generate_nofuncall(FILE *f, tInstr *instruction, bool builtin)
         {
             case NOLENGTH_CALL:
                 fprintf(f, "CALL $length\n");
+                // User called length, need to request code generator, to define it later
+                lengthRequest = true;
                 break;
             case NOSUBSTR_CALL:
                 fprintf(f, "CALL $substr\n");
+                substrRequest = true;
                 break;
             case NOORD_CALL:
                 fprintf(f, "CALL $ord\n");
+                ordRequest = true;
                 break;
             case NOCHR_CALL:
                 fprintf(f, "CALL $chr\n");
+                chrRequest = true;
                 break;
         }
     }
@@ -777,7 +786,7 @@ void generate_substr(FILE *f)
     fprintf(f, "LABEL $endif$substr\n\n");
     // While(cnt != max)
     fprintf(f, "LABEL $while$substr\n");
-    fprintf(f, "GT TF@from$BOOL TF@$cnt TF@$max\n");
+    fprintf(f, "EQ TF@from$BOOL TF@$cnt TF@$max\n");
     fprintf(f, "JUMPIFEQ $while$end$substr TF@from$BOOL bool@true\n");
     // tmpstr = Getchar(s, from)
     fprintf(f, "GETCHAR TF@$tmpstr TF@string TF@from\n");
@@ -825,7 +834,7 @@ void generate_ord(FILE *f)
     fprintf(f, "DEFVAR TF@string$length\n");
     fprintf(f, "STRLEN TF@string$length TF@string\n\n");
     fprintf(f, "DEFVAR TF@int$BOOL\n");
-    fprintf(f, "LF TF@int$BOOL TF@int TF@string$length\n");
+    fprintf(f, "LT TF@int$BOOL TF@int TF@string$length\n");
     fprintf(f, "JUMPIFEQ $int$TRUE TF@int$BOOL bool@true\n");
     fprintf(f, "MOVE TF@$retval nil@nil\n");
     fprintf(f, "RETURN\n\n");
@@ -960,6 +969,7 @@ void generate_defvar_main(FILE *f, tInstr *instruction)
         if(instruction->instr == DEFVAR)
         {
             fprintf(f, "DEFVAR TF@%s\n", instruction->params->param.attr.str.str);
+            fprintf(f, "MOVE TF@%s nil@nil\n", instruction->params->param.attr.str.str);
             // replace defvar with nop to skip this instruction next time
             instruction->instr = NOP;
         }
@@ -982,6 +992,7 @@ void generate_defvar_fun(FILE *f, tInstr *instruction)
         if(instruction->instr == DEFVAR)
         {
             fprintf(f, "DEFVAR TF@%s\n", instruction->params->param.attr.str.str);
+            fprintf(f, "MOVE TF@%s nil@nil\n", instruction->params->param.attr.str.str);
             // replace defvar with nop to skip this instruction next time
             instruction->instr = NOP;
         }
@@ -995,6 +1006,7 @@ void generate_defvar_fun(FILE *f, tInstr *instruction)
  */
 void generate_main(FILE *f)
 {
+    fprintf(f, "########## MAIN ##########\n");
     tInstr *begin = ilist->head;
     // DEFVARS must go first!
     // generating special variable noretval which saves return of nonreturn function, so nonreturn function can return value if was called inside return function
@@ -1083,6 +1095,7 @@ tToken choose_return(tInstr *instruction)
  */
 void generate_fundef(FILE *f)
 {
+    fprintf(f, "########## USER'S FUNCTIONS ##########\n");
     tInstr *begin = ilist->head;
     tTList *params = NULL;
     tToken ret;
@@ -1124,33 +1137,42 @@ void generate_fundef(FILE *f)
             }
             fprintf(f, "RETURN\n\n");
         }
-        // If built in function was called, must check if it was generated already, if it was not generate it, else do nothing
-        else if((begin->instr == LENGTH_CALL || begin->instr == NOLENGTH_CALL) && lengthGenerated == false)
-        {
-            generate_length(f);
-            // function was generated, set bool to true so function will not be generated again
-            lengthGenerated = true;
-        }
-        else if((begin->instr == SUBSTR_CALL || begin->instr == NOSUBSTR_CALL) && substrGenerated == false)
-        {
-            generate_substr(f);
-            substrGenerated = true;
-        }
-        else if((begin->instr == ORD_CALL || begin->instr == NOORD_CALL) && ordGenerated == false)
-        {
-            generate_ord(f);
-            ordGenerated = true;
-        }
-        else if((begin->instr == CHR_CALL || begin->instr == NOCHR_CALL) && chrGenerated == false)
-        {
-            generate_chr(f);
-            chrGenerated = true;
-        }
         begin = begin->next;
     }
     if(ret.type == NORETVAL) // If we stored string in ret token, we need to free it
     {
         str_free(&ret.attr.str);
+    }
+}
+
+/**
+ * Function generates builtin functions based on request bools.
+ * @param f Pointer to the IFJcode18 source code.
+ */
+void generate_builtin(FILE *f)
+{
+    fprintf(f, "########## BUILTIN FUNCTIONS ##########\n");
+    // If built in function was called, must check if it was generated already, if it was not generate it, else do nothing
+    if(lengthRequest == true)
+    {
+        generate_length(f);
+        // function was generated, set bool to false so function will not be generated again
+        lengthRequest = false;
+    }
+    else if(substrRequest == true)
+    {
+        generate_substr(f);
+        substrRequest = false;
+    }
+    else if(ordRequest == true)
+    {
+        generate_ord(f);
+        ordRequest = false;
+    }
+    else if(chrRequest == true)
+    {
+        generate_chr(f);
+        chrRequest = false;
     }
 }
 
@@ -1167,6 +1189,7 @@ void generate_code()
     FILE *f = generate_head();
     generate_main(f);
     generate_fundef(f);
+    generate_builtin(f);
     fclose(f);
     // This part is segfaulting, will fix
     free_ilist(ilist);
