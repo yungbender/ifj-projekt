@@ -1,3 +1,14 @@
+/************************************************************************
+ * 
+ * Compiler implementation for imperative programming language IFJ18
+ * 
+ * Autors:
+ * Sasák Tomáš - xsasak01
+ * Venkrbec Tomáš - xvenkr01
+ * Krajči Martin - xkrajc21
+ * Natália Dižová - xdizov00 
+ * 
+ ***********************************************************************/
 /* 
 Constant STR_LEN_INC defines how many bytes we allocate for the string during initialization
 and subsequently how many bytes we allocate when we run of free space when appending the string

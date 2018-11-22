@@ -1,9 +1,23 @@
+/************************************************************************
+ * 
+ * Compiler implementation for imperative programming language IFJ18
+ * 
+ * Autors:
+ * Sasák Tomáš - xsasak01
+ * Venkrbec Tomáš - xvenkr01
+ * Krajči Martin - xkrajc21
+ * Natália Dižová - xdizov00 
+ * 
+ ***********************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
 #include "error.h"
 #include "scanner.h"
 
-
+/**
+ * Function which based on error id, will generate defined error and close the compiler.
+ * @param id Number of error.
+ */
 void print_error_exit(int id)
 {
     switch(id)
@@ -42,6 +56,7 @@ void print_error_exit(int id)
             fprintf(stderr,"Syntax error, unexpected token inside function call! \n");
             exit(SY_ERR);
         case L_ERR:
+            fprintf(stderr,"Syntax error, invalid token inside code. \n");
             exit(L_ER);
         case COND_ERR:
             fprintf(stderr,"Semantic error, wrong data type in condition! \n");

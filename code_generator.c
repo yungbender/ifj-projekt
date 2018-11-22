@@ -1,22 +1,38 @@
+/************************************************************************
+ * 
+ * Compiler implementation for imperative programming language IFJ18
+ * 
+ * Autors:
+ * Sasák Tomáš - xsasak01
+ * Venkrbec Tomáš - xvenkr01
+ * Krajči Martin - xkrajc21
+ * Natália Dižová - xdizov00 
+ * 
+ ***********************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include "code_generator.h"
 #include "error.h"
 
-// Unique number used for generating labels
-int uniqueCounter;
+/**
+ * Counter for making unique labels.
+ */
+int uniqueCounter = 0;
 
-// These bools, signifies, if builtin functions needs to be generated, so they cannot generate two times, or will not generate at all if thy were not called
+/** @name These bools, signifies, if builtin functions needs to be generated, so they cannot generate two times, or will not generate at all if thy were not called
+*/
+//@{
 bool lengthGenerated = false;
 bool substrGenerated = false;
 bool ordGenerated = false;
 bool chrGenerated = false;
+//@}
 
 /**
  * Function initializes instruction list for first use.
- * @params instrs Pointer to the instruction list.
- **/
+ * @param instrs Pointer to the instruction list.
+ */
 void init_ilist(tIList *instrs)
 {
     instrs->active = NULL;
@@ -25,9 +41,9 @@ void init_ilist(tIList *instrs)
 
 /**
  * Function inserts instruction code (macro) to the instruction list, creates instruction node for it.
- * @params @instrs Pointer to the instruction list.
- * @params instr Number of instruction to insert (macro).
- **/
+ * @param instrs Pointer to the instruction list.
+ * @param instr Number of instruction to insert (macro).
+ */
 void insert_instr(tIList *instrs, int instr)
 {
     // This situation cannot occur, but just in case there is no SEGFAULT
@@ -57,7 +73,7 @@ void insert_instr(tIList *instrs, int instr)
  * Function appends parameter inside one instruction.
  * @param instrs Pointer to the instruction list.
  * @param param Parameter of function which is represented by token.
- **/
+ */
 void insert_param(tIList *instrs, tToken param)
 {
     // This situation cannot occur, but just in case there is no SEGFAULT
@@ -90,8 +106,8 @@ void insert_param(tIList *instrs, tToken param)
 
 /**
  * Function free's up the whole instruction list, instructions, tokens.
- * @params instrs Instruction list with instructions which is supposed to get free'd.
- **/
+ * @param instrs Instruction list with instructions which is supposed to get free'd.
+ */
 void free_ilist(tIList *instrs)
 {
     if(instrs == NULL)
@@ -132,7 +148,7 @@ void free_ilist(tIList *instrs)
 /**
  * Function initialize pointer list, which prevents compiler from double free.
  * @param plist Pointer to the pointer list.
- **/
+ */
 void init_plist(tPList *plist)
 {
     plist->active = NULL;
@@ -143,8 +159,7 @@ void init_plist(tPList *plist)
  * Function appends pointer, at the end of list.
  * @param plist Pointer to the pointer list.
  * @param freed Pointer to the freed string.
- * @warning This string pointer, is always free, do not reference it.
- **/
+ */
 void insert_ptr(tPList *plist, string freed)
 {
     if(plist == NULL)
@@ -171,8 +186,8 @@ void insert_ptr(tPList *plist, string freed)
  * Function searches allocated pointers and returns if pointer was free'd or not.
  * @param plist Pointer to the pointer list.
  * @param freed Pointer to the freed string.
- * @return Function returns true pointer was free'd, false if not.
- **/
+ * @return Function returns true pointer was found, if not false.
+ */
 bool search_ptr(tPList *plist, string freed)
 {
     if(plist == NULL)
@@ -194,7 +209,7 @@ bool search_ptr(tPList *plist, string freed)
 /**
  * Function free's up whole list of pointers.
  * @param plist Pointer to the pointer list.
- **/
+ */
 void free_plist(tPList *plist)
 {
     if(plist == NULL)
@@ -218,7 +233,7 @@ void free_plist(tPList *plist)
 /**
  * Function creates output file, insert needed header for ifjcode18 and creates temporary frame for working with "main".
  * @return Function returns pointer to the output file.
- **/
+ */
 FILE* generate_head()
 {
     FILE *f = fopen("prog.out","w");
@@ -231,7 +246,7 @@ FILE* generate_head()
  * Function generates while operation inside code.
  * @param f Pointer to the IFJcode2018 source code.
  * @param instruction Pointer to the single instruction from inside code.
- **/
+ */
 void generate_add(FILE *f, tInstr *instruction)
 {
 
@@ -241,7 +256,7 @@ void generate_add(FILE *f, tInstr *instruction)
  * Function generates while operation inside code.
  * @param f Pointer to the IFJcode2018 source code.
  * @param instruction Pointer to the single instruction from inside code.
- **/
+ */
 void generate_sub(FILE *f, tInstr *instruction)
 {
 
@@ -251,7 +266,7 @@ void generate_sub(FILE *f, tInstr *instruction)
  * Function generates while operation inside code.
  * @param f Pointer to the IFJcode2018 source code.
  * @param instruction Pointer to the single instruction from inside code.
- **/
+ */
 void generate_mul(FILE *f, tInstr *instruction)
 {
 
@@ -261,7 +276,7 @@ void generate_mul(FILE *f, tInstr *instruction)
  * Function generates while operation inside code.
  * @param f Pointer to the IFJcode2018 source code.
  * @param instruction Pointer to the single instruction from inside code.
- **/
+ */
 void generate_div(FILE *f, tInstr *instruction)
 {
 
@@ -271,7 +286,7 @@ void generate_div(FILE *f, tInstr *instruction)
  * Function generates while operation inside code.
  * @param f Pointer to the IFJcode2018 source code.
  * @param instruction Pointer to the single instruction from inside code.
- **/
+ */
 void generate_move(FILE *f, tInstr *instruction)
 {
 
@@ -281,7 +296,7 @@ void generate_move(FILE *f, tInstr *instruction)
  * Function generates while operation inside code.
  * @param f Pointer to the IFJcode2018 source code.
  * @param instruction Pointer to the single instruction from inside code.
- **/
+ */
 void generate_while(FILE *f, tInstr *instruction)
 {
     tInstr *actualInstr = instruction;
@@ -380,7 +395,7 @@ void generate_while(FILE *f, tInstr *instruction)
  * Function generates if operation inside code.
  * @param f Pointer to the IFJcode2018 source code.
  * @param instruction Pointer to the single instruction from inside code.
- **/
+ */
 void generate_if(FILE *f, tInstr *instruction)
 {
 
@@ -391,7 +406,7 @@ void generate_if(FILE *f, tInstr *instruction)
  * @param f Pointer to the IFJcode2018 source code.
  * @param instruction Pointer to the single instruction from inside code.
  * @param builtin Signifies if called function is builtin or user-defined.
- **/
+ */
 void generate_funcall(FILE *f, tInstr *instruction, bool builtin)
 {
     fprintf(f, "# FUNCTION CALL\n");
@@ -482,7 +497,7 @@ void generate_funcall(FILE *f, tInstr *instruction, bool builtin)
  * @param f Pointer to the IFJcode2018 source code.
  * @param instruction Pointer to the single instruction from inside code.
  * @param builtin Signifies if called function is builtin or user-defined.
- **/
+ */
 void generate_nofuncall(FILE *f, tInstr *instruction, bool builtin)
 {
     fprintf(f, "# FUNCTION CALL\n");
@@ -568,10 +583,10 @@ void generate_nofuncall(FILE *f, tInstr *instruction, bool builtin)
 
 /**
  * Function generates inputs, inputf, inputi, built-in functions into IFJcode2018.
- * @params f Pointer to the IFJcode2018 source code.
- * @params instruction Pointer to the single instruction from inside code.
- * @params moved Bool which signifies if result of the function is going to be moved.
- **/
+ * @param f Pointer to the IFJcode2018 source code.
+ * @param instruction Pointer to the single instruction from inside code.
+ * @param moved Bool which signifies if result of the function is going to be moved.
+ */
 void generate_input(FILE *f, tInstr *instruction, bool moved, int datatype)
 {
     // input is going to be saved
@@ -613,10 +628,10 @@ void generate_input(FILE *f, tInstr *instruction, bool moved, int datatype)
 
 /**
  * Function generates print built-in functions into IFJcode2018.
- * @params f Pointer to the IFJcode2018 source code.
- * @params instruction Pointer to the single instruction from inside code.
- * @params moved Bool which signifies if result of the function is going to be moved.
- **/
+ * @param f Pointer to the IFJcode2018 source code.
+ * @param instruction Pointer to the single instruction from inside code.
+ * @param moved Bool which signifies if result of the function is going to be moved.
+ */
 void generate_print(FILE *f, tInstr *instruction, bool moved)
 {
     tToken where;
@@ -663,8 +678,8 @@ void generate_print(FILE *f, tInstr *instruction, bool moved)
 
 /**
  * Function generates length(s) built-in functions into IFJcode2018.
- * @params f Pointer to the IFJcode2018 source code.
- **/
+ * @param f Pointer to the IFJcode2018 source code.
+ */
 void generate_length(FILE *f)
 {
     fprintf(f, "# DEFINITION OF BUILTIN FUNCTION LENGTH()\n\n");
@@ -684,7 +699,7 @@ void generate_length(FILE *f)
 
 /**
  * Function generates substr(s, i, n) built-infunction into IFJcode2018.
- * @params f Pointer to the IFJcode2018 source code.
+ * @param f Pointer to the IFJcode2018 source code.
  **/
 void generate_substr(FILE *f)
 {
@@ -781,8 +796,8 @@ void generate_substr(FILE *f)
 
 /**
  * Function generates ord(s, i) built-infunction into IFJcode2018.
- * @params f Pointer to the IFJcode2018 source code.
- **/
+ * @param f Pointer to the IFJcode2018 source code.
+ */
 void generate_ord(FILE *f)
 {
     fprintf(f, "# DEFINITION OF BUILTIN FUNCTION ORD()\n\n");
@@ -822,8 +837,8 @@ void generate_ord(FILE *f)
 
 /**
  * Function generates chr(i) built-infunction into IFJcode2018.
- * @params f Pointer to the IFJcode2018 source code.
- **/
+ * @param f Pointer to the IFJcode2018 source code.
+ */
 void generate_chr(FILE *f)
 {
     fprintf(f, "# DEFINITION OF BUILTIN FUNCTION CHR()\n\n");
@@ -857,7 +872,7 @@ void generate_chr(FILE *f)
  * Function generates ONE instruction only.
  * @param f Pointer to the IFJcode2018 source code.
  * @param instruction Pointer to the single instruction from inside code.
- **/
+ */
 void generate_instruction(FILE *f, tInstr *instruction)
 {
     switch(instruction->instr)
@@ -926,9 +941,9 @@ void generate_instruction(FILE *f, tInstr *instruction)
 
 /**
  * Function generates ALL defvars inside main.
- * @params f Pointer to the IFJcode2018 source code.
- * @params instruction Pointer to the list of instructions.
- **/
+ * @param f Pointer to the IFJcode2018 source code.
+ * @param instruction Pointer to the list of instructions.
+ */
 void generate_defvar_main(FILE *f, tInstr *instruction)
 {
     while(instruction != NULL)
@@ -954,9 +969,9 @@ void generate_defvar_main(FILE *f, tInstr *instruction)
 
 /**
  * Function generates ALL defvars inside function.
- * @params f Pointer to the IFJcode2018 source code.
- * @params instruction Pointer to the list of instructions.
- **/
+ * @param f Pointer to the IFJcode2018 source code.
+ * @param instruction Pointer to the list of instructions.
+ */
 void generate_defvar_fun(FILE *f, tInstr *instruction)
 {
     // generating special variable noretval which saves return of nonreturn function, so nonreturn function can return value if was called inside return function
@@ -977,7 +992,7 @@ void generate_defvar_fun(FILE *f, tInstr *instruction)
 /**
  * Function generates instruction one by one but ignores function definitions and everything inside it until end macro.
  * @param f Pointer to the IFJcode2018 source code.
- **/
+ */
 void generate_main(FILE *f)
 {
     tInstr *begin = ilist->head;
@@ -1010,7 +1025,7 @@ void generate_main(FILE *f)
 /**
  * Function chooses, which value(token) to return, based on last instruction.
  * @param instruction Pointer to the last instruction of the funcion.
- **/
+ */
 tToken choose_return(tInstr *instruction)
 {
     tToken nil;
@@ -1065,7 +1080,7 @@ tToken choose_return(tInstr *instruction)
 /**
  * Function finds function definition macro and generates everything until end of the function and continues until end of the list.
  * @param f Pointer to the IFJcode2018 source code.
- **/
+ */
 void generate_fundef(FILE *f)
 {
     tInstr *begin = ilist->head;
@@ -1142,7 +1157,7 @@ void generate_fundef(FILE *f)
 
 /**
  * Function which generates parsed inside code to final IFJcode2018 code.
- **/
+ */
 void generate_code()
 {
     if(ilist == NULL)

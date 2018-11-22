@@ -1,3 +1,14 @@
+/************************************************************************
+ * 
+ * Compiler implementation for imperative programming language IFJ18
+ * 
+ * Autors:
+ * Sasák Tomáš - xsasak01
+ * Venkrbec Tomáš - xvenkr01
+ * Krajči Martin - xkrajc21
+ * Natália Dižová - xdizov00 
+ * 
+ ***********************************************************************/
 // ======= ERRORS =======
 #define L_ER     1
 #define SY_ERR	  2
@@ -27,6 +38,5 @@
 #define EXPECTED_END 115
 #define UNDEFINED_VAR 116
 #define UNEXPECTED_W 117
-
 
 void print_error_exit(int id);

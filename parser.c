@@ -1,46 +1,69 @@
+/************************************************************************
+ * 
+ * Compiler implementation for imperative programming language IFJ18
+ * 
+ * Autors:
+ * Sasák Tomáš - xsasak01
+ * Venkrbec Tomáš - xvenkr01
+ * Krajči Martin - xkrajc21
+ * Natália Dižová - xdizov00 
+ * 
+ ***********************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include "parser.h"
 
-tPData pData;
-bool endoffile = false;
+tPData pData; //< This global variable, are data of parser, symbol tables, instruction list etc.
+bool endoffile = false; //< This global bool, signifies if endofline was reached, to prevent double free.
 
 #define GET_TOKEN() \
     pData.token = get_token(); \
     if(pData.token.type == L_ERR) \
     { \
-        fprintf(stderr,"Lexical error, wrong lexem structure at line %d! \n", pData.token.attr.i);\
+        fprintf(stderr,"Lexical error, wrong lexem structure at line %d! \n", pData.token.attr.i); \
         error(L_ERR); \
     }; \
 
+/**
+ * Function initializes structure tPData, which are data of parser.
+ */
 void parser_init()
 {
     pData.global = (tSymTable *)malloc(sizeof(struct symTable));
     pData.local = (tSymTable *)malloc(sizeof(struct symTable));
     pData.instrs = (tIList *)malloc(sizeof(struct instructionList));
     pData.stack = (tStack *)malloc(sizeof(struct tokenStack));
+
     pData.scopes = 0;
     pData.inDefinition = false;
+
     init_stack(pData.stack);
     init_ilist(pData.instrs);
     init_table(pData.global);
     init_table(pData.local);
 }
 
+/**
+ * Function free's out all parser resources (pData) and call's error print function.
+ * Function is only called when semantic or synthathic analysis fails.
+ * @param id Type of error.
+ */
 void error(int id)
 {
     free_symtable(pData.global);
     free_symtable(pData.local);
+
     free_ilist(pData.instrs);
     free_stack(pData.stack);
+
     print_error_exit(id);
 }
 
 /**
  * Function searches if string is keyword or built-in function.
- * @params name Name of the function/variable.
- * @returns True if it is validate name, false if not.
+ * @param name Name of the function/variable.
+ * @return Macro number of keyword or builtin function from scanner.h.
  **/ 
 int validate_symbol(string name)
 {
@@ -115,6 +138,10 @@ int validate_symbol(string name)
     return OK;
 }
 
+/**
+ * Function validates number of every function call.
+ * @param root Pointer to the global symbol table, which has all functions.
+ */
 void validate_params(tNode *root)
 {
     tInstr *head = pData.instrs->head;
@@ -258,6 +285,10 @@ void validate_params(tNode *root)
     }
 }
 
+/**
+ * Function validates, if every function call is calling existing function.
+ * @param root Pointer to the global symbol table, which has all functions.
+ */
 void validate_calls(tNode *root)
 {
     if(root == NULL)
@@ -278,7 +309,12 @@ void validate_calls(tNode *root)
     }
 }
 
-bool validate_variable(string name)
+/**
+ * Function validates name of variable, checks if its name is builtin function or keyword, and searches inside local table.
+ * If found, function calls error.
+ * @param name Name of the variable.
+ */
+void validate_variable(string name)
 {
     // Check if the variable name is not built-in function name or keyword
     int result = validate_symbol(name);
@@ -286,18 +322,19 @@ bool validate_variable(string name)
     {
         error(IDF_REDEF);
     }
-    // Search the if the variable is inside local table
-    tNode *temp = search_table(pData.local->root, name);
+    // Search the if the variable is inside global
+    tNode *temp = search_table(pData.global->root, name);
     // Expecting NULL, if not its redefinition
     if(temp != NULL)
     {
         error(IDF_REDEF);
     }
-
-    return true;
 }
 
 // <f_def> <start> <f_decl>
+/**
+ * Function parses function definition, by calling the start() of the function recursively.
+ */
 void parse_function_definition()
 {
     // Setting if the parser is currently in definition to true, and also incrementing scope number
@@ -343,6 +380,10 @@ void parse_function_definition()
 }
 
 // <params> ID  <params> ) <f_decl>
+/**
+ * Function parses current function formal parameters.
+ * @param function Pointer straight to the function inside global symbol table.
+ */
 void params(tNode *function)
 {
     GET_TOKEN();
@@ -400,6 +441,9 @@ void params(tNode *function)
     }
 }
 
+/**
+ * Function parses function declaration, name, parameters and body.
+ */
 void function_declaration()
 {
     // Function definition implementation
@@ -475,6 +519,11 @@ void function_declaration()
     start();
 }
 
+/**
+ * Function parses, function call and inserts instructions inside instruction list.
+ * @param moved Bool which signifies if function result is going to be saved.
+ * @param pushed Bool which signifies if parser "ate" one more token to analyse correct derivation tree.
+ */ 
 void function_call(bool moved, bool pushed)
 {
     // Check if the called function is in the global table
@@ -537,6 +586,8 @@ void function_call(bool moved, bool pushed)
         tNode *result = search_table(pData.local->root,name.attr.str);
         if(result == NULL)
         {
+            // Need to check if variable name is not builtin function or keyword
+            validate_variable(name.attr.str);
             if(pData.local->root == NULL)
             {
                 pData.local->root = insert_var(pData.local->root, name);
@@ -655,6 +706,9 @@ void function_call(bool moved, bool pushed)
     start();
 }
 
+/**
+ * Function parses, while loop and generates instructions inside instruction list.
+ */
 void while_loop()
 {
     // Got into while scope
@@ -701,6 +755,9 @@ void while_loop()
     start();
 }
 
+/**
+ * Function parses if condition and generates instructions inside instruction list.
+ */
 void if_condition()
 {
     pData.scopes++;
@@ -758,12 +815,19 @@ void if_condition()
     start(); // Continue parsing
 }
 
+/**
+ * Function parses end of line.
+ */
 void end_of_line()
 {
     GET_TOKEN();
     start();
 }
 
+/**
+ * Function parses end of file, checks if all conditions, loops and definitions were ended "end".
+ * Free's out all parser resources and submit's intruction list, to code generator.
+ */
 void end_of_file()
 {
     if(endoffile == false)
@@ -786,6 +850,9 @@ void end_of_file()
     }
 }
 
+/**
+ * Function parses assignmnet to variable.
+ */
 void assignment()
 {
     // Left assignment side, is still on stack
@@ -848,8 +915,8 @@ void assignment()
 }
 
 /**
- * Function analyses ID and chooses what to do next.
- **/
+ * Function analyses ID and chooses which derivation tree should create.
+ */
 void analyse_id()
 {
     // push the ID on the stack
@@ -904,6 +971,10 @@ void analyse_id()
     start();
 }
 
+/**
+ * Main parse function which chooses the start of the derivation tree.
+ * This function is called everytime when new line.
+ */
 void start()
 {
     switch(pData.token.type)
@@ -955,6 +1026,9 @@ void start()
     }
 }
 
+/**
+ * Function initializes parser and start creating derivation tree.
+ */
 void parse()
 {
     parser_init();
