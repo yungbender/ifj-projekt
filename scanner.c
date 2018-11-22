@@ -746,7 +746,7 @@ struct token get_token()
 				break;
 
 			case X_ES: // hexadecimal escape sequence \xh
-				if((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F')) // Accepted hexadecimal alphanumericals
+				if((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f')) // Accepted hexadecimal alphanumericals
 				{
 					state = XHH_ES;
 					hexa[0] = c; // We save the first digit of hexa number
@@ -774,7 +774,7 @@ struct token get_token()
 				else if(c > 31)
 				{
 					state = TMP_SL;
-					if((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F')) // Accepted hexadecimal alphanumericals
+					if((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f')) // Accepted hexadecimal alphanumericals
 					{
 						hexa[1] = c; // We save the second digit of hexa number
 					}
@@ -801,7 +801,7 @@ struct token get_token()
 				}
 				str_add_string(&attr, decimal);
 
-				if(!((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || c == '\"' || c == '\\'))
+				if(!((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f') || c == '\"' || c == '\\'))
 				{
 					str_add_char(&attr, c);	// If we have short hexa sequence, dont forget the letter that ended the sequence
 				}				

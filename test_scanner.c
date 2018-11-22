@@ -653,6 +653,26 @@ int main()
 	assert(LEX.type == END_OF_FILE && LEX.attr.i == 1);
 	fclose(f);
 
+	open_file("tests_scanner/test50");
+	puts("TEST50 -- Hexadecimal string sequence can contain lowercase letters");
+	LEX = get_token();
+	assert(LEX.type == STRING && str_cmp_const_str(&LEX.attr.str, "dalsi\\032debilni\\032update\\032\\010\\010\\015\\255\\240") == 0);
+	LEX = get_token();
+	assert(LEX.type == END_OF_FILE && LEX.attr.i == 1);
+	fclose(f);
+
+	open_file("tests_scanner/test51a");
+	puts("TEST51 -- ERROR: Hexadecimal string sequence with incorrect lowercase letters");
+	LEX = get_token();
+	assert(LEX.type == STRING && str_cmp_const_str(&LEX.attr.str, "\\000g") == 0);
+	LEX = get_token();
+	assert(LEX.type == END_OF_FILE && LEX.attr.i == 1);
+	fclose(f);
+	open_file("tests_scanner/test51b");
+	LEX = get_token();
+
+	assert(LEX.type == L_ERR && LEX.attr.i == 1);
+	fclose(f);
 	puts("\nEverything is OK\n");
 	return 0;
 }
