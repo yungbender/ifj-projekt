@@ -84,5 +84,8 @@ void print_error_exit(int id)
         case UNEXPECTED_EXPR:
             fprintf(stderr,"Syntax error, unexpected token in expression! \n");
             exit(SY_ERR);
+        case UNEXPECTED_TOKEN:
+            fprintf(stderr,"Syntax error, unexpected token! \n");
+            exit(SY_ERR);   
     }
 }

@@ -570,6 +570,7 @@ void function_call(bool moved, bool pushed)
         else
         {
             insert_instr(pData.instrs,(builtin + NOCALL_CALL_DIFFERENCE));
+            str_free(&pData.token.attr.str); // We dont need to save the name of builtin function
         }
     }
     // If will be moved
@@ -771,7 +772,7 @@ void if_condition()
     //pars_expression();
 
     // Expression returns token which should contain THEN keyword
-    //GET_TOKEN(); // TODO: <- so this this is just placeholder for testing
+    GET_TOKEN(); // TODO: <- so this this is just placeholder for testing
     if(pData.token.type != THEN)
     {
         error(UNEXPECTED_IF);
@@ -821,6 +822,7 @@ void if_condition()
  */
 void end_of_line()
 {
+
     GET_TOKEN();
     start();
 }
@@ -845,6 +847,7 @@ void end_of_file()
         free_symtable(pData.global);
         free_symtable(pData.local);
         free_stack(pData.stack);
+
         // Give the final instruction list to the code generator
         ilist = pData.instrs;
         endoffile = true;
@@ -1024,6 +1027,9 @@ void start()
             // Need to check if we are not in function, check if all scopes are 0 and if all called functions got their own definition
             end_of_file();
             break;
+
+        default:
+            error(UNEXPECTED_TOKEN);
     }
 }
 

@@ -106,8 +106,7 @@ tNode* create_var(tToken id)
 {
     tNode *temp = (tNode *)malloc(sizeof(struct node));
     //TODO unsucc malloc
-    str_init(&(temp->id));
-    str_copy_string(&(temp->id),&(id.attr.str)); // must be string because its variable identificator
+    temp->id = (&id)->attr.str;
     temp->wasDefined = true;
     temp->paramsNum = 0;
     temp->lptr = NULL;
@@ -150,8 +149,7 @@ tNode *create_fun(tToken id, int paramsNum, bool wasDefined)
 {
     tNode *temp = (tNode *)malloc(sizeof(struct node));
     //TODO unsucc malloc
-    str_init(&(temp->id));
-    str_copy_string(&(temp->id),&(id.attr.str)); // must be string because its function identificator
+    temp->id = (&id)->attr.str;
     temp->wasDefined = wasDefined;
     temp->paramsNum = paramsNum;
     temp->lptr = NULL;  
