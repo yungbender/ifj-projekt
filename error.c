@@ -56,7 +56,6 @@ void print_error_exit(int id)
             fprintf(stderr,"Syntax error, unexpected token inside function call! \n");
             exit(SY_ERR);
         case L_ERR:
-            fprintf(stderr,"Syntax error, invalid token inside code. \n");
             exit(L_ER);
         case COND_ERR:
             fprintf(stderr,"Semantic error, wrong data type in condition! \n");
@@ -82,5 +81,8 @@ void print_error_exit(int id)
         case UNDEFINED_VAR:
             fprintf(stderr,"Semantic error, undefined variable inside expression or function call!\n");
             exit(DATA_ERR);
+        case UNEXPECTED_EXPR:
+            fprintf(stderr,"Syntax error, unexpected token in expression! \n");
+            exit(SY_ERR);
     }
 }

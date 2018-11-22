@@ -249,10 +249,10 @@ void opt_switch(){
 	push_stack(pData.stack, pData.token);
 	tmp_head = head_stack(pData.stack);
 	pData.token = get_token();
-	//if(pData.token.type == L_ERR){
-	//	fprintf(stderr,"Lexical error, wrong lexem structure at line %d! \n",pData.token.attr.i);
-	//	error(L_ERR);
-	//}
+	if(pData.token.type == L_ERR){
+		fprintf(stderr,"Lexical error, wrong lexem structure at line %d! \n",pData.token.attr.i);
+		error(L_ERR);
+	}
 }
 
 // insert token to the end of the list
@@ -305,11 +305,7 @@ void pars_expression(){
 	tToken stack_end;	
 	stack_end.type = DOLLAR;
 	push_stack(pData.stack, stack_end);
-	pData.token = get_token();
-	//if(pData.token.type == L_ERR){
-	//	fprintf(stderr,"Lexical error, wrong lexem structure at line %d! \n",pData.token.attr.i);
-	//	error(L_ERR);
-	//}
+
 	while (1) {
 		PT_idx activ = table_index(pData.token);
 		tToken top_stack = head_stack(pData.stack);
@@ -323,7 +319,7 @@ void pars_expression(){
 		else if((prec_table[activ][top])==N4)
 				error(DATA_ERR);
 		else
-				error(SY_ERR);
+				error(UNEXPECTED_EXPR);
 	}
 }
 

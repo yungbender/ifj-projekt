@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "parser.h"
+#include "expression.h"
 
 tPData pData; //< This global variable, are data of parser, symbol tables, instruction list etc.
 bool endoffile = false; //< This global bool, signifies if endofline was reached, to prevent double free.
@@ -762,15 +763,15 @@ void if_condition()
 {
     pData.scopes++;
     GET_TOKEN(); // Expression starts with one of the following tokens
-    if(pData.token.type != ID && pData.token.type != INTEGER && pData.token.type != FLOAT && pData.token.type != STRING)
+    if(pData.token.type != ID && pData.token.type != INTEGER && pData.token.type != FLOAT && pData.token.type != STRING && pData.token.type != OPEN_PARENTH)
     {
         error(COND_ERR);
     }
 
-    // TODO: Expression parsing
+    //pars_expression();
 
     // Expression returns token which should contain THEN keyword
-    GET_TOKEN(); // TODO: <- so this this is just placeholder for testing
+    //GET_TOKEN(); // TODO: <- so this this is just placeholder for testing
     if(pData.token.type != THEN)
     {
         error(UNEXPECTED_IF);

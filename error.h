@@ -40,6 +40,7 @@
 #define EXPECTED_END 115
 #define UNDEFINED_VAR 116
 #define UNEXPECTED_W 117
+#define UNEXPECTED_EXPR 118
 
 void print_error_exit(int id);
 #endif // _ERR_H
