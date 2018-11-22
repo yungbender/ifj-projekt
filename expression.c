@@ -297,7 +297,6 @@ void opt_eq(){
 		head = head_stack(pData.stack);
 	}while( head.type != stop_token.type );
 	pop_stack(pData.stack);
-	// push naspat vsetky tokeny z tmp_list
 	copy_list_to_stack(list_head);
 }
 
@@ -314,7 +313,6 @@ void pars_expression(){
 	while (1) {
 		PT_idx activ = table_index(pData.token);
 		tToken top_stack = head_stack(pData.stack);
-			// tToken top_stack = head(pData)
 		PT_idx top = table_index(top_stack);
 		if((prec_table[activ][top])==S)
 				opt_switch();
