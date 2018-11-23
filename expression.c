@@ -14,14 +14,6 @@
 #include "parser.h"
 #include "scanner.h"
 
-#define GET_TOKEN() \
-    pData.token = get_token(); \
-    if(pData.token.type == L_ERR) \
-    { \
-        fprintf(stderr,"Lexical error, wrong lexem structure at line %d! \n", pData.token.attr.i); \
-        error(L_ERR); \
-    }; \
-
 // precedence table symbols
 typedef enum {
 	S = 500,		// < shift
@@ -92,19 +84,35 @@ PT_idx table_index(tToken token)
 		case ID:
 		case NONTERM:
 			return I_data;
+		case IDF:
+			error(UNEXPECTED_FUN);
+			exit(SE_ERR); // Just to prevent warning from compiler
 		default:
 			return I_dollar;
 	}
 }
 
- 
+// Function chcek if the variable is inside table
+void check_data(tToken id){
+	tNode *result = search_table(pData.local->root, id.attr.str);
+	if(result == NULL)
+	{
+		error(UNDEF_V);
+	}
+}
+
 void reduce_by_rule(tStack *tmp_stack)
 {
 	rule_token.type = NONTERM;
 	tToken head = head_stack(tmp_stack);
 	//E->i
 	if(head.type == ID || head.type == INTEGER || head.type == FLOAT || head.type == STRING)
-	{
+	{	
+		// Chcek if the variable is defined
+		if(head.type == ID)
+		{
+			check_data(head);
+		}
 		insert_instr(pData.instrs, PUSHS);
 		insert_param(pData.instrs, head);
 		pop_stack(tmp_stack);
@@ -199,8 +207,8 @@ void reduce_by_rule(tStack *tmp_stack)
 			{
 				pop_stack(tmp_stack);
 				push_stack(pData.stack, rule_token);
-				insert_instr(pData.instrs,NOTS);
 				insert_instr(pData.instrs,EQS);
+				insert_instr(pData.instrs,NOTS);
 			}
 		}
 		//E->E>E
@@ -236,9 +244,8 @@ void reduce_by_rule(tStack *tmp_stack)
 			{
 				pop_stack(tmp_stack);
 				push_stack(pData.stack, rule_token);
-				insert_instr(pData.instrs,NOTS);
 				insert_instr(pData.instrs,LTS);
-				// NOTS LTS || GTS ORS EQS ?
+				insert_instr(pData.instrs,NOTS);
 			}
 		}
 		//E->E<=E
@@ -250,9 +257,8 @@ void reduce_by_rule(tStack *tmp_stack)
 			{
 				pop_stack(tmp_stack);
 				push_stack(pData.stack, rule_token);
-				insert_instr(pData.instrs,NOTS);
 				insert_instr(pData.instrs,GTS);
-				// NOTS GTS || LTS ORS EQS ?
+				insert_instr(pData.instrs,NOTS);
 			}
 		}
 	}
@@ -354,7 +360,7 @@ void pars_expression()
 		}
 		else if((prec_table[top][activ]) == N4)
 		{
-			error(DATA_ERR);
+			error(INCOMPATIBLE_EXPR);
 		}
 		else if((prec_table[top][activ]) == N2)
 		{

@@ -27,6 +27,7 @@
 // While calls
 #define WHILE_CALL 206
 #define WHILE_END 207
+#define WHILE_COND_END 238
 // Built-in functions
 #define INPUTS_CALL 208
 #define INPUTI_CALL 209
@@ -72,7 +73,7 @@
 #define POPS 250
 #define NOTS 251
 // Empty instruction
-#define NOP 240
+#define NOP 299
 
 typedef struct tokenList tTList;
 typedef struct instructionList tIList;
@@ -104,7 +105,7 @@ typedef struct pointerNode
 /**
  * Structure ADS single-linked list which contains parameters saved as tokens of ONE instruction in instruction list.
  * Example: ord(s, i) - token s and token i is in this list.
- * @see tIList
+ * @see tIList
  */
 typedef struct tokenList
 {

@@ -18,19 +18,6 @@
 tPData pData; //< This global variable, are data of parser, symbol tables, instruction list etc.
 bool endoffile = false; //< This global bool, signifies if endofline was reached, to prevent double free.
 
-#define GET_TOKEN() \
-    pData.token = get_token(); \
-    if(pData.token.type == L_ERR) \
-    { \
-        fprintf(stderr,"Lexical error, wrong lexem structure at line %d! \n", pData.token.attr.i); \
-        error(L_ERR); \
-    }; \
-
-#define CREATE_NORETVAL_TOKEN() \
-    tToken noretval; \
-    str_init(&noretval.attr.str); \
-    str_add_string(&noretval.attr.str, "$noretval"); \
-
 /**
  * Function initializes structure tPData, which are data of parser.
  */
@@ -736,15 +723,16 @@ void while_loop()
         error(COND_ERR);
     } 
 
-    //TODO: spracovanie výrazu;
+    pars_expression();
 
-    GET_TOKEN();
     // Expecting DO after condition
     if(pData.token.type != DO)
     {
         error(EXPECTED_DO);
     }
 
+    insert_instr(pData.instrs, WHILE_COND_END);
+    
     GET_TOKEN();
     // Expecting EOL after DO
     if(pData.token.type != END_OF_LINE)
@@ -943,6 +931,7 @@ void assignment()
         //TODO: if here the parser will see that it is not function call, parser is one token off        
     }
     // TODO: call expression parsing
+// TODO: call expression parsing
     else if(pData.token.type == INTEGER || pData.token.type == FLOAT || pData.token.type == STRING)
     {
         tToken where = head_stack(pData.stack);
@@ -1121,6 +1110,7 @@ void start()
             parse_concatenation();
             insert_instr(pData.instrs, CONCAT_END);
             insert_param(pData.instrs, noretval);
+            start();
             break;
 
         default:

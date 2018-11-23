@@ -81,12 +81,18 @@ void print_error_exit(int id)
         case UNDEFINED_VAR:
             fprintf(stderr,"Semantic error, undefined variable inside expression or function call!\n");
             exit(DATA_ERR);
+        case UNEXPECTED_FUN:
+            fprintf(stderr,"Semantic error, unexpected function call inside expression!\n");
+            exit(SE_ERR);
         case UNEXPECTED_EXPR:
             fprintf(stderr,"Syntax error, unexpected token in expression! \n");
             exit(SY_ERR);
         case UNEXPECTED_TOKEN:
             fprintf(stderr,"Syntax error, unexpected token! \n");
-            exit(SY_ERR);   
+            exit(SY_ERR);
+        case INCOMPATIBLE_EXPR:
+            fprintf(stderr,"Semantic error, wrong data type in expression! \n");
+            exit(DATA_ERR);
         case WRONG_OP_CONCAT:
             fprintf(stderr, "Semantic error, wrong operations inside concatenation! \n");
             exit(DATA_ERR);

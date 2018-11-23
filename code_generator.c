@@ -19,6 +19,7 @@
  * Counter for making unique labels.
  */
 int uniqueCounter = 0;
+bool inExpression = false;
 
 /** @name These bools, signifies, if builtin functions needs to be generated, so they cannot generate two times, or will not generate at all if thy were not called
 */
@@ -243,7 +244,7 @@ FILE* generate_head()
 }
 
 /**
- * Function generates while operation inside code.
+ * Function generates add operation inside code.
  * @param f Pointer to the IFJcode2018 source code.
  * @param instruction Pointer to the single instruction from inside code.
  */
@@ -253,7 +254,7 @@ void generate_add(FILE *f, tInstr *instruction)
 }
 
 /**
- * Function generates while operation inside code.
+ * Function generates sub operation inside code.
  * @param f Pointer to the IFJcode2018 source code.
  * @param instruction Pointer to the single instruction from inside code.
  */
@@ -263,7 +264,7 @@ void generate_sub(FILE *f, tInstr *instruction)
 }
 
 /**
- * Function generates while operation inside code.
+ * Function generates mul operation inside code.
  * @param f Pointer to the IFJcode2018 source code.
  * @param instruction Pointer to the single instruction from inside code.
  */
@@ -273,7 +274,7 @@ void generate_mul(FILE *f, tInstr *instruction)
 }
 
 /**
- * Function generates while operation inside code.
+ * Function generates div operation inside code.
  * @param f Pointer to the IFJcode2018 source code.
  * @param instruction Pointer to the single instruction from inside code.
  */
@@ -283,7 +284,7 @@ void generate_div(FILE *f, tInstr *instruction)
 }
 
 /**
- * Function generates while operation inside code.
+ * Function generates move operation inside code.
  * @param f Pointer to the IFJcode2018 source code.
  * @param instruction Pointer to the single instruction from inside code.
  */
@@ -329,6 +330,11 @@ void generate_concatenation(FILE *f, tInstr *instruction)
     fprintf(f, "MOVE TF@%s TF@$tmpconcat$%d\n", where.attr.str.str, defvarnum);
 }
 
+/**
+ * Function generates push instruction inside code.
+ * @param f Pointer to the IFJcode2018 source code.
+ * @param instruction Pointer to the single instruction from inside code.
+ */
 void generate_pushs(FILE *f, tInstr *instruction)
 {
     switch(instruction->params->param.type)
@@ -348,6 +354,11 @@ void generate_pushs(FILE *f, tInstr *instruction)
     }
 }
 
+/**
+ * Function generates pop instruction inside code.
+ * @param f Pointer to the IFJcode2018 source code.
+ * @param instruction Pointer to the single instruction from inside code.
+ */
 void generate_pops(FILE *f, tInstr *instruction)
 {
     if(instruction->params->param.type == ID)
@@ -366,6 +377,7 @@ void generate_while(FILE *f, tInstr *instruction)
     tInstr *actualInstr = instruction;
     int instr;
     int scopeWhile = 0;
+    int tempUniqueCounter = 0;
 
     do
     {
@@ -385,71 +397,36 @@ void generate_while(FILE *f, tInstr *instruction)
         actualInstr = actualInstr->next;
     } while(scopeWhile != 0);
 
-    instr = instruction->next->instr;
-    //TODO: while
-    while(instr != EQ && instr != NE && instr != LT && instr != GT && instr != GE && instr != LE && instr != FLOAT && instr != INTEGER && instr != STRING)
-    {
-        generate_instruction(f, instruction);
-    }
+    fprintf(f, "LABEL $while_start%d\n", uniqueCounter);
 
-    switch(instr)
-    {
-        case EQ:
-            fprintf(f, "JUMPIFNEQS $while%d\n", uniqueCounter);
-            break;
-        case NE:
-            fprintf(f, "JUMPIFEQS $while%d\n", uniqueCounter);
-            break;
-        case LT: //x < y ..... x >= y
-            fprintf(f, "DEFVAR TF@result1-%d\n", uniqueCounter);
-            fprintf(f, "DEFVAR TF@result2%-d\n", uniqueCounter);
-            fprintf(f, "DEFVAR TF@result3%-d\n", uniqueCounter);
-            fprintf(f, "DEFVAR TF@x%d\n", uniqueCounter);
-            fprintf(f, "DEFVAR TF@y%d\n", uniqueCounter);
-            fprintf(f, "DEFVAR TF@x$type%d\n", uniqueCounter);
-            fprintf(f, "DEFVAR TF@y$type%d\n", uniqueCounter);
-            fprintf(f, "POPS TF@y%d\n", uniqueCounter);
-            fprintf(f, "POPS TF@x%d\n", uniqueCounter);
-            //checking type
-            fprintf(f, "TYPE TF@x%d$type TF@x%d\n", uniqueCounter, uniqueCounter);
-            fprintf(f, "TYPE TF@y%d$type TF@Y%d\n", uniqueCounter, uniqueCounter);
-            fprintf(f, "JUMPIFNEQ $while_not_string%d string@string TF@y%d$type\n", uniqueCounter, uniqueCounter);
-            fprintf(f, "JUMPIFNEQ $while_not_string%d TF@x%d$type string@string\n", uniqueCounter, uniqueCounter);
-            fprintf(f, "EXIT int@4\n\n");
-            fprintf(f, "LABEL $while_not_string%d\n", uniqueCounter);
-            fprintf(f, "JUMPIFEQ $while_ok%d TF@x%d$type TF@y%d$type\n", uniqueCounter, uniqueCounter, uniqueCounter);
-            fprintf(f, "JUMPIFEQ $while_retype%d TF@x%d$type string@int\n", uniqueCounter, uniqueCounter);
-            fprintf(f, "INT2FLOAT TF@x%d\n", uniqueCounter);
-            fprintf(f, "JUMP $while_ok%d\n", uniqueCounter);
-            fprintf(f, "LABEL $while_retype%d\n", uniqueCounter);
-            fprintf(f, "INT2FLOAT TF@y%d\n", uniqueCounter);
-            //condition
-            fprintf(f, "LABEL $while_ok%d\n", uniqueCounter);
-            fprintf(f, "GT TF@result1-%d TF@x%d TF@y%d\n", uniqueCounter, uniqueCounter, uniqueCounter);
-            fprintf(f, "EQ TF@result2-%d TF@x%d TF@y%d\n", uniqueCounter, uniqueCounter, uniqueCounter);
-            fprintf(f, "AND TF@result3-%d TF@result1%d TF@result2%d\n", uniqueCounter, uniqueCounter, uniqueCounter);
-            fprintf(f, "JUMPIFEQ $while%d TF@result3%d bool@true\n", uniqueCounter, uniqueCounter);
-            break;
-        case GT:
-            break;
-        case LE:
-            break;
-        case GE:
-            break;
-        case INTEGER:
-            break;
-        case FLOAT:
-            break;
-        case STRING:
-            break;
-    }
+    instruction = instruction->next;
 
-    while(instruction->instr != END)
+    while(instruction->instr != WHILE_COND_END)
     {
         generate_instruction(f, instruction);
         instruction = instruction->next;
     }
 
+    fprintf(f, "DEFVAR TF@condition%d\n", uniqueCounter);
+    fprintf(f, "DEFVAR TF@condition$type%d\n", uniqueCounter);
+    fprintf(f, "POPS TF@condition%d\n", uniqueCounter);
+    fprintf(f, "TYPE TF@condition$type%d TF@condition%d\n", uniqueCounter, uniqueCounter);
+    fprintf(f, "JUMPIFEQ $while%d TF@condition$type%d int@0\n", uniqueCounter, uniqueCounter);
+    fprintf(f, "JUMPIFEQ $while%d TF@condition$type%d float@0x0p+0\n", uniqueCounter, uniqueCounter);
+    fprintf(f, "JUMPIFEQ $while%d TF@condition$type%d bool@false\n", uniqueCounter, uniqueCounter);
+
+    instruction = instruction->next;
+    tempUniqueCounter = uniqueCounter;
+    uniqueCounter++;
+
+    while(instruction->instr != WHILE_END)
+    {
+        generate_instruction(f, instruction);
+        instruction = instruction->next;
+    }
+
+    uniqueCounter = tempUniqueCounter;
+    fprintf(f, "JUMP $while_start%d\n", uniqueCounter);
     fprintf(f, "LABEL $while%d\n", uniqueCounter);
     uniqueCounter++;
 
@@ -1150,7 +1127,7 @@ tToken choose_return(tInstr *instruction)
         case LENGTH_CALL:
         case SUBSTR_CALL:
         case ORD_CALL:
-        case CHR_CALL:
+        case CHR_CALL: 
         case CONCAT_CALL:
         case CONCAT_END:
             // return where the function result was saved

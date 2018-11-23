@@ -15,6 +15,19 @@
 
 #define OK 0
 
+#define GET_TOKEN() \
+    pData.token = get_token(); \
+    if(pData.token.type == L_ERR) \
+    { \
+        fprintf(stderr,"Lexical error, wrong lexem structure at line %d! \n", pData.token.attr.i); \
+        error(L_ERR); \
+    }; \
+
+#define CREATE_NORETVAL_TOKEN() \
+    tToken noretval; \
+    str_init(&noretval.attr.str); \
+    str_add_string(&noretval.attr.str, "$noretval"); \
+
 /**
  * Structure which represents data of parser.
  */
