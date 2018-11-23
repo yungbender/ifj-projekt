@@ -51,8 +51,9 @@ int prec_table[8][8] = {
 #define DOLLAR 200	// $
 #define STOP 201 	// <
 #define NONTERM 202  	// nonterminal E
-tToken tmp_head;
+tToken tmp_head;	// token for saving head_stack "without nonterm"
 tToken stop_token;
+tToken rule_token;
 
 //get precedence table index
 PT_idx table_index(tToken token)
@@ -92,7 +93,6 @@ PT_idx table_index(tToken token)
  
 void reduce_by_rule(tStack *tmp_stack)
 {
-	tToken rule_token;
 	rule_token.type = NONTERM;
 	tToken head = head_stack(tmp_stack);
 	//E->i
@@ -279,8 +279,21 @@ void opt_reduce()
 void opt_switch()
 {
 	stop_token.type = STOP;
-	push_stack(pData.stack, stop_token);
-	push_stack(pData.stack, pData.token);
+	rule_token.type = NONTERM;
+	// check if type of top_stack is NONTERM to correct pushing STOP
+	tToken top_stack = head_stack(pData.stack);
+	if(top_stack.type == NONTERM)
+	{
+		pop_stack(pData.stack);
+		push_stack(pData.stack, stop_token);
+		push_stack(pData.stack, rule_token);
+		push_stack(pData.stack, pData.token);
+	}
+	else 
+	{
+		push_stack(pData.stack, stop_token);
+		push_stack(pData.stack, pData.token);
+	}
 	tmp_head = head_stack(pData.stack);
 	pData.token = get_token();
 	if(pData.token.type == L_ERR)
@@ -292,18 +305,25 @@ void opt_switch()
 // operation equal '='  ==========================================================
 void opt_eq()
 {	
+	rule_token.type = NONTERM;
+	tToken check = head_stack(pData.stack);
 	tToken head;
+	// reduce all between open parenth and close parenth ... 
 	do{
 		pop_stack(pData.stack);
 		head = head_stack(pData.stack);
 	}while(head.type != STOP);
+	// ... including stop token
 	pop_stack(pData.stack);
-	pData.token = get_token();
 	tmp_head = head_stack(pData.stack);
+	if(check.type == NONTERM)
+		push_stack(pData.stack, rule_token);
+	pData.token = get_token();
 }
 
 void pars_expression()
 {
+	printf("in pars_expression\n");
 	// push end of stack = dollar
 	tToken stack_end;	
 	stack_end.type = DOLLAR;

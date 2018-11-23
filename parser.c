@@ -922,7 +922,9 @@ void assignment()
         }
         //TODO: if here the parser will see that it is not function call, parser is one token off        
     }
-    // TODO: call expression parsing
+    pars_expression();// TODO: call expression parsing
+    GET_TOKEN();
+    start();
 }
 
 /**
