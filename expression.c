@@ -323,7 +323,6 @@ void opt_eq()
 
 void pars_expression()
 {
-	printf("in pars_expression\n");
 	// push end of stack = dollar
 	tToken stack_end;	
 	stack_end.type = DOLLAR;
