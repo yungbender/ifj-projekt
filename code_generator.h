@@ -56,6 +56,7 @@
 #define GT  225 // '>'
 #define GE  226 // '>='
 #define NE  227 // '!='
+#define CONCAT 252 // string + string
 // Data stack instructions
 #define ADDS 241
 #define SUBS 242

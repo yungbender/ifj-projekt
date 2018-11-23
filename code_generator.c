@@ -236,7 +236,7 @@ void free_plist(tPList *plist)
  */
 FILE* generate_head()
 {
-    FILE *f = fopen("prog.out","w");
+    FILE *f = fopen("prg.out","w");
     fprintf(f,".IFJcode18\n");
     fprintf(f,"CREATEFRAME\n\n");
     return f;
@@ -290,6 +290,33 @@ void generate_div(FILE *f, tInstr *instruction)
 void generate_move(FILE *f, tInstr *instruction)
 {
 
+}
+
+void generate_pushs(FILE *f, tInstr *instruction)
+{
+    switch(instruction->params->param.type)
+    {
+        case INTEGER:
+            fprintf(f, "PUSHS int@%d\n", instruction->params->param.attr.i);
+            break;
+        case FLOAT:
+            fprintf(f, "PUSHS float@%a\n", instruction->params->param.attr.f);
+            break;
+        case STRING:
+            fprintf(f, "PUSHS string@%s\n", instruction->params->param.attr.str.str);
+            break;
+        case ID:
+            fprintf(f, "PUSHS TF@%s\n", instruction->params->param.attr.str.str);
+            break;
+    }
+}
+
+void generate_pops(FILE *f, tInstr *instruction)
+{
+    if(instruction->params->param.type == ID)
+    {
+        fprintf(f, "POPS TF@%s\n", instruction->params->param.attr.str.str);
+    }
 }
 
 /**
@@ -921,6 +948,12 @@ void generate_instruction(FILE *f, tInstr *instruction)
         case NOINPUTI_CALL:
         case NOINPUTS_CALL:
             generate_input(f,instruction,false, instruction->instr);
+            break;
+        case PUSHS:
+            generate_pushs(f,instruction);
+            break;
+        case POPS:
+            generate_pops(f, instruction);
             break;
         case PRINT_CALL:
             generate_print(f,instruction,true);

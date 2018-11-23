@@ -48,9 +48,9 @@ int prec_table[8][8] = {
 	{  S,  S,  S,  S,  S,  N2, S,  K }  // $
 };
 
-#define DOLLAR 200	// $
-#define STOP 201 	// <
-#define NONTERM 202  	// nonterminal E
+#define DOLLAR 500	// $
+#define STOP 501 	// <
+#define NONTERM 502  	// nonterminal E
 tToken tmp_head;	// token for saving head_stack "without nonterm"
 tToken stop_token;
 tToken rule_token;
@@ -82,7 +82,6 @@ PT_idx table_index(tToken token)
 		case FLOAT:
 		case STRING:
 		case ID:
-		case IDF:
 		case NONTERM:
 			return I_data;
 		default:
@@ -324,6 +323,7 @@ void opt_eq()
 void pars_expression()
 {
 	// push end of stack = dollar
+	clear_stack(pData.stack);
 	tToken stack_end;	
 	stack_end.type = DOLLAR;
 	push_stack(pData.stack, stack_end);
@@ -354,6 +354,36 @@ void pars_expression()
 		}
 		else
 			return;
+	}
+}
+
+void parse_concatenation()
+{
+ 	while(pData.token.type != END_OF_LINE || pData.token.type != END_OF_FILE)
+	{
+		// string + string + string + id
+		if(pData.token.type == STRING || pData.token.type == ID)
+		{
+			insert_instr(pData.instrs, CONCAT);
+			insert_param(pData.instrs, pData.token);
+			GET_TOKEN();
+		}
+		else
+		{
+			error(UNEXPECTED_TOKEN);
+		}
+		if(pData.token.type == PLUS)
+		{
+			GET_TOKEN();
+		}
+		else if(pData.token.type == END_OF_FILE || pData.token.type == END_OF_LINE)
+		{
+			break;
+		}
+		else
+		{
+			error(UNEXPECTED_TOKEN);
+		}
 	}
 }
 

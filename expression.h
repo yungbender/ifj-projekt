@@ -6,3 +6,4 @@ void insert_list(tTList **list, tToken token);
 void copy_list_to_stack(tTList *list);
 void opt_eq();
 void pars_expression();
+void parse_concatenation();

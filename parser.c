@@ -26,6 +26,12 @@ bool endoffile = false; //< This global bool, signifies if endofline was reached
         error(L_ERR); \
     }; \
 
+#define CREATE_NORETVAL_TOKEN() \
+    tToken noretval; \
+    str_init(&noretval.attr.str); \
+    str_add_string(noretval.attr.str, "$noretval"); \
+
+
 /**
  * Function initializes structure tPData, which are data of parser.
  */
@@ -892,12 +898,26 @@ void assignment()
         // Need to check if the ID is not variable, if it is, its expression, if its not, its error
         if(result == NULL && pData.inDefinition == false)
         {
-            result = search_table(pData.local->root, pData.token.attr.str);
-            // if its not found, it is error
+            // get token where the result is going to be saved
+            tToken where = head_stack(pData.stack);
+            result = search_table(pData.local->root, where.attr.str);
             if(result == NULL)
             {
-                error(UNDEFINED_VAR);
+                insert_instr(pData.instrs, DEFVAR);
+                insert_param(pData.instrs, pData.token);
+                if(pData.local->root == NULL)
+                {
+                    pData.local->root = insert_var(pData.local->root, where);
+                }
+                else 
+                {
+                    insert_var(pData.local->root, where);
+                }
             }
+            pars_expression();
+            insert_instr(pData.instrs, POPS);
+            insert_param(pData.instrs, where);
+            return;
         }
         // If parser is inside function, it still can be a function call, but user is calling undefined function need to get next token and determine what is it
         else if(result == NULL && pData.inDefinition == true)
@@ -920,11 +940,46 @@ void assignment()
                     return;
             }
         }
+
         //TODO: if here the parser will see that it is not function call, parser is one token off        
     }
-    pars_expression();// TODO: call expression parsing
-    GET_TOKEN();
-    start();
+    // TODO: call expression parsing
+    else if(pData.token.type == INTEGER || pData.token.type == FLOAT)
+    {
+        tToken where = head_stack(pData.stack);
+        pars_expression();
+        // Expression is parsed, need to pop it out from stack and save POPS to the ilist
+        pop_stack(pData.stack);
+        // Search if the variable is inside global table, if is, its semnatic error, asigning to the function
+        tNode *result = search_table(pData.global->root, where.attr.str);
+        if(result != NULL)
+        {
+            error(IDF_REDEF);
+        }
+        //Search the variable inside local symtable, if it is not there, need to define it, if is, do nothing
+        result = search_table(pData.local->root, where.attr.str);
+        if(result == NULL)
+        {
+            insert_instr(pData.instrs, DEFVAR);
+            insert_param(pData.instrs, where);
+            // and insert it inside local table
+            if(pData.local->root == NULL)
+            {
+                pData.local->root = insert_var(pData.local->root, where);
+            }
+            insert_var(pData.local->root, where);
+        }
+        insert_instr(pData.instrs, POPS);
+        insert_param(pData.instrs, where);
+        return;
+    }
+    // TODO: concat
+    // Here only be performed concatenation or just simple assignment with string
+    /*else if(pData.token.type == STRING)
+    {
+        tToken where
+        parse_concatenation();
+    }*/
 }
 
 /**
@@ -972,7 +1027,6 @@ void analyse_id()
     else if(pData.token.type == ASSIGNMENT)
     {
         assignment();
-        return;
     }
     // If is in definition it still can be function call with no return value saved
     else if(result == NULL && pData.inDefinition == true)
@@ -1047,6 +1101,16 @@ void start()
         case END_OF_FILE:
             // Need to check if we are not in function, check if all scopes are 0 and if all called functions got their own definition
             end_of_file();
+            break;
+        case INTEGER:
+        case FLOAT:
+            // Just calculate the expression 
+/*             pars_expression();
+            insert_instr(pData.instrs, POPS);
+            insert_var(); */
+            break;
+        case STRING:
+            parse_concatenation();
             break;
 
         default:
