@@ -1022,7 +1022,6 @@ void generate_defvar_main(FILE *f, tInstr *instruction)
             {
                 instruction = instruction->next;
             }
-            instruction = instruction->next;
         }
         if(instruction->instr == DEFVAR)
         {

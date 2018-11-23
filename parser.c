@@ -1102,14 +1102,18 @@ void start()
             pars_expression();
             // Insert empty POPS to pop to RETVAL
             insert_instr(pData.instrs, POPS);
+            CREATE_NORETVAL_TOKEN();
+            insert_param(pData.instrs, noretval);
+            GET_TOKEN();
+            start();
             break;
         case STRING:
             insert_instr(pData.instrs, CONCAT_CALL);
-            CREATE_NORETVAL_TOKEN();
             insert_param(pData.instrs, noretval);
             parse_concatenation();
             insert_instr(pData.instrs, CONCAT_END);
             insert_param(pData.instrs, noretval);
+            GET_TOKEN();
             start();
             break;
 
