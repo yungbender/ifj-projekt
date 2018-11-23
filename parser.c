@@ -29,8 +29,7 @@ bool endoffile = false; //< This global bool, signifies if endofline was reached
 #define CREATE_NORETVAL_TOKEN() \
     tToken noretval; \
     str_init(&noretval.attr.str); \
-    str_add_string(noretval.attr.str, "$noretval"); \
-
+    str_add_string(&noretval.attr.str, "$noretval"); \
 
 /**
  * Function initializes structure tPData, which are data of parser.
@@ -676,7 +675,7 @@ void function_call(bool moved, bool pushed)
             break;
         }
         // If it is variable search it in local symtable, if int,float,string, just add as paramter
-        else if(pData.token.type == ID || pData.token.type == INTEGER || pData.token.type == FLOAT || pData.token.type == STRING)
+        else if(pData.token.type == ID || pData.token.type == INTEGER || pData.token.type == FLOAT || pData.token.type == STRING || pData.token.type == NIL)
         {
             comma = false;
             // Search if the variable is defined, if not, error
@@ -944,11 +943,9 @@ void assignment()
         //TODO: if here the parser will see that it is not function call, parser is one token off        
     }
     // TODO: call expression parsing
-    else if(pData.token.type == INTEGER || pData.token.type == FLOAT)
+    else if(pData.token.type == INTEGER || pData.token.type == FLOAT || pData.token.type == STRING)
     {
         tToken where = head_stack(pData.stack);
-        pars_expression();
-        // Expression is parsed, need to pop it out from stack and save POPS to the ilist
         pop_stack(pData.stack);
         // Search if the variable is inside global table, if is, its semnatic error, asigning to the function
         tNode *result = search_table(pData.global->root, where.attr.str);
@@ -969,17 +966,25 @@ void assignment()
             }
             insert_var(pData.local->root, where);
         }
-        insert_instr(pData.instrs, POPS);
-        insert_param(pData.instrs, where);
+        if(pData.token.type == INTEGER || pData.token.type == FLOAT)
+        {
+            // Expression is parsed, 
+            pars_expression();
+            // need to pop it out from stack and save POPS to the ilist
+            insert_instr(pData.instrs, POPS);
+            insert_param(pData.instrs, where);
+        }
+        else if(pData.token.type == STRING)
+        {
+            insert_instr(pData.instrs, CONCAT_CALL);
+            insert_param(pData.instrs, where);
+            parse_concatenation();
+            // Need save where to save the concatenation
+            insert_instr(pData.instrs, CONCAT_END);
+            insert_param(pData.instrs, where);
+        }
         return;
     }
-    // TODO: concat
-    // Here only be performed concatenation or just simple assignment with string
-    /*else if(pData.token.type == STRING)
-    {
-        tToken where
-        parse_concatenation();
-    }*/
 }
 
 /**
@@ -1104,13 +1109,18 @@ void start()
             break;
         case INTEGER:
         case FLOAT:
-            // Just calculate the expression 
-/*             pars_expression();
+             //Just calculate the expression 
+            pars_expression();
+            // Insert empty POPS to pop to RETVAL
             insert_instr(pData.instrs, POPS);
-            insert_var(); */
             break;
         case STRING:
+            insert_instr(pData.instrs, CONCAT_CALL);
+            CREATE_NORETVAL_TOKEN();
+            insert_param(pData.instrs, noretval);
             parse_concatenation();
+            insert_instr(pData.instrs, CONCAT_END);
+            insert_param(pData.instrs, noretval);
             break;
 
         default:

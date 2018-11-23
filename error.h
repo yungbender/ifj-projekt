@@ -42,6 +42,7 @@
 #define UNEXPECTED_W 117
 #define UNEXPECTED_EXPR 118
 #define UNEXPECTED_TOKEN 119
+#define WRONG_OP_CONCAT 120
 
 void print_error_exit(int id);
 #endif // _ERR_H

@@ -87,5 +87,8 @@ void print_error_exit(int id)
         case UNEXPECTED_TOKEN:
             fprintf(stderr,"Syntax error, unexpected token! \n");
             exit(SY_ERR);   
+        case WRONG_OP_CONCAT:
+            fprintf(stderr, "Semantic error, wrong operations inside concatenation! \n");
+            exit(DATA_ERR);
     }
 }

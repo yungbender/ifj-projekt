@@ -292,6 +292,43 @@ void generate_move(FILE *f, tInstr *instruction)
 
 }
 
+void generate_concatenation(FILE *f, tInstr *instruction)
+{
+    int defvarnum = uniqueCounter;
+    tToken where = instruction->params->param;
+    fprintf(f, "DEFVAR TF@$tmpconcat$type$%d\n", defvarnum);
+    fprintf(f, "DEFVAR TF@$tmpconcat$%d\n", defvarnum);
+    fprintf(f, "MOVE TF@$tmpconcat$%d string@\n", defvarnum);
+    while(instruction->instr != CONCAT_END)
+    {
+        if(instruction->instr == CONCAT)
+        {
+            // if its constant string, no need to control type because its string
+            if(instruction->params->param.type == STRING)
+            {
+                fprintf(f, "CONCAT TF@$tmpconcat$%d TF@$tmpconcat$%d string@%s\n\n", defvarnum, defvarnum, instruction->params->param.attr.str.str);
+            }
+            // It is ID need to semantic check
+            else if(instruction->params->param.type == ID)
+            {
+                fprintf(f, "TYPE TF@$tmpconcat$type$%d TF@%s\n", defvarnum, instruction->params->param.attr.str.str);
+                fprintf(f, "JUMPIFEQ $concat$%d TF@$tmpconcat$type$%d string@string\n", uniqueCounter, defvarnum);
+                fprintf(f, "EXIT int@4\n");
+                fprintf(f, "LABEL $concat$%d\n", uniqueCounter);
+                fprintf(f, "CONCAT TF@$tmpconcat$%d TF@$tmpconcat$%d TF@%s\n\n", defvarnum, defvarnum, instruction->params->param.attr.str.str);
+            }
+        }
+        uniqueCounter++;
+        if(instruction->next->instr == CONCAT_END)
+        {
+            break;
+        }
+        instruction = instruction->next;
+    }
+    // Here instruction is move, if NULL the value is not saved, need to save it just to retval
+    fprintf(f, "MOVE TF@%s TF@$tmpconcat$%d\n", where.attr.str.str, defvarnum);
+}
+
 void generate_pushs(FILE *f, tInstr *instruction)
 {
     switch(instruction->params->param.type)
@@ -475,15 +512,19 @@ void generate_funcall(FILE *f, tInstr *instruction, bool builtin)
         }
         else if(params->param.type == INTEGER)
         {
-            fprintf(f, "MOVE TF@%d int@%d\n",paramsNum, params->param.attr.i);
+            fprintf(f, "MOVE TF@$%d int@%d\n",paramsNum, params->param.attr.i);
         }
         else if(params->param.type == FLOAT)
         {
-            fprintf(f, "MOVE TF@%d float@%a\n",paramsNum, params->param.attr.f);
+            fprintf(f, "MOVE TF@$%d float@%a\n",paramsNum, params->param.attr.f);
         }
         else if(params->param.type == STRING)
         {
-            fprintf(f, "MOVE TF@%d string@%s\n",paramsNum, params->param.attr.str.str);
+            fprintf(f, "MOVE TF@$%d string@%s\n",paramsNum, params->param.attr.str.str);
+        }
+        else if(params->param.type == NIL)
+        {
+            fprintf(f, "MOVE TF@$%d nil@nil\n", paramsNum);
         }
         paramsNum++;
         params = params->next;
@@ -577,6 +618,10 @@ void generate_nofuncall(FILE *f, tInstr *instruction, bool builtin)
         else if(params->param.type == STRING)
         {
             fprintf(f, "MOVE TF@$%d string@%s\n",paramsNum, params->param.attr.str.str);
+        }
+        else if(params->param.type == NIL)
+        {
+            fprintf(f, "MOVE TF@$%d nil@nil\n", paramsNum);
         }
         paramsNum++;
         params = params->next;
@@ -976,6 +1021,9 @@ void generate_instruction(FILE *f, tInstr *instruction)
         case MOVE:
             generate_move(f, instruction);
             break;
+        case CONCAT_CALL:
+            generate_concatenation(f, instruction);
+            break;
         case NOP:
             break;
     }
@@ -1102,7 +1150,9 @@ tToken choose_return(tInstr *instruction)
         case LENGTH_CALL:
         case SUBSTR_CALL:
         case ORD_CALL:
-        case CHR_CALL: 
+        case CHR_CALL:
+        case CONCAT_CALL:
+        case CONCAT_END:
             // return where the function result was saved
             str_free(&noretval.attr.str);
             return (instruction->params->param);

@@ -44,6 +44,8 @@
 #define NOSUBSTR_CALL 235
 #define NOORD_CALL 236
 #define NOCHR_CALL 237
+#define CONCAT_CALL 253
+#define CONCAT_END 254
 // Operators
 #define ADD 217 // '+'
 #define SUB 218 // '-'

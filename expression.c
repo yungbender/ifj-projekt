@@ -14,6 +14,14 @@
 #include "parser.h"
 #include "scanner.h"
 
+#define GET_TOKEN() \
+    pData.token = get_token(); \
+    if(pData.token.type == L_ERR) \
+    { \
+        fprintf(stderr,"Lexical error, wrong lexem structure at line %d! \n", pData.token.attr.i); \
+        error(L_ERR); \
+    }; \
+
 // precedence table symbols
 typedef enum {
 	S = 500,		// < shift
@@ -370,7 +378,7 @@ void parse_concatenation()
 		}
 		else
 		{
-			error(UNEXPECTED_TOKEN);
+			error(WRONG_OP_CONCAT);
 		}
 		if(pData.token.type == PLUS)
 		{
@@ -382,7 +390,7 @@ void parse_concatenation()
 		}
 		else
 		{
-			error(UNEXPECTED_TOKEN);
+			error(WRONG_OP_CONCAT);
 		}
 	}
 }
