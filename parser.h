@@ -27,6 +27,7 @@
     tToken noretval; \
     str_init(&noretval.attr.str); \
     str_add_string(&noretval.attr.str, "$noretval"); \
+    noretval.type = ID; \
 
 /**
  * Structure which represents data of parser.

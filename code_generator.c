@@ -1129,6 +1129,7 @@ tToken choose_return(tInstr *instruction)
         case CHR_CALL: 
         case CONCAT_CALL:
         case CONCAT_END:
+        case POPS:
             // return where the function result was saved
             str_free(&noretval.attr.str);
             return (instruction->params->param);

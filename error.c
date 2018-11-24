@@ -99,5 +99,8 @@ void print_error_exit(int id)
         case EXPECTED_EXPR:
             fprintf(stderr,"Syntax error, missing expression! \n");
             exit(SY_ERR);
+        case ID_REDEF:
+            fprintf(stderr, "Semantic error, redefinition of variable! \n");
+            exit(DEF_ERR);
     }
 }

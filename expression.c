@@ -367,7 +367,10 @@ void pars_expression()
 			error(UNEXPECTED_EXPR);
 		}
 		else
+		{
+			clear_stack(pData.stack);
 			return;
+		}
 	}
 }
 

@@ -380,6 +380,7 @@ void parse_function_definition()
  */
 void params(tNode *function)
 {
+    clear_stack(pData.stack);
     GET_TOKEN();
     // Expecting ID or parenth
     // If we get parenth there are no parameters for function
@@ -395,7 +396,6 @@ void params(tNode *function)
     }
     // Now parser will take every parameter until token is not ID
     // Clear out the so parser can save params one by one and compare them 
-    clear_stack(pData.stack);
     while(pData.token.type == ID)
     {
         // Need to save the parameter inside instruction list
@@ -462,13 +462,17 @@ void function_declaration()
     tNode *temp = search_table(pData.local->root,pData.token.attr.str);
     if(temp != NULL)
     {
-        error(IDF_REDEF);
+        error(ID_REDEF);
     }
     // Funtion name is correct and is not a keyword, nor variable name, now needs to check if the function was already called or not (if it was called, there is global table node created already)
     temp = search_table(pData.global->root,pData.token.attr.str);
-    // Function was already called somewhere inside code, parser must mark that the definintion of the function was found.
+    // Function was already called somewhere inside code, parser must mark that the definintion of the function was found or if was defined already, thats redefinition error
     if(temp != NULL)
     {
+        if(temp->wasDefined == true)
+        {
+            error(IDF_REDEF);
+        }
         temp->wasDefined = true;
     }
     else if(temp == NULL) // Function was not called, parser must insert new symbol inside symbol table (into Global)
@@ -878,7 +882,6 @@ void assignment()
     tNode *result = NULL;
     if(pData.token.type == ID)
     {
-        tToken temp;
         // If it is function, its function call
         result = search_table(pData.global->root, pData.token.attr.str);
         int builtin = validate_symbol(pData.token.attr.str);
@@ -887,58 +890,48 @@ void assignment()
             function_call(true, false);
             return;
         }
-        // If parser is in main, and result is NULL, it cannot be function call, it can be only expression or error
-        // Need to check if the ID is not variable, if it is, its expression, if its not, its error
-        if(result == NULL && pData.inDefinition == false)
+        // Search it inside local table, if it is variable, it only can be expression
+        result = search_table(pData.local->root, pData.token.attr.str);
+        if(result != NULL)
         {
-            // get token where the result is going to be saved
             tToken where = head_stack(pData.stack);
+            pop_stack(pData.stack);
+            // Search if the left side is defined, if not define it
             result = search_table(pData.local->root, where.attr.str);
             if(result == NULL)
             {
                 insert_instr(pData.instrs, DEFVAR);
-                insert_param(pData.instrs, pData.token);
+                insert_param(pData.instrs, where);
                 if(pData.local->root == NULL)
                 {
                     pData.local->root = insert_var(pData.local->root, where);
                 }
-                else 
+                else
                 {
                     insert_var(pData.local->root, where);
                 }
             }
+            // Call expression parsing
             pars_expression();
+            // Save the result from stack
             insert_instr(pData.instrs, POPS);
             insert_param(pData.instrs, where);
             return;
         }
-        // If parser is inside function, it still can be a function call, but user is calling undefined function need to get next token and determine what is it
+        // If parser is inside function, it still can be a function call, but user is calling undefined function or expression
         else if(result == NULL && pData.inDefinition == true)
         {
-            // Need to save the previous token, if was function call, need to put it back to pData.token
-            temp = pData.token;
-            GET_TOKEN();
-            switch(pData.token.type)
-            {
-                case OPEN_PARENTH:
-                case END_OF_FILE:
-                case END_OF_LINE:
-                case ID:
-                case STRING:
-                case FLOAT:
-                case INTEGER:
-                    push_stack(pData.stack,pData.token);
-                    pData.token = temp;
-                    function_call(true, true);
-                    return;
-            }
+            function_call(true, false);
+            return;
+        }        
+        // If parser is in main, and result is NULL, it cannot be function call, it can be only expression or error
+        else 
+        {
+            error(UNDEF_F);
         }
-
-        //TODO: if here the parser will see that it is not function call, parser is one token off        
     }
-    // TODO: call expression parsing
-// TODO: call expression parsing
-    else if(pData.token.type == INTEGER || pData.token.type == FLOAT || pData.token.type == STRING)
+
+    if(pData.token.type == INTEGER || pData.token.type == FLOAT || pData.token.type == STRING)
     {
         tToken where = head_stack(pData.stack);
         pop_stack(pData.stack);
@@ -980,6 +973,10 @@ void assignment()
         }
         return;
     }
+    else
+    {
+        error(UNEXPECTED_TOKEN);
+    }
 }
 
 /**
@@ -989,8 +986,46 @@ void analyse_id()
 {
     // push the ID on the stack
     push_stack(pData.stack,pData.token);
+    // Search local table, if it is variable 
+    tNode *result = search_table(pData.local->root, pData.token.attr.str);
+    if(result != NULL)
+    {
+        tToken where = pData.token;
+        pars_expression();
+        // If the precedence parsing got assignment and let it be, it must be function call
+        if(pData.token.type == ASSIGNMENT)
+        {
+            push_stack(pData.stack, where);
+            assignment();
+            if(pData.token.type == END)
+            {
+                return;
+            }
+            GET_TOKEN();
+            start();
+            return;
+        }
+        // Precedence was calculated
+        else
+        {
+            CREATE_NORETVAL_TOKEN();
+            insert_instr(pData.instrs, POPS);
+            insert_param(pData.instrs, noretval);
+            if(pData.token.type == END)
+            {
+                return;
+            }
+            else if(pData.token.type != END_OF_FILE && pData.token.type != END_OF_LINE)
+            {
+                error(UNEXPECTED_TOKEN);
+            }
+            GET_TOKEN();
+            start();
+            return;
+        }
+    }
     // Search global table, if found, its function_call with no result saved
-    tNode *result = search_table(pData.global->root,pData.token.attr.str);
+    result = search_table(pData.global->root,pData.token.attr.str);
     int builtin = validate_symbol(pData.token.attr.str);
     if(result != NULL || builtin != OK)
     {
@@ -999,7 +1034,7 @@ void analyse_id()
         GET_TOKEN();
         if(pData.token.type == ASSIGNMENT)
         {
-            error(UNEXPECTED_TOKEN);
+            error(IDF_REDEF);
         }
         tToken temp = head_stack(pData.stack);
         pop_stack(pData.stack);
@@ -1007,7 +1042,7 @@ void analyse_id()
         pData.token = temp;
         // Parser is again one token off and parameter is on stack
         function_call(false, true);
-        return;
+        return;        
     }
     GET_TOKEN();
     // If EOL or EOF, function, check if parser is inside function
@@ -1044,6 +1079,11 @@ void analyse_id()
     else
     {
         error(WRONG_PARAM);
+    }
+
+    if(pData.token.type == END)
+    {
+        return;
     }
     // Parse next
     GET_TOKEN();
