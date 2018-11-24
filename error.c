@@ -96,5 +96,8 @@ void print_error_exit(int id)
         case WRONG_OP_CONCAT:
             fprintf(stderr, "Semantic error, wrong operations inside concatenation! \n");
             exit(DATA_ERR);
+        case EXPECTED_EXPR:
+            fprintf(stderr,"Syntax error, missing expression! \n");
+            exit(SY_ERR);
     }
 }

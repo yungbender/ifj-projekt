@@ -128,6 +128,7 @@ int validate_symbol(string name)
     {
         return CHR_CALL;
     }
+
     return OK;
 }
 
@@ -453,7 +454,7 @@ void function_declaration()
     }
     // Expecting valid function ID, that means: no keyword, no redefinition of built-in functions
     int result = validate_symbol(pData.token.attr.str);
-    if(result != OK)
+    if(result != OK || search_table(pData.global->root, pData.token.attr.str) != NULL)
     {
         error(IDF_REDEF);
     }
@@ -645,15 +646,15 @@ void function_call(bool moved, bool pushed)
         leftbracket = true;
         GET_TOKEN();
     }
-    // Bool for checking comma
-    bool comma = false;
+    // Int for checking comma; 1 => first parameter, 2 => we have comma and have to give next param, 3 => we need to supply comma 
+    int comma = 1;
     // Get parameters
     while(true)
     {
         // If close parenth, must check if there was open parenth and return
         if(pData.token.type == CLOSE_PARENTH)
         {
-            if(leftbracket == false || comma == true)
+            if(leftbracket == false || comma == 2)
             {
                 error(UNEXPECTED_F);
             }
@@ -662,9 +663,9 @@ void function_call(bool moved, bool pushed)
             break;
         }
         // If it is variable search it in local symtable, if int,float,string, just add as paramter
-        else if(pData.token.type == ID || pData.token.type == INTEGER || pData.token.type == FLOAT || pData.token.type == STRING || pData.token.type == NIL)
+        else if(comma != 3 && (pData.token.type == ID || pData.token.type == INTEGER || pData.token.type == FLOAT || pData.token.type == STRING || pData.token.type == NIL))
         {
-            comma = false;
+            comma = 3;
             // Search if the variable is defined, if not, error
             if(pData.token.type == ID)
             {
@@ -680,15 +681,15 @@ void function_call(bool moved, bool pushed)
         // Unexpected token
         else if(pData.token.type == END_OF_LINE || pData.token.type == END_OF_FILE)
         {
-            if(comma == true)
+            if(comma == 2)
             {
                 error(WRONG_PARAM);
             }
             break;
         }
-        else if(pData.token.type == COMMA)
+        else if(comma != 2 && pData.token.type == COMMA)
         {
-            comma = true;
+            comma = 2;
         }
         else
         {
@@ -720,7 +721,7 @@ void while_loop()
     // If is in condition something else then variable, float, int or string constant
     if(pData.token.type != ID && pData.token.type != INTEGER && pData.token.type != FLOAT && pData.token.type != STRING)
     {
-        error(COND_ERR);
+        error(EXPECTED_EXPR);
     } 
 
     pars_expression();
@@ -767,7 +768,7 @@ void if_condition()
     GET_TOKEN(); // Expression starts with one of the following tokens
     if(pData.token.type != ID && pData.token.type != INTEGER && pData.token.type != FLOAT && pData.token.type != STRING && pData.token.type != OPEN_PARENTH)
     {
-        error(COND_ERR);
+        error(EXPECTED_EXPR);
     }
 
     pars_expression();
@@ -867,6 +868,11 @@ void assignment()
         // its function call, need to call it true, because result is going to be save
         function_call(true, false);
         return;
+    }
+    // Right side of assignment cannot be missing
+    else if(pData.token.type == END_OF_FILE || pData.token.type == END_OF_LINE)
+    {
+        error(EXPECTED_EXPR);
     }
     // If its ID, need to check if its function
     tNode *result = NULL;
