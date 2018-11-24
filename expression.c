@@ -337,6 +337,7 @@ void opt_eq()
 void pars_expression()
 {
 	// push end of stack = dollar
+	insert_instr(pData.instrs, EXPRESSION_CALL);
 	clear_stack(pData.stack);
 	tToken stack_end;	
 	stack_end.type = DOLLAR;
@@ -368,6 +369,7 @@ void pars_expression()
 		}
 		else
 		{
+			insert_instr(pData.instrs, EXPRESSION_END);
 			clear_stack(pData.stack);
 			return;
 		}

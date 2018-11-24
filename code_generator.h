@@ -62,6 +62,8 @@
 #define NE  227 // '!='
 #define CONCAT 252 // string + string
 // Data stack instructions
+#define EXPRESSION_CALL 255
+#define EXPRESSION_END 256
 #define ADDS 241
 #define SUBS 242
 #define MULS 243

@@ -248,7 +248,7 @@ FILE* generate_head()
  * @param f Pointer to the IFJcode2018 source code.
  * @param instruction Pointer to the single instruction from inside code.
  */
-void generate_add(FILE *f, tInstr *instruction)
+void generate_adds(FILE *f, tInstr *instruction)
 {
 
 }
@@ -258,7 +258,7 @@ void generate_add(FILE *f, tInstr *instruction)
  * @param f Pointer to the IFJcode2018 source code.
  * @param instruction Pointer to the single instruction from inside code.
  */
-void generate_sub(FILE *f, tInstr *instruction)
+void generate_subs(FILE *f, tInstr *instruction)
 {
 
 }
@@ -268,7 +268,7 @@ void generate_sub(FILE *f, tInstr *instruction)
  * @param f Pointer to the IFJcode2018 source code.
  * @param instruction Pointer to the single instruction from inside code.
  */
-void generate_mul(FILE *f, tInstr *instruction)
+void generate_muls(FILE *f, tInstr *instruction)
 {
 
 }
@@ -278,19 +278,34 @@ void generate_mul(FILE *f, tInstr *instruction)
  * @param f Pointer to the IFJcode2018 source code.
  * @param instruction Pointer to the single instruction from inside code.
  */
-void generate_div(FILE *f, tInstr *instruction)
+void generate_divs(FILE *f, tInstr *instruction)
 {
 
 }
 
-/**
- * Function generates move operation inside code.
- * @param f Pointer to the IFJcode2018 source code.
- * @param instruction Pointer to the single instruction from inside code.
- */
-void generate_move(FILE *f, tInstr *instruction)
+void generate_nots(FILE *f, tInstr *instruction)
 {
 
+}
+
+void generate_lts(FILE *f, tInstr *instruction)
+{
+
+}
+
+void generate_gts(FILE *f, tInstr *instruction)
+{
+
+}
+
+void generate_eqs(FILE *f, tInstr *instruction)
+{
+
+}
+
+void generate_expression(FILE *f, tInstr *instruction)
+{
+    fprintf(f, "DEFVAR ");
 }
 
 void generate_concatenation(FILE *f, tInstr *instruction)
@@ -1045,7 +1060,7 @@ void generate_instruction(FILE *f, tInstr *instruction)
         case NOPRINT_CALL:
             generate_print(f,instruction,false);
             break;
-        case ADD:
+/*         case ADD:
             generate_add(f, instruction);
             break;
         case SUB:
@@ -1059,7 +1074,7 @@ void generate_instruction(FILE *f, tInstr *instruction)
             break;
         case MOVE:
             generate_move(f, instruction);
-            break;
+            break; */
         case CONCAT_CALL:
             generate_concatenation(f, instruction);
             break;
@@ -1176,11 +1191,7 @@ tToken choose_return(tInstr *instruction)
         case PRINT_CALL:
         case NOPRINT_CALL:
             break;
-        case ADD:
-        case SUB:
-        case MUL:
-        case DIV:
-        case MOVE:
+        case POPS:
         case FUN_CALL:
         case INPUTF_CALL:
         case INPUTI_CALL:
@@ -1191,7 +1202,6 @@ tToken choose_return(tInstr *instruction)
         case CHR_CALL: 
         case CONCAT_CALL:
         case CONCAT_END:
-        case POPS:
             // return where the function result was saved
             str_free(&noretval.attr.str);
             return (instruction->params->param);
@@ -1313,6 +1323,5 @@ void generate_code()
     generate_fundef(f);
     generate_builtin(f);
     fclose(f);
-    // This part is segfaulting, will fix
     free_ilist(ilist);
 }

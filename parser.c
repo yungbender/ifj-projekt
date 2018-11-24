@@ -1113,6 +1113,7 @@ void analyse_id()
  */
 void start()
 {
+    CREATE_NORETVAL_TOKEN();
     switch(pData.token.type)
     {
         // <start> DEF <f_decl> IDF ( <params> EOL <f_def> <start>
@@ -1165,7 +1166,6 @@ void start()
             pars_expression();
             // Insert empty POPS to pop to RETVAL
             insert_instr(pData.instrs, POPS);
-            CREATE_NORETVAL_TOKEN();
             insert_param(pData.instrs, noretval);
             GET_TOKEN();
             start();
