@@ -46,7 +46,7 @@
 #define INCOMPATIBLE_EXPR 121
 #define WRONG_OP_CONCAT 122
 #define EXPECTED_EXPR 123
-#define ID_REDEF 123
+#define ID_REDEF 124
 
 void print_error_exit(int id);
 #endif // _ERR_H
