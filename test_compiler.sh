@@ -457,7 +457,7 @@ fi
 i=$((i+1))
 echo -e "TEST$i: Wrong token after id \c"
 ./ifj2018 <tests_compiler/test$i &>/dev/null 
-if [ $? -eq 2 ]; then
+if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
     echo -e "${RED}[FAILED]${NOCOLOR}"

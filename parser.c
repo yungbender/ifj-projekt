@@ -769,6 +769,7 @@ void while_loop()
 void if_condition()
 {
     pData.scopes++;
+    insert_instr(pData.instrs, IF_CALL);
     GET_TOKEN(); // Expression starts with one of the following tokens
     if(pData.token.type != ID && pData.token.type != INTEGER && pData.token.type != FLOAT && pData.token.type != STRING && pData.token.type != OPEN_PARENTH)
     {
@@ -778,18 +779,17 @@ void if_condition()
     pars_expression();
 
     // Expression returns token which should contain THEN keyword
-    //GET_TOKEN(); // TODO: <- so this this is just placeholder for testing
     if(pData.token.type != THEN)
     {
         error(UNEXPECTED_IF);
     }
     insert_instr(pData.instrs, IF_COND_END);
+
     GET_TOKEN();
     if(pData.token.type != END_OF_LINE)
     {
         error(EXPECTED_EOL);
     }
-    insert_instr(pData.instrs, IF_CALL);
 
     GET_TOKEN();
     start(); // Parsing first part of if
