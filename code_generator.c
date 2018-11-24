@@ -355,32 +355,157 @@ void generate_muls(FILE *f, tInstr *instruction)
  */
 void generate_divs(FILE *f, tInstr *instruction)
 {
+    fprintf(f, "POPS TF@op2\n");
+    fprintf(f, "POPS TF@op1\n\n");
+    fprintf(f, "TYPE TF@op1$type TF@op1\n");
+    fprintf(f, "TYPE TF@op2$type TF@op2\n\n");
+    fprintf(f, "JUMPIFNEQ $div$op1$ok$%d TF@op1$type string@string\n", uniqueCounter);
+    fprintf(f, "EXIT int@4\n\n");
+    fprintf(f, "LABEL $div$op1$ok$%d\n", uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $div$ok$type$%d TF@op2$type string@string\n", uniqueCounter);
+    fprintf(f, "EXIT int@4\n\n");
+    fprintf(f, "LABEL $div$ok$type$%d\n", uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $div$retype$%d TF@op1$type TF@op2$type\n\n", uniqueCounter);
+    fprintf(f, "LABEL $div$ok$%d\n", uniqueCounter);
+    fprintf(f, "TYPE TF@op1$type TF@op1\n");
+    fprintf(f, "JUMPIFEQ $idivs$%d TF@op1$type string@float\n\n", uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $noti$op20$%d TF@op2 int@0\n", uniqueCounter);
+    fprintf(f, "EXIT int@9\n\n");
+    fprintf(f, "LABEL $noti$op20$%d\n", uniqueCounter);
+    fprintf(f, "PUSH TF@op1\n");
+    fprintf(f, "PUSH TF@op2\n");
+    fprintf(f, "DIVS\n");
+    fprintf(f, "JUMP $end$div$%d\n\n", uniqueCounter);
+    fprintf(f, "LABEL $idivs$%d\n", uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $notf$op20$%d TF@op2 float@0x0p+0\n", uniqueCounter);
+    fprintf(f, "EXIT int@9\n\n");
+    fprintf(f, "LABEL $notf$op20$%d\n", uniqueCounter);
+    fprintf(f, "PUSH TF@op1\n");
+    fprintf(f, "PUSH TF@op2\n");
+    fprintf(f, "IDIVS\n");
+    fprintf(f, "JUMP $end$div$%d\n", uniqueCounter);
+    fprintf(f, "LABEL $div$retype$%d\n", uniqueCounter);
+    fprintf(f, "JUMPIFEQ $div$retype1$%d TF@op1$type string@int\n", uniqueCounter);
+    fprintf(f, "INT2FLOAT TF@op2 TF@op2\n");
+    fprintf(f, "JUMP $div$ok$%d\n\n", uniqueCounter);
+    fprintf(f, "LABEL $div$retype1$%d\n", uniqueCounter);
+    fprintf(f, "INT2FLOAT TF@op1 TF@op1\n");
+    fprintf(f, "JUMP $div$ok$%d\n\n", uniqueCounter);
+    fprintf(f, "LABEL $end$div$%d\n", uniqueCounter);
 
+    uniqueCounter++;
+    instruction->instr = NOP;
 }
 
 void generate_nots(FILE *f, tInstr *instruction)
 {
+    fprintf(f, "NOTS\n");
 
+    instruction->instr = NOP;
 }
 
 void generate_lts(FILE *f, tInstr *instruction)
 {
+    fprintf(f, "POPS TF@op2\n");
+    fprintf(f, "POPS TF@op1\n\n");
+    fprintf(f, "TYPE TF@op1$type TF@op1\n");
+    fprintf(f, "TYPE TF@op2$type TF@op2\n\n");
+    fprintf(f, "JUMPIFEQ $lt$string$%d TF@op1$type string@string\n", uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $lt$retype$%d TF@op1$type TF@op2$type\n\n", uniqueCounter);
+    fprintf(f, "LABEL $lt$string$%d", uniqueCounter);
+    fprintf(f, "JUMPIFEQ $lt$ok$%d TF@op2$type string@string\n", uniqueCounter);
+    fprintf(f, "EXIT int@4\n\n");
+    fprintf(f, "LABEL $lt$ok$%d", uniqueCounter);
+    fprintf(f, "PUSH TF@op1\n");
+    fprintf(f, "PUSH TF@op2\n");
+    fprintf(f, "LTS");
+    fprintf(f, "JUMP $end$lt$%d\n\n", uniqueCounter);
+    fprintf(f, "LABEL $lt$retype$%d\n", uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $lt$notstring$%d TF@op2$type string@string\n", uniqueCounter);
+    fprintf(f, "EXIT int@4\n\n");
+    fprintf(f, "LABEL $lt$notstring$%d\n", uniqueCounter);
+    fprintf(f, "JUMPIFEQ $lt$retype1$%d\n TF@op1$type string@int\n", uniqueCounter);
+    fprintf(f, "INT2FLOAT TF@op2 TF@op2\n");
+    fprintf(f, "JUMP $lt$ok$%d\n", uniqueCounter);
+    fprintf(f, "LABEL $lt$retype1$%d\n", uniqueCounter);
+    fprintf(f, "INT2FLOAT TF@op1 TF@op1\n");
+    fprintf(f, "JUMP $lt$ok$%d\n\n", uniqueCounter);
+    fprintf(f, "LABEL $end$lt$%d\n", uniqueCounter);
 
+    uniqueCounter++;
+    instruction->instr = NOP;
 }
 
 void generate_gts(FILE *f, tInstr *instruction)
 {
-
+    fprintf(f, "POPS TF@op2\n");
+    fprintf(f, "POPS TF@op1\n\n");
+    fprintf(f, "TYPE TF@op1$type TF@op1\n");
+    fprintf(f, "TYPE TF@op2$type TF@op2\n\n");
+    fprintf(f, "JUMPIFEQ $gt$string$%d TF@op1$type string@string\n", uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $gt$retype$%d TF@op1$type TF@op2$type\n\n", uniqueCounter);
+    fprintf(f, "LABEL $gt$string$%d", uniqueCounter);
+    fprintf(f, "JUMPIFEQ $gt$ok$%d TF@op2$type string@string\n", uniqueCounter);
+    fprintf(f, "EXIT int@4\n\n");
+    fprintf(f, "LABEL $gt$ok$%d", uniqueCounter);
+    fprintf(f, "PUSH TF@op1\n");
+    fprintf(f, "PUSH TF@op2\n");
+    fprintf(f, "GTS");
+    fprintf(f, "JUMP $end$gt$%d\n\n", uniqueCounter);
+    fprintf(f, "LABEL $gt$retype$%d\n", uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $gt$notstring$%d TF@op2$type string@string\n", uniqueCounter);
+    fprintf(f, "EXIT int@4\n\n");
+    fprintf(f, "LABEL $gt$notstring$%d\n", uniqueCounter);
+    fprintf(f, "JUMPIFEQ $gt$retype1$%d\n TF@op1$type string@int\n", uniqueCounter);
+    fprintf(f, "INT2FLOAT TF@op2 TF@op2\n");
+    fprintf(f, "JUMP $gt$ok$%d\n", uniqueCounter);
+    fprintf(f, "LABEL $gt$retype1$%d\n", uniqueCounter);
+    fprintf(f, "INT2FLOAT TF@op1 TF@op1\n");
+    fprintf(f, "JUMP $gt$ok$%d\n\n", uniqueCounter);
+    fprintf(f, "LABEL $end$gts$%d\n", uniqueCounter);
+    
+    uniqueCounter++;
+    instruction->instr = NOP;
 }
 
 void generate_eqs(FILE *f, tInstr *instruction)
 {
+    fprintf(f, "POPS TF@op2\n");
+    fprintf(f, "POPS TF@op1\n\n");
+    fprintf(f, "TYPE TF@op1$type TF@op1\n");
+    fprintf(f, "TYPE TF@op2$type TF@op2\n\n");
+    fprintf(f, "JUMPIFEQ $eq$ok$%d TF@op1$type TF@op2$type\n", uniqueCounter);
+    fprintf(f, "PUSH bool@false\n\n");
+    fprintf(f, "LABEL $eq$ok$%d\n", uniqueCounter);
+    fprintf(f, "PUSH TF@op1\n");
+    fprintf(f, "PUSH TF@op2\n");
+    fprintf(f, "EQS\n");
 
+    uniqueCounter++;
+    instruction->instr = NOP;
 }
 
 void generate_expression(FILE *f, tInstr *instruction)
 {
-    fprintf(f, "DEFVAR ");
+    // Initialize internal variables
+    fprintf(f, "# MATHEMATICAL EXPRESSION START\n");
+    fprintf(f, "PUSHFRAME\n\n");
+    fprintf(f, "DEFVAR TF@op1\n");
+    fprintf(f, "DEFVAR TF@op2\n");
+    fprintf(f, "DEFVAR TF@op1$type\n");
+    fprintf(f, "DEFVAR TF@op2$type\n");
+
+    instruction = instruction->next;
+
+    while(instruction->instr != EXPRESSION_END)
+    {
+        generate_instruction(f, instruction);
+        instruction = instruction->next;
+    }
+    
+    // Expression is completed and result is on stack
+    fprintf(f, "POPFRAME\n");
+    fprintf(f, "# MATHEMATHICAL EXPRESSION FINISH\n");
 }
 
 void generate_concatenation(FILE *f, tInstr *instruction)
@@ -1135,21 +1260,30 @@ void generate_instruction(FILE *f, tInstr *instruction)
         case NOPRINT_CALL:
             generate_print(f,instruction,false);
             break;
-/*         case ADD:
-            generate_add(f, instruction);
+        case EXPRESSION_CALL:
+            generate_expression(f, instruction);
             break;
-        case SUB:
-            generate_sub(f, instruction);
+        case ADDS:
+            generate_adds(f, instruction);
             break;
-        case MUL:
-            generate_sub(f, instruction);
+        case SUBS:
+            generate_subs(f, instruction);
             break;
-        case DIV:
-            generate_div(f, instruction);
+        case MULS:
+            generate_muls(f, instruction);
             break;
-        case MOVE:
-            generate_move(f, instruction);
-            break; */
+        case DIVS:
+            generate_divs(f, instruction);
+            break;
+        case LTS:
+            generate_lts(f, instruction);
+            break;
+        case GTS:
+            generate_gts(f, instruction);
+            break;
+        case EQS:
+            generate_eqs(f, instruction);
+            break;
         case CONCAT_CALL:
             generate_concatenation(f, instruction);
             break;

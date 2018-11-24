@@ -68,7 +68,6 @@
 #define SUBS 242
 #define MULS 243
 #define DIVS 244
-#define IDIVS 245
 #define LTS 246
 #define GTS 247
 #define EQS 248
