@@ -250,34 +250,34 @@ FILE* generate_head()
  */
 void generate_adds(FILE *f, tInstr *instruction)
 {
-    fprintf(f, "POPS TF@op1");
-    fprintf(f, "POPS TF@op2");
-    fprintf(f, "TYPE TF@op1$type TF@op1");
-    fprintf(f, "TYPE TF@op2$type TF@op2");
-    fprintf(f, "JUMPIFEQ $add_ok%d TF@op1$type TF@op2$type", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $checktype1%d TF@op1$type string@string", uniqueCounter);
-    fprintf(f, "EXIT int@4");
-    fprintf(f, "LABEL $checktype1%d", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $checktype2%d TF@op2$type string@string", uniqueCounter);
-    fprintf(f, "EXIT int@4");
-    fprintf(f, "LABEL $checktype2%d", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $add-retype1%d TF@op1$type string@int", uniqueCounter);
-    fprintf(f, "INT2FLOAT TF@op1 TF@op1");
-    fprintf(f, "LABEL $add-retype1%d", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $add_ok%d TF@op2$type string@int", uniqueCounter);
-    fprintf(f, "INT2FLOAT TF@op2 TF@op2");
-    fprintf(f, "LABEL $add_ok%d", uniqueCounter);
-    fprintf(f, "JUMPIFEQ $concat%d TF@op1$type string@string", uniqueCounter);
+    fprintf(f, "POPS TF@op1\n");
+    fprintf(f, "POPS TF@op2\n");
+    fprintf(f, "TYPE TF@op1$type TF@op1\n");
+    fprintf(f, "TYPE TF@op2$type TF@op2\n");
+    fprintf(f, "JUMPIFEQ $add_ok%d TF@op1$type TF@op2$type\n", uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $checktype1%d TF@op1$type string@string\n", uniqueCounter);
+    fprintf(f, "EXIT int@4\n");
+    fprintf(f, "LABEL $checktype1%d\n", uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $checktype2%d TF@op2$type string@string\n", uniqueCounter);
+    fprintf(f, "EXIT int@4\n");
+    fprintf(f, "LABEL $checktype2%d\n", uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $add-retype1%d TF@op1$type string@int\n", uniqueCounter);
+    fprintf(f, "INT2FLOAT TF@op1 TF@op1\n");
+    fprintf(f, "LABEL $add-retype1%d\n", uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $add_ok%d TF@op2$type string@int\n", uniqueCounter);
+    fprintf(f, "INT2FLOAT TF@op2 TF@op2\n");
+    fprintf(f, "LABEL $add_ok%d\n", uniqueCounter);
+    fprintf(f, "JUMPIFEQ $concat%d TF@op1$type string@string\n", uniqueCounter);
 
-    fprintf(f, "PUSH TF@op2");
-    fprintf(f, "PUSH TF@op1");
-    fprintf(f, "ADDS");
-    fprintf(f, "JUMP $add_end%d", uniqueCounter);
+    fprintf(f, "PUSH TF@op2\n");
+    fprintf(f, "PUSH TF@op1\n");
+    fprintf(f, "ADDS\n");
+    fprintf(f, "JUMP $add_end%d\n", uniqueCounter);
 
-    fprintf(f, "LABEL $concat%d", uniqueCounter);
-    fprintf(f, "CONCAT TF@op1 TF@op1 TF@op2");
-    fprintf(f, "PUSH TF@op1");
-    fprintf(f, "LABEL $add_end%d", uniqueCounter);
+    fprintf(f, "LABEL $concat%d\n", uniqueCounter);
+    fprintf(f, "CONCAT TF@op1 TF@op1 TF@op2\n");
+    fprintf(f, "PUSH TF@op1\n");
+    fprintf(f, "LABEL $add_end%d\n", uniqueCounter);
 
     instruction->instr = NOP;
     uniqueCounter++;
@@ -291,26 +291,26 @@ void generate_adds(FILE *f, tInstr *instruction)
  */
 void generate_subs(FILE *f, tInstr *instruction)
 {
-    fprintf(f, "POPS TF@op1");
-    fprintf(f, "POPS TF@op2");
-    fprintf(f, "TYPE TF@op1$type TF@op1");
-    fprintf(f, "TYPE TF@op2$type TF@op2");
-    fprintf(f, "JUMPIFNEQ $checktype1%d TF@op1$type string@string", uniqueCounter);
-    fprintf(f, "EXIT int@4");
-    fprintf(f, "LABEL $checktype1%d", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $checktype2%d TF@op2$type string@string", uniqueCounter);
-    fprintf(f, "EXIT int@4");
-    fprintf(f, "LABEL $checktype2%d", uniqueCounter);
-    fprintf(f, "JUMPIFEQ $sub_ok%d TF@op1$type TF@op2$type", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $sub-retype1%d TF@op1$type string@int", uniqueCounter);
-    fprintf(f, "INT2FLOAT TF@op1 TF@op1");
-    fprintf(f, "LABEL $sub-retype1%d", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $sub_ok%d TF@op2$type string@int", uniqueCounter);
-    fprintf(f, "INT2FLOAT TF@op2 TF@op2");
-    fprintf(f, "LABEL $sub_ok%d", uniqueCounter);
-    fprintf(f, "PUSH TF@op2");
-    fprintf(f, "PUSH TF@op1");
-    fprintf(f, "SUBS");
+    fprintf(f, "POPS TF@op1\n");
+    fprintf(f, "POPS TF@op2\n");
+    fprintf(f, "TYPE TF@op1$type TF@op1\n");
+    fprintf(f, "TYPE TF@op2$type TF@op2\n");
+    fprintf(f, "JUMPIFNEQ $checktype1%d TF@op1$type string@string\n", uniqueCounter);
+    fprintf(f, "EXIT int@4\n");
+    fprintf(f, "LABEL $checktype1%d\n", uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $checktype2%d TF@op2$type string@string\n", uniqueCounter);
+    fprintf(f, "EXIT int@4\n");
+    fprintf(f, "LABEL $checktype2%d\n", uniqueCounter);
+    fprintf(f, "JUMPIFEQ $sub_ok%d TF@op1$type TF@op2$type\n", uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $sub-retype1%d TF@op1$type string@int\n", uniqueCounter);
+    fprintf(f, "INT2FLOAT TF@op1 TF@op1\n");
+    fprintf(f, "LABEL $sub-retype1%d\n", uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $sub_ok%d TF@op2$type string@int\n", uniqueCounter);
+    fprintf(f, "INT2FLOAT TF@op2 TF@op2\n");
+    fprintf(f, "LABEL $sub_ok%d\n", uniqueCounter);
+    fprintf(f, "PUSH TF@op2\n");
+    fprintf(f, "PUSH TF@op1\n");
+    fprintf(f, "SUBS\n");
 
     instruction->instr = NOP;
     uniqueCounter++;
@@ -323,26 +323,26 @@ void generate_subs(FILE *f, tInstr *instruction)
  */
 void generate_muls(FILE *f, tInstr *instruction)
 {
-    fprintf(f, "POPS TF@op1");
-    fprintf(f, "POPS TF@op2");
-    fprintf(f, "TYPE TF@op1$type TF@op1");
-    fprintf(f, "TYPE TF@op2$type TF@op2");
-    fprintf(f, "JUMPIFNEQ $checktype1%d TF@op1$type string@string", uniqueCounter);
-    fprintf(f, "EXIT int@4");
-    fprintf(f, "LABEL $checktype1%d", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $checktype2%d TF@op2$type string@string", uniqueCounter);
-    fprintf(f, "EXIT int@4");
-    fprintf(f, "LABEL $checktype2%d", uniqueCounter);
-    fprintf(f, "JUMPIFEQ $mul_ok%d TF@op1$type TF@op2$type", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $mul-retype1%d TF@op1$type string@int", uniqueCounter);
-    fprintf(f, "INT2FLOAT TF@op1 TF@op1");
-    fprintf(f, "LABEL $mul-retype1%d", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $mul_ok%d TF@op2$type string@int", uniqueCounter);
-    fprintf(f, "INT2FLOAT TF@op2 TF@op2");
-    fprintf(f, "LABEL $mul_ok%d", uniqueCounter);
-    fprintf(f, "PUSH TF@op2");
-    fprintf(f, "PUSH TF@op1");
-    fprintf(f, "MULS");
+    fprintf(f, "POPS TF@op1\n");
+    fprintf(f, "POPS TF@op2\n");
+    fprintf(f, "TYPE TF@op1$type TF@op1\n");
+    fprintf(f, "TYPE TF@op2$type TF@op2\n");
+    fprintf(f, "JUMPIFNEQ $checktype1%d TF@op1$type string@string\n", uniqueCounter);
+    fprintf(f, "EXIT int@4\n");
+    fprintf(f, "LABEL $checktype1%d\n", uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $checktype2%d TF@op2$type string@string\n", uniqueCounter);
+    fprintf(f, "EXIT int@4\n");
+    fprintf(f, "LABEL $checktype2%d\n", uniqueCounter);
+    fprintf(f, "JUMPIFEQ $mul_ok%d TF@op1$type TF@op2$type\n", uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $mul-retype1%d TF@op1$type string@int\n", uniqueCounter);
+    fprintf(f, "INT2FLOAT TF@op1 TF@op1\n");
+    fprintf(f, "LABEL $mul-retype1%d\n", uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $mul_ok%d TF@op2$type string@int\n", uniqueCounter);
+    fprintf(f, "INT2FLOAT TF@op2 TF@op2\n");
+    fprintf(f, "LABEL $mul_ok%d\n", uniqueCounter);
+    fprintf(f, "PUSH TF@op2\n");
+    fprintf(f, "PUSH TF@op1\n");
+    fprintf(f, "MULS\n");
 
     instruction->instr = NOP;
     uniqueCounter++;
