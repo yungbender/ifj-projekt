@@ -397,6 +397,8 @@ void generate_while(FILE *f, tInstr *instruction)
         actualInstr = actualInstr->next;
     } while(scopeWhile != 0);
 
+    fprintf(f, "DEFVAR TF@condition%d\n", uniqueCounter);
+    fprintf(f, "DEFVAR TF@condition$type%d\n", uniqueCounter);
     fprintf(f, "LABEL $while_start%d\n", uniqueCounter);
 
     instruction = instruction->next;
@@ -407,8 +409,6 @@ void generate_while(FILE *f, tInstr *instruction)
         instruction = instruction->next;
     }
 
-    fprintf(f, "DEFVAR TF@condition%d\n", uniqueCounter);
-    fprintf(f, "DEFVAR TF@condition$type%d\n", uniqueCounter);
     fprintf(f, "POPS TF@condition%d\n", uniqueCounter);
     fprintf(f, "TYPE TF@condition$type%d TF@condition%d\n", uniqueCounter, uniqueCounter);
     fprintf(f, "JUMPIFEQ $while%d TF@condition$type%d string@nil\n", uniqueCounter, uniqueCounter);
