@@ -783,6 +783,7 @@ void if_condition()
     {
         error(UNEXPECTED_IF);
     }
+    insert_instr(pData.instrs, IF_COND_END);
     GET_TOKEN();
     if(pData.token.type != END_OF_LINE)
     {

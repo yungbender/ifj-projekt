@@ -375,7 +375,6 @@ void generate_pops(FILE *f, tInstr *instruction)
 void generate_while(FILE *f, tInstr *instruction)
 {
     tInstr *actualInstr = instruction;
-    int instr;
     int scopeWhile = 0;
     int tempUniqueCounter = 0;
 
@@ -384,6 +383,7 @@ void generate_while(FILE *f, tInstr *instruction)
         if(actualInstr->instr == DEFVAR)
         {
             fprintf(f, "DEFVAR TF@%s\n", instruction->params->param.attr.str.str);
+            actualInstr->instr = NOP;
         }
         else if(actualInstr->instr == WHILE_END)
         {
@@ -411,9 +411,10 @@ void generate_while(FILE *f, tInstr *instruction)
     fprintf(f, "DEFVAR TF@condition$type%d\n", uniqueCounter);
     fprintf(f, "POPS TF@condition%d\n", uniqueCounter);
     fprintf(f, "TYPE TF@condition$type%d TF@condition%d\n", uniqueCounter, uniqueCounter);
-    fprintf(f, "JUMPIFEQ $while%d TF@condition$type%d int@0\n", uniqueCounter, uniqueCounter);
-    fprintf(f, "JUMPIFEQ $while%d TF@condition$type%d float@0x0p+0\n", uniqueCounter, uniqueCounter);
-    fprintf(f, "JUMPIFEQ $while%d TF@condition$type%d bool@false\n", uniqueCounter, uniqueCounter);
+    fprintf(f, "JUMPIFEQ $while%d TF@condition$type%d string@nil\n", uniqueCounter, uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $while_ok%d TF@condition$type%d string@bool\n", uniqueCounter, uniqueCounter);
+    fprintf(f, "JUMPIFEQ $while%d TF@condition%d bool@false\n", uniqueCounter, uniqueCounter);
+    fprintf(f, "LABEL $while_ok%d\n", uniqueCounter);
 
     instruction = instruction->next;
     tempUniqueCounter = uniqueCounter;
@@ -425,9 +426,8 @@ void generate_while(FILE *f, tInstr *instruction)
         instruction = instruction->next;
     }
 
-    uniqueCounter = tempUniqueCounter;
-    fprintf(f, "JUMP $while_start%d\n", uniqueCounter);
-    fprintf(f, "LABEL $while%d\n", uniqueCounter);
+    fprintf(f, "JUMP $while_start%d\n", tempUniqueCounter);
+    fprintf(f, "LABEL $while%d\n", tempUniqueCounter);
     uniqueCounter++;
 
 }
@@ -439,7 +439,69 @@ void generate_while(FILE *f, tInstr *instruction)
  */
 void generate_if(FILE *f, tInstr *instruction)
 {
+    tInstr *actualInstr = instruction;
+    int scopeIf = 0;
+    int tempUniqueCounter = 0;
 
+    do
+    {
+        if(actualInstr->instr == DEFVAR)
+        {
+            fprintf(f, "DEFVAR TF@%s\n", instruction->params->param.attr.str.str);
+            actualInstr->instr = NOP;
+        }
+        else if(actualInstr->instr == IF_END)
+        {
+            scopeIf--;
+        }
+        else if(actualInstr->instr == IF_CALL)
+        {
+            scopeIf++;
+        }
+
+        actualInstr = actualInstr->next;
+    } while(scopeIf != 0);
+
+    instruction = instruction->next;
+
+    while(instruction->instr != IF_COND_END)
+    {
+        generate_instruction(f, instruction);
+        instruction = instruction->next;
+    }
+
+    printf(f, "DEFVAR TF@condition%d", uniqueCounter);
+    printf(f, "DEFVAR TF@condition$type%d", uniqueCounter);
+    printf(f, "POPS TF@condition%d", uniqueCounter);
+    printf(f, "TYPE TF@condition$type%d TF@condition%d", uniqueCounter, uniqueCounter);
+    fprintf(f, "JUMPIFEQ $else%d TF@condition$type%d string@nil\n", uniqueCounter, uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $if_ok%d TF@condition$type%d string@bool\n", uniqueCounter, uniqueCounter);
+    fprintf(f, "JUMPIFEQ $else%d TF@condition%d bool@false\n", uniqueCounter, uniqueCounter);
+    fprintf(f, "LABEL $if_ok%d\n", uniqueCounter);
+
+    instruction = instruction->next;
+    tempUniqueCounter = uniqueCounter;
+    uniqueCounter++;
+
+    while(instruction->instr != IF_END)
+    {
+        generate_instruction(f, instruction);
+        instruction = instruction->next;
+    }
+
+    fprintf(f, "JUMP $else_end%d\n", tempUniqueCounter);
+    fprintf(f, "LABEL $else%d\n", tempUniqueCounter);
+    uniqueCounter++;
+    instruction = instruction->next;
+
+    while(instruction->instr != IF_END)
+    {
+        generate_instruction(f, instruction);
+        instruction = instruction->next;
+    }
+
+    fprintf(f, "LABEL $else_end%d\n", tempUniqueCounter);
+    uniqueCounter++;
 }
 
 /**

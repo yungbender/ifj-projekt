@@ -24,6 +24,7 @@
 #define IF_CALL 203
 #define ELSE_CALL 204
 #define IF_END 205
+#define IF_COND_END 260
 // While calls
 #define WHILE_CALL 206
 #define WHILE_END 207
