@@ -470,10 +470,10 @@ void generate_if(FILE *f, tInstr *instruction)
         instruction = instruction->next;
     }
 
-    printf(f, "DEFVAR TF@condition%d", uniqueCounter);
-    printf(f, "DEFVAR TF@condition$type%d", uniqueCounter);
-    printf(f, "POPS TF@condition%d", uniqueCounter);
-    printf(f, "TYPE TF@condition$type%d TF@condition%d", uniqueCounter, uniqueCounter);
+    fprintf(f, "DEFVAR TF@condition%d", uniqueCounter);
+    fprintf(f, "DEFVAR TF@condition$type%d", uniqueCounter);
+    fprintf(f, "POPS TF@condition%d", uniqueCounter);
+    fprintf(f, "TYPE TF@condition$type%d TF@condition%d", uniqueCounter, uniqueCounter);
     fprintf(f, "JUMPIFEQ $else%d TF@condition$type%d string@nil\n", uniqueCounter, uniqueCounter);
     fprintf(f, "JUMPIFNEQ $if_ok%d TF@condition$type%d string@bool\n", uniqueCounter, uniqueCounter);
     fprintf(f, "JUMPIFEQ $else%d TF@condition%d bool@false\n", uniqueCounter, uniqueCounter);
