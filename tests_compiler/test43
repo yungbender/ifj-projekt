@@ -1,0 +1,4 @@
+def ahoj ()
+	test = 5
+	test
+end

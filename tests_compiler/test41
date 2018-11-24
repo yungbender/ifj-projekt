@@ -1,0 +1,6 @@
+def ahoj ()
+	inputs
+end
+
+id = ahoj
+id2 = id

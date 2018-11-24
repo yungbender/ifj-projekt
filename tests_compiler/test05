@@ -1,0 +1,6 @@
+def ahoj ()
+	inputs
+end
+
+xd = ahoj
+print xd
