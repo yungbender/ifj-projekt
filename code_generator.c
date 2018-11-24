@@ -340,8 +340,8 @@ void generate_muls(FILE *f, tInstr *instruction)
     fprintf(f, "JUMPIFNEQ $mul_ok%d TF@op2$type string@int\n", uniqueCounter);
     fprintf(f, "INT2FLOAT TF@op2 TF@op2\n");
     fprintf(f, "LABEL $mul_ok%d\n", uniqueCounter);
-    fprintf(f, "PUSH TF@op2\n");
-    fprintf(f, "PUSH TF@op1\n");
+    fprintf(f, "PUSHS TF@op2\n");
+    fprintf(f, "PUSHS TF@op1\n");
     fprintf(f, "MULS\n");
 
     instruction->instr = NOP;
@@ -380,8 +380,8 @@ void generate_divs(FILE *f, tInstr *instruction)
     fprintf(f, "JUMPIFNEQ $notf$op20$%d TF@op2 float@0x0p+0\n", uniqueCounter);
     fprintf(f, "EXIT int@9\n\n");
     fprintf(f, "LABEL $notf$op20$%d\n", uniqueCounter);
-    fprintf(f, "PUSH TF@op1\n");
-    fprintf(f, "PUSH TF@op2\n");
+    fprintf(f, "PUSHS TF@op1\n");
+    fprintf(f, "PUSHS TF@op2\n");
     fprintf(f, "IDIVS\n");
     fprintf(f, "JUMP $end$div$%d\n", uniqueCounter);
     fprintf(f, "LABEL $div$retype$%d\n", uniqueCounter);
@@ -416,8 +416,8 @@ void generate_lts(FILE *f, tInstr *instruction)
     fprintf(f, "JUMPIFEQ $lt$ok$%d TF@op2$type string@string\n", uniqueCounter);
     fprintf(f, "EXIT int@4\n\n");
     fprintf(f, "LABEL $lt$ok$%d", uniqueCounter);
-    fprintf(f, "PUSH TF@op1\n");
-    fprintf(f, "PUSH TF@op2\n");
+    fprintf(f, "PUSHS TF@op1\n");
+    fprintf(f, "PUSHS TF@op2\n");
     fprintf(f, "LTS");
     fprintf(f, "JUMP $end$lt$%d\n\n", uniqueCounter);
     fprintf(f, "LABEL $lt$retype$%d\n", uniqueCounter);
