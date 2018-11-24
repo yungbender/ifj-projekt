@@ -891,6 +891,22 @@ void assignment()
             function_call(true, false);
             return;
         }
+        // Here left side is still not inside local table, need to insert it
+        tToken where = head_stack(pData.stack);
+        result = search_table(pData.local->root, where.attr.str);
+        if(result == NULL)
+        {
+            if(pData.local->root == NULL)
+            {
+                pData.local->root = insert_var(pData.local->root, where);
+            }
+            else
+            {
+                insert_var(pData.local->root, where);
+            }
+            insert_instr(pData.instrs, DEFVAR);
+            insert_param(pData.instrs, where);
+        }
         // Search it inside local table, if it is variable, it only can be expression
         result = search_table(pData.local->root, pData.token.attr.str);
         if(result != NULL)
