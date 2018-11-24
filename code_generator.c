@@ -567,6 +567,7 @@ void generate_pushs(FILE *f, tInstr *instruction)
             fprintf(f, "PUSHS TF@%s\n", instruction->params->param.attr.str.str);
             break;
     }
+    instruction->instr = NOP;
 }
 
 /**
