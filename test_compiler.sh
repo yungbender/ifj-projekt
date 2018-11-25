@@ -6,11 +6,14 @@ NOCOLOR='\033[0m'
 
 touch test
 i=1
+success=0
+
 echo -e "\nTEST0$i: Empty file \c"
 ./ifj2018 <test 
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 rm test
@@ -22,6 +25,7 @@ echo -e "TEST0$i: Function without parameters \c"
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -31,6 +35,7 @@ echo -e "TEST0$i: Function with one parameter \c"
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -40,6 +45,7 @@ echo -e "TEST0$i: Function with two parameters \c"
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -49,6 +55,7 @@ echo -e "TEST0$i: Function returns string value \c"
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -58,6 +65,7 @@ echo -e "TEST0$i: Function returns float value \c"
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -67,6 +75,7 @@ echo -e "TEST0$i: Function returns integer value \c"
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -76,6 +85,7 @@ echo -e "TEST0$i: Missing closing parentheses \c"
 if [ $? -eq 2 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -85,6 +95,7 @@ echo -e "TEST0$i: Missing opening parentheses \c"
 if [ $? -eq 2 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -94,6 +105,7 @@ echo -e "TEST$i: Missing closing parentheses with paramater \c"
 if [ $? -eq 2 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -103,6 +115,7 @@ echo -e "TEST$i: Comma after last parameter \c"
 if [ $? -eq 2 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -112,6 +125,7 @@ echo -e "TEST$i: Double comma after parameter \c"
 if [ $? -eq 2 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -121,6 +135,7 @@ echo -e "TEST$i: No end after function definition \c"
 if [ $? -eq 2 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -130,6 +145,7 @@ echo -e "TEST$i: Function definition inside function definition \c"
 if [ $? -eq 2 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -139,6 +155,7 @@ echo -e "TEST$i: No newline after parameters \c"
 if [ $? -eq 2 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -148,6 +165,7 @@ echo -e "TEST$i: No newline after end \c"
 if [ $? -eq 2 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -157,6 +175,7 @@ echo -e "TEST$i: Missing parentheses with parameters \c"
 if [ $? -eq 2 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -166,6 +185,7 @@ echo -e "TEST$i: Multiple functions \c"
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -177,6 +197,7 @@ echo -e "TEST$i: While loop \c"
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -186,6 +207,7 @@ echo -e "TEST$i: Multiple while loops inside each other \c"
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -195,6 +217,7 @@ echo -e "TEST$i: Multiple while loops \c"
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -204,6 +227,7 @@ echo -e "TEST$i: Missing do token \c"
 if [ $? -eq 2 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -213,6 +237,7 @@ echo -e "TEST$i: Missing EOL after do token \c"
 if [ $? -eq 2 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -222,6 +247,7 @@ echo -e "TEST$i: Missing end token \c"
 if [ $? -eq 2 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -231,6 +257,7 @@ echo -e "TEST$i: Missing expression \c"
 if [ $? -eq 2 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -242,6 +269,7 @@ echo -e "TEST$i: Single if condition \c"
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -251,6 +279,7 @@ echo -e "TEST$i: Nested if conditions \c"
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -260,6 +289,7 @@ echo -e "TEST$i: Many if conditions \c"
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -269,6 +299,7 @@ echo -e "TEST$i: Missing end in if condition \c"
 if [ $? -eq 2 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -278,6 +309,7 @@ echo -e "TEST$i: Missing then token \c"
 if [ $? -eq 2 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -287,6 +319,7 @@ echo -e "TEST$i: Missing expression token in if condition \c"
 if [ $? -eq 2 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -296,6 +329,7 @@ echo -e "TEST$i: Missing EOL after then token \c"
 if [ $? -eq 2 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -305,6 +339,7 @@ echo -e "TEST$i: Missing EOL after else token \c"
 if [ $? -eq 2 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -314,6 +349,7 @@ echo -e "TEST$i: Missing else and end \c"
 if [ $? -eq 2 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -323,6 +359,7 @@ echo -e "TEST$i: EOL after expression \c"
 if [ $? -eq 2 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -332,6 +369,7 @@ echo -e "TEST$i: Missing first part of if condition \c"
 if [ $? -eq 2 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -343,6 +381,7 @@ echo -e "TEST$i: Assignment from integer \c"
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -352,6 +391,7 @@ echo -e "TEST$i: Assignment from float \c"
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -361,6 +401,7 @@ echo -e "TEST$i: Assignment from string \c"
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -370,6 +411,7 @@ echo -e "TEST$i: Assignment from function \c"
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -379,6 +421,7 @@ echo -e "TEST$i: Assignment from id \c"
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -388,6 +431,7 @@ echo -e "TEST$i: Initialization of id with the same id (id = id) \c"
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -397,6 +441,7 @@ echo -e "TEST$i: Only id on the line \c"
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -406,6 +451,7 @@ echo -e "TEST$i: Assignment from expression \c"
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -415,6 +461,7 @@ echo -e "TEST$i: Assignment from function with parameters, missing comma \c"
 if [ $? -eq 2 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -424,6 +471,7 @@ echo -e "TEST$i: Assignment from function with parameters in parentheses, missin
 if [ $? -eq 2 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -433,6 +481,7 @@ echo -e "TEST$i: Assignment from function with parameters separated by comma in 
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -442,6 +491,7 @@ echo -e "TEST$i: Assignment from function with parameters separated by comma \c"
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -451,6 +501,7 @@ echo -e "TEST$i: Assignment from function with parameters separated by multiple 
 if [ $? -eq 2 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -460,6 +511,7 @@ echo -e "TEST$i: Wrong token after id \c"
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -469,6 +521,7 @@ echo -e "TEST$i: Missing right side of assignment with defined variable \c"
 if [ $? -eq 2 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -478,6 +531,7 @@ echo -e "TEST$i: Calling function without parameters \c"
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -487,6 +541,7 @@ echo -e "TEST$i: Calling function with one parameter, without parentheses \c"
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -496,6 +551,7 @@ echo -e "TEST$i: Calling function with one parameter, with parentheses \c"
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -505,6 +561,7 @@ echo -e "TEST$i: Calling function with more parameters, without parentheses and 
 if [ $? -eq 2 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -514,6 +571,7 @@ echo -e "TEST$i: Calling function with more parameters, without commas \c"
 if [ $? -eq 2 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -523,6 +581,7 @@ echo -e "TEST$i: Calling function with more parameters, with parentheses and com
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -532,6 +591,7 @@ echo -e "TEST$i: Calling function without parameters, with parentheses\c"
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
 
@@ -541,5 +601,224 @@ echo -e "TEST$i: Missing right side of assignment with undefined variable \c"
 if [ $? -eq 2 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
+    success=1
     echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+echo -e "\nExpression syntax tests\n"
+
+i=$((i+1))
+echo -e "TEST$i: Various add and substract expressions without assignment \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Concatenation of expressions without assignment \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Concatenation of expressions in assignment \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Various add and substract expressions with assignment \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Nil assignment \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Various multiply and divide expressions without assignment \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Various multiply and divide expressions with assignment \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Various RO and CO expressions without assignment \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Various RO and CO expressions with assignment \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Various expressions with parantheses, no assignment \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Various expressions with parantheses, and assigned \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Wrong relation operator syntax in expression \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 4 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Wrong compare operator syntax in expression \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 4 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Just parentheses in expression \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Wrong open parentheses syntax \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 2 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Wrong closed parentheses syntax \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 2 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Missing operator in front of parentheses \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 2 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Missing operator behind parentheses \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 2 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Missing operator between two values \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 2 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Combination of relation and compare operators \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 4 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Missing operator between two parentheses \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 2 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+if [ "$success" == 0 ]; then
+    echo -e "\nAll tests were ${GREEN}[OK]${NOCOLOR}.\n"
+else
+    echo -e "\nSome tests ${RED}[FAILED]${NOCOLOR}.\n"
 fi
