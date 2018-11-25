@@ -82,6 +82,7 @@ PT_idx table_index(tToken token)
 		case FLOAT:
 		case STRING:
 		case ID:
+		case NIL:
 		case NONTERM:
 			return I_data;
 		case IDF:
@@ -106,7 +107,7 @@ void reduce_by_rule(tStack *tmp_stack)
 	rule_token.type = NONTERM;
 	tToken head = head_stack(tmp_stack);
 	//E->i
-	if(head.type == ID || head.type == INTEGER || head.type == FLOAT || head.type == STRING)
+	if(head.type == ID || head.type == INTEGER || head.type == FLOAT || head.type == STRING || head.type == NIL)
 	{	
 		// Chcek if the variable is defined
 		if(head.type == ID)

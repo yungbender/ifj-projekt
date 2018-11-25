@@ -275,8 +275,8 @@ void generate_adds(FILE *f, tInstr *instruction)
     fprintf(f, "JUMP $add_end%d\n", uniqueCounter);
 
     fprintf(f, "LABEL $concat%d\n", uniqueCounter);
-    fprintf(f, "CONCAT TF@op1 TF@op1 TF@op2\n");
-    fprintf(f, "PUSH TF@op1\n");
+    fprintf(f, "CONCAT TF@op2 TF@op2 TF@op1\n");
+    fprintf(f, "PUSHS TF@op2\n");
     fprintf(f, "LABEL $add_end%d\n", uniqueCounter);
 
     instruction->instr = NOP;
@@ -372,17 +372,17 @@ void generate_divs(FILE *f, tInstr *instruction)
     fprintf(f, "JUMPIFNEQ $noti$op20$%d TF@op2 int@0\n", uniqueCounter);
     fprintf(f, "EXIT int@9\n\n");
     fprintf(f, "LABEL $noti$op20$%d\n", uniqueCounter);
-    fprintf(f, "PUSH TF@op1\n");
-    fprintf(f, "PUSH TF@op2\n");
-    fprintf(f, "DIVS\n");
+    fprintf(f, "PUSHS TF@op1\n");
+    fprintf(f, "PUSHS TF@op2\n");
+    fprintf(f, "IDIVS\n");
     fprintf(f, "JUMP $end$div$%d\n\n", uniqueCounter);
     fprintf(f, "LABEL $idivs$%d\n", uniqueCounter);
     fprintf(f, "JUMPIFNEQ $notf$op20$%d TF@op2 float@0x0p+0\n", uniqueCounter);
     fprintf(f, "EXIT int@9\n\n");
     fprintf(f, "LABEL $notf$op20$%d\n", uniqueCounter);
-    fprintf(f, "PUSH TF@op1\n");
-    fprintf(f, "PUSH TF@op2\n");
-    fprintf(f, "IDIVS\n");
+    fprintf(f, "PUSHS TF@op1\n");
+    fprintf(f, "PUSHS TF@op2\n");
+    fprintf(f, "DIVS\n");
     fprintf(f, "JUMP $end$div$%d\n", uniqueCounter);
     fprintf(f, "LABEL $div$retype$%d\n", uniqueCounter);
     fprintf(f, "JUMPIFEQ $div$retype1$%d TF@op1$type string@int\n", uniqueCounter);
@@ -412,19 +412,20 @@ void generate_lts(FILE *f, tInstr *instruction)
     fprintf(f, "TYPE TF@op2$type TF@op2\n\n");
     fprintf(f, "JUMPIFEQ $lt$string$%d TF@op1$type string@string\n", uniqueCounter);
     fprintf(f, "JUMPIFNEQ $lt$retype$%d TF@op1$type TF@op2$type\n\n", uniqueCounter);
-    fprintf(f, "LABEL $lt$string$%d", uniqueCounter);
+    fprintf(f, "JUMPIFEQ $lt$ok$%d TF@op1$type TF@op2$type\n", uniqueCounter);
+    fprintf(f, "LABEL $lt$string$%d\n", uniqueCounter);
     fprintf(f, "JUMPIFEQ $lt$ok$%d TF@op2$type string@string\n", uniqueCounter);
     fprintf(f, "EXIT int@4\n\n");
-    fprintf(f, "LABEL $lt$ok$%d", uniqueCounter);
-    fprintf(f, "PUSH TF@op1\n");
-    fprintf(f, "PUSH TF@op2\n");
-    fprintf(f, "LTS");
+    fprintf(f, "LABEL $lt$ok$%d\n", uniqueCounter);
+    fprintf(f, "PUSHS TF@op1\n");
+    fprintf(f, "PUSHS TF@op2\n");
+    fprintf(f, "LTS\n");
     fprintf(f, "JUMP $end$lt$%d\n\n", uniqueCounter);
     fprintf(f, "LABEL $lt$retype$%d\n", uniqueCounter);
     fprintf(f, "JUMPIFNEQ $lt$notstring$%d TF@op2$type string@string\n", uniqueCounter);
     fprintf(f, "EXIT int@4\n\n");
     fprintf(f, "LABEL $lt$notstring$%d\n", uniqueCounter);
-    fprintf(f, "JUMPIFEQ $lt$retype1$%d\n TF@op1$type string@int\n", uniqueCounter);
+    fprintf(f, "JUMPIFEQ $lt$retype1$%d TF@op1$type string@int\n", uniqueCounter);
     fprintf(f, "INT2FLOAT TF@op2 TF@op2\n");
     fprintf(f, "JUMP $lt$ok$%d\n", uniqueCounter);
     fprintf(f, "LABEL $lt$retype1$%d\n", uniqueCounter);
@@ -444,26 +445,27 @@ void generate_gts(FILE *f, tInstr *instruction)
     fprintf(f, "TYPE TF@op2$type TF@op2\n\n");
     fprintf(f, "JUMPIFEQ $gt$string$%d TF@op1$type string@string\n", uniqueCounter);
     fprintf(f, "JUMPIFNEQ $gt$retype$%d TF@op1$type TF@op2$type\n\n", uniqueCounter);
-    fprintf(f, "LABEL $gt$string$%d", uniqueCounter);
+    fprintf(f, "JUMPIFEQ $gt$ok$%d TF@op1$type TF@op2$type\n", uniqueCounter);
+    fprintf(f, "LABEL $gt$string$%d\n", uniqueCounter);
     fprintf(f, "JUMPIFEQ $gt$ok$%d TF@op2$type string@string\n", uniqueCounter);
     fprintf(f, "EXIT int@4\n\n");
-    fprintf(f, "LABEL $gt$ok$%d", uniqueCounter);
-    fprintf(f, "PUSH TF@op1\n");
-    fprintf(f, "PUSH TF@op2\n");
-    fprintf(f, "GTS");
+    fprintf(f, "LABEL $gt$ok$%d\n", uniqueCounter);
+    fprintf(f, "PUSHS TF@op1\n");
+    fprintf(f, "PUSHS TF@op2\n");
+    fprintf(f, "GTS\n");
     fprintf(f, "JUMP $end$gt$%d\n\n", uniqueCounter);
     fprintf(f, "LABEL $gt$retype$%d\n", uniqueCounter);
     fprintf(f, "JUMPIFNEQ $gt$notstring$%d TF@op2$type string@string\n", uniqueCounter);
     fprintf(f, "EXIT int@4\n\n");
     fprintf(f, "LABEL $gt$notstring$%d\n", uniqueCounter);
-    fprintf(f, "JUMPIFEQ $gt$retype1$%d\n TF@op1$type string@int\n", uniqueCounter);
+    fprintf(f, "JUMPIFEQ $gt$retype1$%d TF@op1$type string@int\n", uniqueCounter);
     fprintf(f, "INT2FLOAT TF@op2 TF@op2\n");
     fprintf(f, "JUMP $gt$ok$%d\n", uniqueCounter);
     fprintf(f, "LABEL $gt$retype1$%d\n", uniqueCounter);
     fprintf(f, "INT2FLOAT TF@op1 TF@op1\n");
     fprintf(f, "JUMP $gt$ok$%d\n\n", uniqueCounter);
-    fprintf(f, "LABEL $end$gts$%d\n", uniqueCounter);
-    
+    fprintf(f, "LABEL $end$gt$%d\n", uniqueCounter);
+
     uniqueCounter++;
     instruction->instr = NOP;
 }
@@ -475,11 +477,13 @@ void generate_eqs(FILE *f, tInstr *instruction)
     fprintf(f, "TYPE TF@op1$type TF@op1\n");
     fprintf(f, "TYPE TF@op2$type TF@op2\n\n");
     fprintf(f, "JUMPIFEQ $eq$ok$%d TF@op1$type TF@op2$type\n", uniqueCounter);
-    fprintf(f, "PUSH bool@false\n\n");
+    fprintf(f, "PUSHS bool@false\n\n");
+    fprintf(f, "JUMP $end$eq$%d\n", uniqueCounter);
     fprintf(f, "LABEL $eq$ok$%d\n", uniqueCounter);
-    fprintf(f, "PUSH TF@op1\n");
-    fprintf(f, "PUSH TF@op2\n");
+    fprintf(f, "PUSHS TF@op1\n");
+    fprintf(f, "PUSHS TF@op2\n");
     fprintf(f, "EQS\n");
+    fprintf(f, "LABEL $end$eq$%d\n", uniqueCounter);
 
     uniqueCounter++;
     instruction->instr = NOP;
@@ -489,7 +493,8 @@ void generate_expression(FILE *f, tInstr *instruction)
 {
     // Initialize internal variables
     fprintf(f, "# MATHEMATICAL EXPRESSION START\n");
-    fprintf(f, "PUSHFRAME\n\n");
+    fprintf(f, "PUSHFRAME\n");
+    fprintf(f, "CREATEFRAME\n\n");
     fprintf(f, "DEFVAR TF@op1\n");
     fprintf(f, "DEFVAR TF@op2\n");
     fprintf(f, "DEFVAR TF@op1$type\n");
@@ -564,7 +569,10 @@ void generate_pushs(FILE *f, tInstr *instruction)
             fprintf(f, "PUSHS string@%s\n", instruction->params->param.attr.str.str);
             break;
         case ID:
-            fprintf(f, "PUSHS TF@%s\n", instruction->params->param.attr.str.str);
+            fprintf(f, "PUSHS LF@%s\n", instruction->params->param.attr.str.str);
+            break;
+        case NIL:
+            fprintf(f, "PUSHS nil@nil\n");
             break;
     }
     instruction->instr = NOP;
@@ -592,13 +600,14 @@ void generate_while(FILE *f, tInstr *instruction)
 {
     tInstr *actualInstr = instruction;
     int scopeWhile = 0;
-    int tempUniqueCounter = 0;
+    int tempUniqueCounter = uniqueCounter;
 
     do
     {
         if(actualInstr->instr == DEFVAR)
         {
             fprintf(f, "DEFVAR TF@%s\n", instruction->params->param.attr.str.str);
+            fprintf(f, "DEFVAR TF@%s nil@nil\n", instruction->params->param.attr.str.str);
             actualInstr->instr = NOP;
         }
         else if(actualInstr->instr == WHILE_END)
@@ -613,9 +622,9 @@ void generate_while(FILE *f, tInstr *instruction)
         actualInstr = actualInstr->next;
     } while(scopeWhile != 0);
 
-    fprintf(f, "DEFVAR TF@condition%d\n", uniqueCounter);
-    fprintf(f, "DEFVAR TF@condition$type%d\n", uniqueCounter);
-    fprintf(f, "LABEL $while_start%d\n", uniqueCounter);
+    fprintf(f, "DEFVAR TF@condition%d\n", tempUniqueCounter);
+    fprintf(f, "DEFVAR TF@condition$type%d\n", tempUniqueCounter);
+    fprintf(f, "LABEL $while_start%d\n", tempUniqueCounter);
 
     instruction = instruction->next;
 
@@ -625,20 +634,20 @@ void generate_while(FILE *f, tInstr *instruction)
         instruction = instruction->next;
     }
 
-    fprintf(f, "POPS TF@condition%d\n", uniqueCounter);
-    fprintf(f, "TYPE TF@condition$type%d TF@condition%d\n", uniqueCounter, uniqueCounter);
-    fprintf(f, "JUMPIFEQ $while%d TF@condition$type%d string@nil\n", uniqueCounter, uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $while_ok%d TF@condition$type%d string@bool\n", uniqueCounter, uniqueCounter);
-    fprintf(f, "JUMPIFEQ $while%d TF@condition%d bool@false\n", uniqueCounter, uniqueCounter);
-    fprintf(f, "LABEL $while_ok%d\n", uniqueCounter);
+    fprintf(f, "POPS TF@condition%d\n", tempUniqueCounter);
+    fprintf(f, "TYPE TF@condition$type%d TF@condition%d\n", tempUniqueCounter, tempUniqueCounter);
+    fprintf(f, "JUMPIFEQ $while%d TF@condition$type%d string@nil\n", tempUniqueCounter, tempUniqueCounter);
+    fprintf(f, "JUMPIFNEQ $while_ok%d TF@condition$type%d string@bool\n", tempUniqueCounter, tempUniqueCounter);
+    fprintf(f, "JUMPIFEQ $while%d TF@condition%d bool@false\n", tempUniqueCounter, tempUniqueCounter);
+    fprintf(f, "LABEL $while_ok%d\n", tempUniqueCounter);
 
     instruction = instruction->next;
-    tempUniqueCounter = uniqueCounter;
     uniqueCounter++;
 
     while(instruction->instr != WHILE_END)
     {
         generate_instruction(f, instruction);
+        instruction->instr = NOP;
         instruction = instruction->next;
     }
 
@@ -657,13 +666,14 @@ void generate_if(FILE *f, tInstr *instruction)
 {
     tInstr *actualInstr = instruction;
     int scopeIf = 0;
-    int tempUniqueCounter = 0;
+    int tempUniqueCounter = uniqueCounter;
 
     do
     {
         if(actualInstr->instr == DEFVAR)
         {
             fprintf(f, "DEFVAR TF@%s\n", instruction->params->param.attr.str.str);
+            fprintf(f, "DEFVAR TF@%s nil@nil\n", instruction->params->param.attr.str.str);
             actualInstr->instr = NOP;
         }
         else if(actualInstr->instr == IF_END)
@@ -686,22 +696,22 @@ void generate_if(FILE *f, tInstr *instruction)
         instruction = instruction->next;
     }
 
-    fprintf(f, "DEFVAR TF@condition%d\n", uniqueCounter);
-    fprintf(f, "DEFVAR TF@condition$type%d\n", uniqueCounter);
-    fprintf(f, "POPS TF@condition%d\n", uniqueCounter);
-    fprintf(f, "TYPE TF@condition$type%d TF@condition%d\n", uniqueCounter, uniqueCounter);
-    fprintf(f, "JUMPIFEQ $else%d TF@condition$type%d string@nil\n", uniqueCounter, uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $if_ok%d TF@condition$type%d string@bool\n", uniqueCounter, uniqueCounter);
-    fprintf(f, "JUMPIFEQ $else%d TF@condition%d bool@false\n", uniqueCounter, uniqueCounter);
-    fprintf(f, "LABEL $if_ok%d\n", uniqueCounter);
+    fprintf(f, "DEFVAR TF@condition%d\n", tempUniqueCounter);
+    fprintf(f, "DEFVAR TF@condition$type%d\n", tempUniqueCounter);
+    fprintf(f, "POPS TF@condition%d\n", tempUniqueCounter);
+    fprintf(f, "TYPE TF@condition$type%d TF@condition%d\n", tempUniqueCounter, tempUniqueCounter);
+    fprintf(f, "JUMPIFEQ $else%d TF@condition$type%d string@nil\n", tempUniqueCounter, tempUniqueCounter);
+    fprintf(f, "JUMPIFNEQ $if_ok%d TF@condition$type%d string@bool\n", tempUniqueCounter, tempUniqueCounter);
+    fprintf(f, "JUMPIFEQ $else%d TF@condition%d bool@false\n", tempUniqueCounter, tempUniqueCounter);
+    fprintf(f, "LABEL $if_ok%d\n", tempUniqueCounter);
 
     instruction = instruction->next;
-    tempUniqueCounter = uniqueCounter;
     uniqueCounter++;
 
     while(instruction->instr != ELSE_CALL)
     {
         generate_instruction(f, instruction);
+        instruction->instr = NOP;
         instruction = instruction->next;
     }
 
@@ -713,6 +723,7 @@ void generate_if(FILE *f, tInstr *instruction)
     while(instruction->instr != IF_END)
     {
         generate_instruction(f, instruction);
+        instruction->instr = NOP;
         instruction = instruction->next;
     }
 
@@ -1287,6 +1298,9 @@ void generate_instruction(FILE *f, tInstr *instruction)
             break;
         case CONCAT_CALL:
             generate_concatenation(f, instruction);
+            break;
+        case NOTS:
+            generate_nots(f, instruction);
             break;
         case NOP:
             break;
