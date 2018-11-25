@@ -621,6 +621,7 @@ void function_call(bool moved, bool pushed)
         {
             insert_instr(pData.instrs,builtin);
             insert_param(pData.instrs,name);
+            str_free(&pData.token.attr.str); // We dont need to save the name of builtin function
         }
         if(pushed == true)
         {
