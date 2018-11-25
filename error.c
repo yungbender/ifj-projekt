@@ -102,5 +102,8 @@ void print_error_exit(int id, int line)
         case ID_REDEF:
             fprintf(stderr, "Semantic error, redefinition of variable! Line: %d\n", line);
             exit(DEF_ERR);
+        case UNDEF_F_OR_V:
+            fprintf(stderr, "Semantic error, calling undefined function or using undefined variable! Line: %d\n", line);
+            exit(DEF_ERR);
     }
 }

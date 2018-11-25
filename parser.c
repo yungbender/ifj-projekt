@@ -17,6 +17,8 @@
 
 tPData pData; //< This global variable, are data of parser, symbol tables, instruction list etc.
 bool endoffile = false; //< This global bool, signifies if endofline was reached, to prevent double free.
+tToken noretval; //< THis global token, is used for inside compiler variable $noretval
+
 
 /**
  * Function initializes structure tPData, which are data of parser.
@@ -30,6 +32,8 @@ void parser_init()
     pData.currentLine = 0;
     pData.scopes = 0;
     pData.inDefinition = false;
+
+    CREATE_NORETVAL_TOKEN();
 
     init_stack(pData.stack);
     init_ilist(pData.instrs);
@@ -46,7 +50,7 @@ void error(int id, int line)
 {
     free_symtable(pData.global);
     free_symtable(pData.local);
-
+    str_free(&noretval.attr.str);
     free_ilist(pData.instrs);
     free_stack(pData.stack);
 
@@ -853,7 +857,9 @@ void end_of_file()
         free_symtable(pData.global);
         free_symtable(pData.local);
         free_stack(pData.stack);
-
+        // Make sure noretval is freed, insert it into list as empty instruciton
+        insert_instr(pData.instrs, NOP);
+        insert_param(pData.instrs, noretval);
         // Give the final instruction list to the code generator
         ilist = pData.instrs;
         endoffile = true;
@@ -944,7 +950,7 @@ void assignment()
         // If parser is in main, and result is NULL, it cannot be function call, it can be only expression or error
         else 
         {
-            error(UNDEF_F, pData.currentLine);
+            error(UNDEF_F_OR_V, pData.currentLine);
         }
     }
 
@@ -1114,7 +1120,6 @@ void analyse_id()
 void start()
 {
     pData.currentLine++;
-    CREATE_NORETVAL_TOKEN();
     switch(pData.token.type)
     {
         // <start> DEF <f_decl> IDF ( <params> EOL <f_def> <start>
@@ -1155,7 +1160,7 @@ void start()
                 error(SY_ERR, pData.currentLine);
             }
             // If there are scopes, end just returns back to the parsing function (parser_function_definition, while_function, if_function)
-            return;
+            break;
             // <EOF> -> end
         case END_OF_FILE:
             // Need to check if we are not in function, check if all scopes are 0 and if all called functions got their own definition

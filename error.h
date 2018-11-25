@@ -47,6 +47,7 @@
 #define WRONG_OP_CONCAT 122
 #define EXPECTED_EXPR 123
 #define ID_REDEF 124
+#define UNDEF_F_OR_V 125 
 
 void print_error_exit(int id, int line);
 #endif // _ERR_H
