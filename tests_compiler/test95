@@ -1,5 +1,5 @@
-def _ahoj ()
+def ahoj? ()
 	inputs
 end
 
-_ahoj
+ahoj?
