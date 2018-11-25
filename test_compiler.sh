@@ -818,25 +818,7 @@ else
 fi
 
 i=$((i+1))
-echo -e "TEST$i: Add operation with nil, without assignment \c"
-./ifj2018 <tests_compiler/test$i &>/dev/null 
-if [ $? -eq 4 ]; then
-    echo -e "${GREEN}[OK]${NOCOLOR}"
-else
-    success=1
-    echo -e "${RED}[FAILED]${NOCOLOR}"
-fi
-
 i=$((i+1))
-echo -e "TEST$i: Multiply operation with nil, without assignment \c"
-./ifj2018 <tests_compiler/test$i &>/dev/null 
-if [ $? -eq 4 ]; then
-    echo -e "${GREEN}[OK]${NOCOLOR}"
-else
-    success=1
-    echo -e "${RED}[FAILED]${NOCOLOR}"
-fi
-
 i=$((i+1))
 echo -e "TEST$i: Compare operation with nil, without assignment \c"
 ./ifj2018 <tests_compiler/test$i &>/dev/null 
@@ -848,15 +830,6 @@ else
 fi
 
 i=$((i+1))
-echo -e "TEST$i: Relation operation with nil, without assignment \c"
-./ifj2018 <tests_compiler/test$i &>/dev/null 
-if [ $? -eq 4 ]; then
-    echo -e "${GREEN}[OK]${NOCOLOR}"
-else
-    success=1
-    echo -e "${RED}[FAILED]${NOCOLOR}"
-fi
-
 i=$((i+1))
 echo -e "TEST$i: Nil in parentheses, without assignment \c"
 ./ifj2018 <tests_compiler/test$i &>/dev/null 
@@ -868,25 +841,7 @@ else
 fi
 
 i=$((i+1))
-echo -e "TEST$i: Add operation with nil, with assignment \c"
-./ifj2018 <tests_compiler/test$i &>/dev/null 
-if [ $? -eq 4 ]; then
-    echo -e "${GREEN}[OK]${NOCOLOR}"
-else
-    success=1
-    echo -e "${RED}[FAILED]${NOCOLOR}"
-fi
-
 i=$((i+1))
-echo -e "TEST$i: Multiply operation with nil, with assignment \c"
-./ifj2018 <tests_compiler/test$i &>/dev/null 
-if [ $? -eq 4 ]; then
-    echo -e "${GREEN}[OK]${NOCOLOR}"
-else
-    success=1
-    echo -e "${RED}[FAILED]${NOCOLOR}"
-fi
-
 i=$((i+1))
 echo -e "TEST$i: Compare operation with nil, with assignment \c"
 ./ifj2018 <tests_compiler/test$i &>/dev/null 
@@ -898,15 +853,6 @@ else
 fi
 
 i=$((i+1))
-echo -e "TEST$i: Relation operation with nil, with assignment \c"
-./ifj2018 <tests_compiler/test$i &>/dev/null 
-if [ $? -eq 4 ]; then
-    echo -e "${GREEN}[OK]${NOCOLOR}"
-else
-    success=1
-    echo -e "${RED}[FAILED]${NOCOLOR}"
-fi
-
 i=$((i+1))
 echo -e "TEST$i: Nil in parentheses, with assignment \c"
 ./ifj2018 <tests_compiler/test$i &>/dev/null 
@@ -952,7 +898,7 @@ fi
 i=$((i+1))
 echo -e "TEST$i: Trying to assign into IDF variable \c"
 ./ifj2018 <tests_compiler/test$i &>/dev/null 
-if [ $? -eq 2 ]; then
+if [ $? -eq 2 -o $? -eq 3 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
     success=1
