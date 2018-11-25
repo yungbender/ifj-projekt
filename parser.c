@@ -867,8 +867,8 @@ void assignment()
 {
     // Left assignment side, is still on stack
     GET_TOKEN();
-    // Need to check the if the token after assignment is ID_F
-    if(pData.token.type == ID_F)
+    // Need to check the if the token after assignment is IDF
+    if(pData.token.type == IDF)
     {
         // its function call, need to call it true, because result is going to be save
         function_call(true, false);

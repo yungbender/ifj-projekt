@@ -25,5 +25,4 @@ int main()
     generate_code();
  
     return OK;
-
 }
