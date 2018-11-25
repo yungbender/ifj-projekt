@@ -9,7 +9,7 @@ i=1
 success=0
 
 echo -e "\nTEST0$i: Empty file \c"
-./ifj2018 <test 
+./ifj2018 <test &>/dev/null
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -21,7 +21,7 @@ rm test
 echo -e "\nFunction definition syntax tests\n"
 i=$((i+1))
 echo -e "TEST0$i: Function without parameters \c"
-./ifj2018 <tests_compiler/test0$i 
+./ifj2018 <tests_compiler/test0$i &>/dev/null
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -31,7 +31,7 @@ fi
 
 i=$((i+1))
 echo -e "TEST0$i: Function with one parameter \c"
-./ifj2018 <tests_compiler/test0$i 
+./ifj2018 <tests_compiler/test0$i &>/dev/null
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -41,7 +41,7 @@ fi
 
 i=$((i+1))
 echo -e "TEST0$i: Function with two parameters \c"
-./ifj2018 <tests_compiler/test0$i
+./ifj2018 <tests_compiler/test0$i &>/dev/null
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -51,7 +51,7 @@ fi
 
 i=$((i+1))
 echo -e "TEST0$i: Function returns string value \c"
-./ifj2018 <tests_compiler/test0$i 
+./ifj2018 <tests_compiler/test0$i &>/dev/null
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -61,7 +61,7 @@ fi
 
 i=$((i+1))
 echo -e "TEST0$i: Function returns float value \c"
-./ifj2018 <tests_compiler/test0$i 
+./ifj2018 <tests_compiler/test0$i &>/dev/null
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -71,7 +71,7 @@ fi
 
 i=$((i+1))
 echo -e "TEST0$i: Function returns integer value \c"
-./ifj2018 <tests_compiler/test0$i 
+./ifj2018 <tests_compiler/test0$i &>/dev/null
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -811,6 +811,178 @@ i=$((i+1))
 echo -e "TEST$i: Missing operator between two parentheses \c"
 ./ifj2018 <tests_compiler/test$i &>/dev/null 
 if [ $? -eq 2 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Add operation with nil, without assignment \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 4 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Multiply operation with nil, without assignment \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 4 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Compare operation with nil, without assignment \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Relation operation with nil, without assignment \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 4 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Nil in parentheses, without assignment \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Add operation with nil, with assignment \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 4 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Multiply operation with nil, with assignment \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 4 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Compare operation with nil, with assignment \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Relation operation with nil, with assignment \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 4 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Nil in parentheses, with assignment \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Comparing nil with integer, without assignment \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Comparing nil with integer, with assignment \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+echo -e "\nOther various tests\n"
+
+i=$((i+1))
+echo -e "TEST$i: Calling undefined function with IDF token type, without assignment \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 3 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Trying to assign into IDF variable \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 2 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Calling function with IDF token name, without assignment \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Calling function with IDF token name, with assignment \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=1
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+
+i=$((i+1))
+echo -e "TEST$i: Calling undefined function with IDF token type, with assignment \c"
+./ifj2018 <tests_compiler/test$i &>/dev/null 
+if [ $? -eq 3 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
     success=1
