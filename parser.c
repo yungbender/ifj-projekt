@@ -777,7 +777,7 @@ void if_condition()
     }
 
     pars_expression();
-    
+
     // Expression returns token which should contain THEN keyword
     if(pData.token.type != THEN)
     {
@@ -948,7 +948,7 @@ void assignment()
         }
     }
 
-    if(pData.token.type == INTEGER || pData.token.type == FLOAT || pData.token.type == STRING || pData.token.type == OPEN_PARENTH)
+    if(pData.token.type == INTEGER || pData.token.type == FLOAT || pData.token.type == STRING || pData.token.type == OPEN_PARENTH || pData.token.type == NIL)
     {
         tToken where = head_stack(pData.stack);
         pop_stack(pData.stack);
@@ -971,7 +971,7 @@ void assignment()
             }
             insert_var(pData.local->root, where);
         }
-        if(pData.token.type == INTEGER || pData.token.type == FLOAT || pData.token.type == OPEN_PARENTH)
+        if(pData.token.type == INTEGER || pData.token.type == FLOAT || pData.token.type == OPEN_PARENTH || pData.token.type == NIL)
         {
             // Expression is parsed, 
             pars_expression();
@@ -1161,6 +1161,7 @@ void start()
             end_of_file();
             break;
         case OPEN_PARENTH:
+        case NIL:
         case INTEGER:
         case FLOAT:
              //Just calculate the expression 

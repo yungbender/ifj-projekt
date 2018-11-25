@@ -254,6 +254,12 @@ void generate_adds(FILE *f, tInstr *instruction)
     fprintf(f, "POPS TF@op2\n");
     fprintf(f, "TYPE TF@op1$type TF@op1\n");
     fprintf(f, "TYPE TF@op2$type TF@op2\n");
+    fprintf(f, "JUMPIFNEQ $add_nil$op1$%d TF@op1$type string@nil\n", uniqueCounter);
+    fprintf(f, "EXIT int@4\n");
+    fprintf(f, "LABEL $add_nil$op1$%d\n", uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $add_nil$op2$%d TF@op2$type string@nil\n", uniqueCounter);
+    fprintf(f, "EXIT int@4\n");
+    fprintf(f, "LABEL $add_nil$op2$%d\n", uniqueCounter);
     fprintf(f, "JUMPIFEQ $add_ok%d TF@op1$type TF@op2$type\n", uniqueCounter);
     fprintf(f, "JUMPIFNEQ $checktype1%d TF@op1$type string@string\n", uniqueCounter);
     fprintf(f, "EXIT int@4\n");
@@ -295,6 +301,12 @@ void generate_subs(FILE *f, tInstr *instruction)
     fprintf(f, "POPS TF@op2\n");
     fprintf(f, "TYPE TF@op1$type TF@op1\n");
     fprintf(f, "TYPE TF@op2$type TF@op2\n");
+    fprintf(f, "JUMPIFNEQ $sub_nil$op1$%d TF@op1$type string@nil\n", uniqueCounter);
+    fprintf(f, "EXIT int@4\n");
+    fprintf(f, "LABEL $sub_nil$op1$%d\n", uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $sub_nil$op2$%d TF@op2$type string@nil\n", uniqueCounter);
+    fprintf(f, "EXIT int@4\n");
+    fprintf(f, "LABEL $sub_nil$op2$%d\n", uniqueCounter);
     fprintf(f, "JUMPIFNEQ $checktype1%d TF@op1$type string@string\n", uniqueCounter);
     fprintf(f, "EXIT int@4\n");
     fprintf(f, "LABEL $checktype1%d\n", uniqueCounter);
@@ -327,6 +339,12 @@ void generate_muls(FILE *f, tInstr *instruction)
     fprintf(f, "POPS TF@op2\n");
     fprintf(f, "TYPE TF@op1$type TF@op1\n");
     fprintf(f, "TYPE TF@op2$type TF@op2\n");
+    fprintf(f, "JUMPIFNEQ $mul_nil$op1$%d TF@op1$type string@nil\n", uniqueCounter);
+    fprintf(f, "EXIT int@4\n");
+    fprintf(f, "LABEL $mul_nil$op1$%d\n", uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $mul_nil$op2$%d TF@op2$type string@nil\n", uniqueCounter);
+    fprintf(f, "EXIT int@4\n");
+    fprintf(f, "LABEL $mul_nil$op2$%d\n", uniqueCounter);
     fprintf(f, "JUMPIFNEQ $checktype1%d TF@op1$type string@string\n", uniqueCounter);
     fprintf(f, "EXIT int@4\n");
     fprintf(f, "LABEL $checktype1%d\n", uniqueCounter);
@@ -359,6 +377,12 @@ void generate_divs(FILE *f, tInstr *instruction)
     fprintf(f, "POPS TF@op1\n\n");
     fprintf(f, "TYPE TF@op1$type TF@op1\n");
     fprintf(f, "TYPE TF@op2$type TF@op2\n\n");
+    fprintf(f, "JUMPIFNEQ $div_nil$op1$%d TF@op1$type string@nil\n", uniqueCounter);
+    fprintf(f, "EXIT int@4\n");
+    fprintf(f, "LABEL $div_nil$op1$%d\n", uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $div_nil$op2$%d TF@op2$type string@nil\n", uniqueCounter);
+    fprintf(f, "EXIT int@4\n");
+    fprintf(f, "LABEL $div_nil$op2$%d\n", uniqueCounter);
     fprintf(f, "JUMPIFNEQ $div$op1$ok$%d TF@op1$type string@string\n", uniqueCounter);
     fprintf(f, "EXIT int@4\n\n");
     fprintf(f, "LABEL $div$op1$ok$%d\n", uniqueCounter);
@@ -410,6 +434,12 @@ void generate_lts(FILE *f, tInstr *instruction)
     fprintf(f, "POPS TF@op1\n\n");
     fprintf(f, "TYPE TF@op1$type TF@op1\n");
     fprintf(f, "TYPE TF@op2$type TF@op2\n\n");
+    fprintf(f, "JUMPIFNEQ $lt_nil$op1$%d TF@op1$type string@nil\n", uniqueCounter);
+    fprintf(f, "EXIT int@4\n");
+    fprintf(f, "LABEL $lt_nil$op1$%d\n", uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $lt_nil$op2$%d TF@op2$type string@nil\n", uniqueCounter);
+    fprintf(f, "EXIT int@4\n");
+    fprintf(f, "LABEL $lt_nil$op2$%d\n", uniqueCounter);
     fprintf(f, "JUMPIFEQ $lt$string$%d TF@op1$type string@string\n", uniqueCounter);
     fprintf(f, "JUMPIFNEQ $lt$retype$%d TF@op1$type TF@op2$type\n\n", uniqueCounter);
     fprintf(f, "JUMPIFEQ $lt$ok$%d TF@op1$type TF@op2$type\n", uniqueCounter);
@@ -443,6 +473,12 @@ void generate_gts(FILE *f, tInstr *instruction)
     fprintf(f, "POPS TF@op1\n\n");
     fprintf(f, "TYPE TF@op1$type TF@op1\n");
     fprintf(f, "TYPE TF@op2$type TF@op2\n\n");
+    fprintf(f, "JUMPIFNEQ $gt_nil$op1$%d TF@op1$type string@nil\n", uniqueCounter);
+    fprintf(f, "EXIT int@4\n");
+    fprintf(f, "LABEL $gt_nil$op1$%d\n", uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $gt_nil$op2$%d TF@op2$type string@nil\n", uniqueCounter);
+    fprintf(f, "EXIT int@4\n");
+    fprintf(f, "LABEL $gt_nil$op2$%d\n", uniqueCounter);
     fprintf(f, "JUMPIFEQ $gt$string$%d TF@op1$type string@string\n", uniqueCounter);
     fprintf(f, "JUMPIFNEQ $gt$retype$%d TF@op1$type TF@op2$type\n\n", uniqueCounter);
     fprintf(f, "JUMPIFEQ $gt$ok$%d TF@op1$type TF@op2$type\n", uniqueCounter);
@@ -495,6 +531,7 @@ void generate_expression(FILE *f, tInstr *instruction)
     fprintf(f, "# MATHEMATICAL EXPRESSION START\n");
     fprintf(f, "PUSHFRAME\n");
     fprintf(f, "CREATEFRAME\n\n");
+    fprintf(f, "PUSHS nil@nil\n");
     fprintf(f, "DEFVAR TF@op1\n");
     fprintf(f, "DEFVAR TF@op2\n");
     fprintf(f, "DEFVAR TF@op1$type\n");
@@ -1071,10 +1108,10 @@ void generate_substr(FILE *f)
     fprintf(f, "MOVE TF@to TF@$2\n");
     // Check types
     fprintf(f, "TYPE TF@string$type TF@string\n");
-    fprintf(f, "JUMPIFEQ $string$OK TF@string$type string@string\n");
+    fprintf(f, "JUMPIFEQ $string$OKK TF@string$type string@string\n");
     fprintf(f, "EXIT int@4\n\n");
     // Get length of string
-    fprintf(f, "LABEL $string$OK\n");
+    fprintf(f, "LABEL $string$OKK\n");
     fprintf(f, "STRLEN TF@string$length TF@string\n\n");
     // Check types, if int its ok, if float, change to float
     fprintf(f, "TYPE TF@from$type TF@from\n");
@@ -1158,17 +1195,17 @@ void generate_ord(FILE *f)
     fprintf(f, "MOVE TF@int TF@$1\n\n");
     fprintf(f, "TYPE TF@string$type TF@string\n");
     fprintf(f, "TYPE TF@int$type TF@int\n");
-    fprintf(f, "JUMPIFEQ $string$OK TF@string$type string@string\n");
+    fprintf(f, "JUMPIFEQ $string$OKKK TF@string$type string@string\n");
     fprintf(f, "EXIT int@4\n\n");
-    fprintf(f, "LABEL $string$OK\n");
+    fprintf(f, "LABEL $string$OKKK\n");
     // If int everything is allright
-    fprintf(f, "JUMPIFEQ $int$OK TF@int$type string@int\n");
+    fprintf(f, "JUMPIFEQ $int$OKO TF@int$type string@int\n");
     // If float, need to FLOAT2INT
-    fprintf(f, "JUMPIFEQ $int$FLOAT TF@int$type string@float\n");
+    fprintf(f, "JUMPIFEQ $int$FLOATO TF@int$type string@float\n");
     fprintf(f, "EXIT int@4\n\n");
-    fprintf(f, "LABEL $int$FLOAT\n");
+    fprintf(f, "LABEL $int$FLOATO\n");
     fprintf(f, "FLOAT2INT TF@int TF@int\n\n");
-    fprintf(f, "LABEL $int$OK\n");
+    fprintf(f, "LABEL $int$OKO\n");
     fprintf(f, "DEFVAR TF@string$length\n");
     fprintf(f, "STRLEN TF@string$length TF@string\n\n");
     fprintf(f, "DEFVAR TF@int$BOOL\n");
@@ -1197,9 +1234,9 @@ void generate_chr(FILE *f)
     fprintf(f, "MOVE TF@int TF@$0\n\n");
     fprintf(f, "TYPE TF@int$type TF@int\n");
     fprintf(f, "JUMPIFEQ $int$LT TF@int$type string@int\n");
-    fprintf(f, "JUMPIFEQ $int$FLOAT TF@int$type string@float\n");
+    fprintf(f, "JUMPIFEQ $int$FLOATC TF@int$type string@float\n");
     fprintf(f, "EXIT int@4\n\n");
-    fprintf(f, "LABEL $int$FLOAT\n");
+    fprintf(f, "LABEL $int$FLOATC\n");
     fprintf(f, "FLOAT2INT TF@int TF@int\n\n");
     fprintf(f, "LABEL $int$LT\n");
     fprintf(f, "LT TF@int$BOOL TF@int int@256\n");
@@ -1207,9 +1244,9 @@ void generate_chr(FILE *f)
     fprintf(f, "EXIT int@4\n\n");
     fprintf(f, "LABEL $int$GT\n");
     fprintf(f, "GT TF@int$BOOL TF@int int@-1\n");
-    fprintf(f, "JUMPIFEQ $int$OK TF@int$BOOL bool@true\n");
+    fprintf(f, "JUMPIFEQ $int$OKC TF@int$BOOL bool@true\n");
     fprintf(f, "EXIT int@4\n\n");
-    fprintf(f, "LABEL $int$OK\n");
+    fprintf(f, "LABEL $int$OKC\n");
     fprintf(f, "INT2CHAR TF@$retval TF@int\n");
     fprintf(f, "RETURN\n\n");
     fprintf(f, "# END OF DEFINITION OF BUILTIN FUNCTION CHR()\n\n");
@@ -1509,26 +1546,29 @@ void generate_builtin(FILE *f)
 {
     fprintf(f, "########## BUILTIN FUNCTIONS ##########\n");
     // If built in function was called, must check if it was generated already, if it was not generate it, else do nothing
-    if(lengthRequest == true)
+    while(chrRequest != false || lengthRequest != false || substrRequest != false || ordRequest != false)
     {
-        generate_length(f);
-        // function was generated, set bool to false so function will not be generated again
-        lengthRequest = false;
-    }
-    else if(substrRequest == true)
-    {
-        generate_substr(f);
-        substrRequest = false;
-    }
-    else if(ordRequest == true)
-    {
-        generate_ord(f);
-        ordRequest = false;
-    }
-    else if(chrRequest == true)
-    {
-        generate_chr(f);
-        chrRequest = false;
+        if(lengthRequest == true)
+        {
+            generate_length(f);
+            // function was generated, set bool to false so function will not be generated again
+            lengthRequest = false;
+        }
+        else if(substrRequest == true)
+        {
+            generate_substr(f);
+            substrRequest = false;
+        }
+        else if(ordRequest == true)
+        {
+            generate_ord(f);
+            ordRequest = false;
+        }
+        else if(chrRequest == true)
+        {
+            generate_chr(f);
+            chrRequest = false;
+        }
     }
 }
 
