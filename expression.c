@@ -16,7 +16,7 @@
 
 // precedence table symbols
 typedef enum {
-	S = 500,		// < shift
+	S = 500,	// < shift
 	R, 			// > reduce
 	E, 			// = equal
 	N4,	  		// error number 4
@@ -25,12 +25,12 @@ typedef enum {
 } T_sign;
 
 typedef enum {
-	I_plus_minus,		// 0 +-
+	I_plus_minus,	// 0 +-
 	I_mul_div,		// 1 */
 	I_rel_op,		// 2 RO
 	I_comp_op,		// 3 CO
 	I_open_par,		// 4 (
-	I_close_par,		// 5 )
+	I_close_par,	// 5 )
 	I_data,			// 6 i
 	I_dollar		// 7 $
 } PT_idx; //precedence table index
@@ -309,12 +309,7 @@ void opt_switch()
 		push_stack(pData.stack, pData.token);
 	}
 	tmp_head = head_stack(pData.stack);
-	pData.token = get_token();
-	if(pData.token.type == L_ERR)
-	{
-		fprintf(stderr,"Lexical error, wrong lexem structure at line %d! \n",pData.token.attr.i);
-		error(L_ERR);
-	}
+	GET_TOKEN();
 }
 // operation equal '='  ==========================================================
 void opt_eq()
@@ -332,7 +327,12 @@ void opt_eq()
 	tmp_head = head_stack(pData.stack);
 	if(check.type == NONTERM)
 		push_stack(pData.stack, rule_token);
-	pData.token = get_token();
+	GET_TOKEN();
+	// There cant be ")(" in expression and since our stack is empty, we have to check it this way
+	if(pData.token.type == OPEN_PARENTH)
+	{
+		error(UNEXPECTED_EXPR);
+	}
 }
 
 void pars_expression()
