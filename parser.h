@@ -19,8 +19,8 @@
     pData.token = get_token(); \
     if(pData.token.type == L_ERR) \
     { \
-        fprintf(stderr,"Lexical error, wrong lexem structure at line %d! \n", pData.token.attr.i); \
-        error(L_ERR); \
+        fprintf(stderr,"Lexical error, wrong lexem structure! Line: %d \n", pData.token.attr.i); \
+        error(L_ERR, pData.token.attr.i); \
     }; \
 
 #define CREATE_NORETVAL_TOKEN() \
@@ -41,6 +41,7 @@ typedef struct parserdata
     tStack *stack; //< Stack with tokens, which can be used next time, used if parser must "eat" one more token to choose correct derivation tree, or used for expression parsing.
     int scopes; //< Counter of how many scopes parser is inside.
     bool inDefinition; //< Bool which signifies if parser is inside function definition.
+    int currentLine;
 }tPData;
 
 extern tPData pData;
@@ -60,4 +61,4 @@ void validate_variable(string name);
 void validate_calls(tNode *root);
 void validate_params(tNode *root);
 int validate_symbol(string name);
-void error(int id);
+void error(int id, int line);

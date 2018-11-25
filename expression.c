@@ -86,7 +86,7 @@ PT_idx table_index(tToken token)
 		case NONTERM:
 			return I_data;
 		case IDF:
-			error(UNEXPECTED_FUN);
+			error(UNEXPECTED_FUN, pData.currentLine);
 			exit(SE_ERR); // Just to prevent warning from compiler
 		default:
 			return I_dollar;
@@ -98,7 +98,7 @@ void check_data(tToken id){
 	tNode *result = search_table(pData.local->root, id.attr.str);
 	if(result == NULL)
 	{
-		error(UNDEF_V);
+		error(UNDEF_V, pData.currentLine);
 	}
 }
 
@@ -266,7 +266,7 @@ void reduce_by_rule(tStack *tmp_stack)
 	head = head_stack(tmp_stack);
 	if(head.type != EMPTY)
 	{
-		error(UNEXPECTED_EXPR);
+		error(UNEXPECTED_EXPR, pData.currentLine);
 	}
 }
 
@@ -331,7 +331,7 @@ void opt_eq()
 	// There cant be ")(" in expression and since our stack is empty, we have to check it this way
 	if(pData.token.type == OPEN_PARENTH)
 	{
-		error(UNEXPECTED_EXPR);
+		error(UNEXPECTED_EXPR, pData.currentLine);
 	}
 }
 
@@ -362,11 +362,11 @@ void pars_expression()
 		}
 		else if((prec_table[top][activ]) == N4)
 		{
-			error(INCOMPATIBLE_EXPR);
+			error(INCOMPATIBLE_EXPR, pData.currentLine);
 		}
 		else if((prec_table[top][activ]) == N2)
 		{
-			error(UNEXPECTED_EXPR);
+			error(UNEXPECTED_EXPR, pData.currentLine);
 		}
 		else
 		{
@@ -390,7 +390,7 @@ void parse_concatenation()
 		}
 		else
 		{
-			error(WRONG_OP_CONCAT);
+			error(WRONG_OP_CONCAT, pData.currentLine);
 		}
 		if(pData.token.type == PLUS)
 		{
@@ -402,7 +402,7 @@ void parse_concatenation()
 		}
 		else
 		{
-			error(WRONG_OP_CONCAT);
+			error(WRONG_OP_CONCAT, pData.currentLine);
 		}
 	}
 }

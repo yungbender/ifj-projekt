@@ -27,7 +27,7 @@ void parser_init()
     pData.local = (tSymTable *)malloc(sizeof(struct symTable));
     pData.instrs = (tIList *)malloc(sizeof(struct instructionList));
     pData.stack = (tStack *)malloc(sizeof(struct tokenStack));
-
+    pData.currentLine = 0;
     pData.scopes = 0;
     pData.inDefinition = false;
 
@@ -42,7 +42,7 @@ void parser_init()
  * Function is only called when semantic or synthathic analysis fails.
  * @param id Type of error.
  */
-void error(int id)
+void error(int id, int line)
 {
     free_symtable(pData.global);
     free_symtable(pData.local);
@@ -50,7 +50,7 @@ void error(int id)
     free_ilist(pData.instrs);
     free_stack(pData.stack);
 
-    print_error_exit(id);
+    print_error_exit(id, line);
 }
 
 /**
@@ -172,7 +172,7 @@ void validate_params(tNode *root)
             function = search_table(root,name.attr.str);
             if(function == NULL || function->paramsNum != callingNum)
             {
-                error(PARAM_NUM);
+                error(PARAM_NUM, pData.currentLine);
             }
         }
         // Built in function call with not saved result
@@ -190,35 +190,35 @@ void validate_params(tNode *root)
             {
                 if(callingNum != 0)
                 {
-                    error(PARAM_NUM);
+                    error(PARAM_NUM, pData.currentLine);
                 }
             }
             else if(result == NOLENGTH_CALL || result == NOCHR_CALL)
             {
                 if(callingNum != 1)
                 {
-                    error(PARAM_NUM);
+                    error(PARAM_NUM, pData.currentLine);
                 }
             }
             else if(result == NOORD_CALL)
             {
                 if(callingNum != 2)
                 {
-                    error(PARAM_NUM);
+                    error(PARAM_NUM, pData.currentLine);
                 }
             }
             else if(result == NOSUBSTR_CALL)
             {
                 if(callingNum != 3)
                 {
-                    error(PARAM_NUM);
+                    error(PARAM_NUM, pData.currentLine);
                 }
             }
             else if(result == NOPRINT_CALL)
             {
                 if(callingNum == 0)
                 {
-                    error(PARAM_NUM);
+                    error(PARAM_NUM, pData.currentLine);
                 }
             }
 
@@ -238,7 +238,7 @@ void validate_params(tNode *root)
             {
                 if(callingNum != 1)
                 {
-                    error(PARAM_NUM);
+                    error(PARAM_NUM, pData.currentLine);
                 }
             }
             // These functions must have only one parameter
@@ -246,7 +246,7 @@ void validate_params(tNode *root)
             {
                 if(callingNum != 2)
                 {
-                    error(PARAM_NUM);
+                    error(PARAM_NUM, pData.currentLine);
                 }
             }
             // These functions must have only two parameters
@@ -254,7 +254,7 @@ void validate_params(tNode *root)
             {
                 if(callingNum != 3)
                 {
-                    error(PARAM_NUM);
+                    error(PARAM_NUM, pData.currentLine);
                 }
             }
             // These functions must have only three parameters
@@ -262,7 +262,7 @@ void validate_params(tNode *root)
             {
                 if(callingNum != 4)
                 {
-                    error(PARAM_NUM);
+                    error(PARAM_NUM, pData.currentLine);
                 }
             }
             // These functions must have more than zero parameters
@@ -270,7 +270,7 @@ void validate_params(tNode *root)
             {
                 if(callingNum == 1)
                 {
-                    error(PARAM_NUM);
+                    error(PARAM_NUM, pData.currentLine);
                 }
             }
         }
@@ -299,7 +299,7 @@ void validate_calls(tNode *root)
     }
     if(root->wasDefined == false)
     {
-        error(UNDEF_F);
+        error(UNDEF_F, pData.currentLine);
     }
 }
 
@@ -314,14 +314,14 @@ void validate_variable(string name)
     int result = validate_symbol(name);
     if(result != OK)
     {
-        error(IDF_REDEF);
+        error(IDF_REDEF, pData.currentLine);
     }
     // Search the if the variable is inside global
     tNode *temp = search_table(pData.global->root, name);
     // Expecting NULL, if not its redefinition
     if(temp != NULL)
     {
-        error(IDF_REDEF);
+        error(IDF_REDEF, pData.currentLine);
     }
 }
 
@@ -357,12 +357,12 @@ void parse_function_definition()
     start();
     if(pData.token.type != END)
     {
-        error(EXPECTED_END);
+        error(EXPECTED_END, pData.currentLine);
     }
     GET_TOKEN();
     if(pData.token.type != END_OF_FILE && pData.token.type != END_OF_LINE)
     {
-        error(UNEXPECTED_END);
+        error(UNEXPECTED_END, pData.currentLine);
     }
     // Function is parsed without error, saving end keyword
     insert_instr(pData.instrs,FUN_END);
@@ -392,7 +392,7 @@ void params(tNode *function)
 
     if(pData.token.type != ID)
     {
-        error(UNEXPECTED_F);
+        error(UNEXPECTED_F, pData.currentLine);
     }
     // Now parser will take every parameter until token is not ID
     // Clear out the so parser can save params one by one and compare them 
@@ -408,7 +408,7 @@ void params(tNode *function)
         {
             if((str_cmp_string(&(pData.token.attr.str),&(stackHead->head.attr.str)) == 0))
             {
-                error(SAME_PARAM);
+                error(SAME_PARAM, pData.currentLine);
             }
             stackHead = stackHead->next;
         }
@@ -425,12 +425,12 @@ void params(tNode *function)
         // If there was not close parenth, there must be comma and next parameter, else syntax error
         if(pData.token.type != COMMA)
         {
-            error(UNEXPECTED_F);
+            error(UNEXPECTED_F, pData.currentLine);
         }
         GET_TOKEN();
         if(pData.token.type != ID)
         {
-            error(UNEXPECTED_F);
+            error(UNEXPECTED_F, pData.currentLine);
         }
     }
 }
@@ -444,25 +444,25 @@ void function_declaration()
     // Cannot define function inside other function or inside while, if
     if(pData.inDefinition == true || pData.scopes > 0)
     {
-        error(UNEXPECTED_F);
+        error(UNEXPECTED_F, pData.currentLine);
     }
     // Expecting function identificator
     GET_TOKEN();
     if(pData.token.type != IDF && pData.token.type != ID)
     {
-        error(IDF);
+        error(IDF, pData.currentLine);
     }
     // Expecting valid function ID, that means: no keyword, no redefinition of built-in functions
     int result = validate_symbol(pData.token.attr.str);
     if(result != OK || search_table(pData.global->root, pData.token.attr.str) != NULL)
     {
-        error(IDF_REDEF);
+        error(IDF_REDEF, pData.currentLine);
     }
     // Now needs to check if the function name is in the local table (variables), if it is, its error, there cannot be same name for function and variable
     tNode *temp = search_table(pData.local->root,pData.token.attr.str);
     if(temp != NULL)
     {
-        error(ID_REDEF);
+        error(ID_REDEF, pData.currentLine);
     }
     // Funtion name is correct and is not a keyword, nor variable name, now needs to check if the function was already called or not (if it was called, there is global table node created already)
     temp = search_table(pData.global->root,pData.token.attr.str);
@@ -471,7 +471,7 @@ void function_declaration()
     {
         if(temp->wasDefined == true)
         {
-            error(IDF_REDEF);
+            error(IDF_REDEF, pData.currentLine);
         }
         temp->wasDefined = true;
     }
@@ -492,7 +492,7 @@ void function_declaration()
     tNode *function = search_table(pData.global->root,pData.token.attr.str);
     if(function == NULL)
     {
-        error(INT_ERR);
+        error(INT_ERR, pData.currentLine);
     }
     // Function definition is correct, parser needs to generate instruction for code generation and save function name
     insert_instr(pData.instrs, FUN_DEF);
@@ -501,14 +501,14 @@ void function_declaration()
     GET_TOKEN();
     if(pData.token.type != OPEN_PARENTH)
     {
-        error(UNEXPECTED_F);
+        error(UNEXPECTED_F, pData.currentLine);
     }
     params(function);
     // Parameters are parsed, expecting EOL
     GET_TOKEN();
     if(pData.token.type != END_OF_LINE)
     {
-        error(UNEXPECTED_F);
+        error(UNEXPECTED_F, pData.currentLine);
     }
     // Expecting function definition
     parse_function_definition();
@@ -537,7 +537,7 @@ void function_call(bool moved, bool pushed)
         builtin = validate_symbol(pData.token.attr.str);
         if(builtin == OK)
         {
-            error(UNDEF_F);
+            error(UNDEF_F, pData.currentLine);
         }
     }
     // If parser did not found function, but is inside function definition, parser just creates new function inside global symtable that it was called but not still not defined
@@ -660,7 +660,7 @@ void function_call(bool moved, bool pushed)
         {
             if(leftbracket == false || comma == 2)
             {
-                error(UNEXPECTED_F);
+                error(UNEXPECTED_F, pData.currentLine);
             }
             // Jump from the while
             rightbracket = true;
@@ -676,7 +676,7 @@ void function_call(bool moved, bool pushed)
                 result = search_table(pData.local->root,pData.token.attr.str);
                 if(result == NULL)
                 {
-                    error(UNDEF_V);
+                    error(UNDEF_V, pData.currentLine);
                 }
             }
             // If is, generate parameter
@@ -687,7 +687,7 @@ void function_call(bool moved, bool pushed)
         {
             if(comma == 2)
             {
-                error(WRONG_PARAM);
+                error(WRONG_PARAM, pData.currentLine);
             }
             break;
         }
@@ -697,7 +697,7 @@ void function_call(bool moved, bool pushed)
         }
         else
         {
-            error(WRONG_PARAM);
+            error(WRONG_PARAM, pData.currentLine);
         }
         // Get next parameter and parse
         GET_TOKEN();
@@ -706,7 +706,7 @@ void function_call(bool moved, bool pushed)
     // Here is EOL, need to check parenths are allright
     if(leftbracket == true && rightbracket != true)
     {
-        error(WRONG_PARAM);
+        error(WRONG_PARAM, pData.currentLine);
     }
     // Function call is parsed, get next token and continue parsing.
     GET_TOKEN();
@@ -725,7 +725,7 @@ void while_loop()
     // If is in condition something else then variable, float, int or string constant
     if(pData.token.type != ID && pData.token.type != INTEGER && pData.token.type != FLOAT && pData.token.type != STRING)
     {
-        error(EXPECTED_EXPR);
+        error(EXPECTED_EXPR, pData.currentLine);
     } 
 
     pars_expression();
@@ -733,7 +733,7 @@ void while_loop()
     // Expecting DO after condition
     if(pData.token.type != DO)
     {
-        error(EXPECTED_DO);
+        error(EXPECTED_DO, pData.currentLine);
     }
 
     insert_instr(pData.instrs, WHILE_COND_END);
@@ -742,19 +742,19 @@ void while_loop()
     // Expecting EOL after DO
     if(pData.token.type != END_OF_LINE)
     {
-        error(EXPECTED_EOL);
+        error(EXPECTED_EOL, pData.currentLine);
     }
     // Parsing body of while
     GET_TOKEN();
     start();
     if(pData.token.type != END)
     {
-        error(EXPECTED_END);
+        error(EXPECTED_END, pData.currentLine);
     }
     GET_TOKEN();
     if(pData.token.type != END_OF_FILE && pData.token.type != END_OF_LINE)
     {
-        error(UNEXPECTED_END);
+        error(UNEXPECTED_END, pData.currentLine);
     }
     // While was successfully parsed
     insert_instr(pData.instrs, WHILE_END);
@@ -773,7 +773,7 @@ void if_condition()
     GET_TOKEN(); // Expression starts with one of the following tokens
     if(pData.token.type != ID && pData.token.type != INTEGER && pData.token.type != FLOAT && pData.token.type != STRING && pData.token.type != OPEN_PARENTH)
     {
-        error(EXPECTED_EXPR);
+        error(EXPECTED_EXPR, pData.currentLine);
     }
 
     pars_expression();
@@ -781,14 +781,14 @@ void if_condition()
     // Expression returns token which should contain THEN keyword
     if(pData.token.type != THEN)
     {
-        error(UNEXPECTED_IF);
+        error(UNEXPECTED_IF, pData.currentLine);
     }
     insert_instr(pData.instrs, IF_COND_END);
 
     GET_TOKEN();
     if(pData.token.type != END_OF_LINE)
     {
-        error(EXPECTED_EOL);
+        error(EXPECTED_EOL, pData.currentLine);
     }
 
     GET_TOKEN();
@@ -796,12 +796,12 @@ void if_condition()
 
     if(pData.token.type != ELSE)
     {
-        error(EXPECTED_ELSE);
+        error(EXPECTED_ELSE, pData.currentLine);
     }
     GET_TOKEN();
     if(pData.token.type != END_OF_LINE)
     {
-        error(EXPECTED_EOL);
+        error(EXPECTED_EOL, pData.currentLine);
     }
     insert_instr(pData.instrs, ELSE_CALL);
 
@@ -810,12 +810,12 @@ void if_condition()
 
     if(pData.token.type != END)
     {
-        error(EXPECTED_END);
+        error(EXPECTED_END, pData.currentLine);
     }
     GET_TOKEN();
     if(pData.token.type != END_OF_FILE && pData.token.type != END_OF_LINE)
     {
-        error(UNEXPECTED_END);
+        error(UNEXPECTED_END, pData.currentLine);
     }
     insert_instr(pData.instrs, IF_END);
     pData.scopes--;
@@ -844,7 +844,7 @@ void end_of_file()
         // Check for unexpected end of file (in definition or in while)
         if(pData.inDefinition == true || pData.scopes > 0)
         {
-            error(UNEXPECTED_EOF);
+            error(UNEXPECTED_EOF, pData.currentLine);
         }
         // Check if there is some function that was called but not defined
         validate_calls(pData.global->root);
@@ -877,7 +877,7 @@ void assignment()
     // Right side of assignment cannot be missing
     else if(pData.token.type == END_OF_FILE || pData.token.type == END_OF_LINE)
     {
-        error(EXPECTED_EXPR);
+        error(EXPECTED_EXPR, pData.currentLine);
     }
     // If its ID, need to check if its function
     tNode *result = NULL;
@@ -944,7 +944,7 @@ void assignment()
         // If parser is in main, and result is NULL, it cannot be function call, it can be only expression or error
         else 
         {
-            error(UNDEF_F);
+            error(UNDEF_F, pData.currentLine);
         }
     }
 
@@ -956,7 +956,7 @@ void assignment()
         tNode *result = search_table(pData.global->root, where.attr.str);
         if(result != NULL)
         {
-            error(IDF_REDEF);
+            error(IDF_REDEF, pData.currentLine);
         }
         //Search the variable inside local symtable, if it is not there, need to define it, if is, do nothing
         result = search_table(pData.local->root, where.attr.str);
@@ -992,7 +992,7 @@ void assignment()
     }
     else
     {
-        error(UNEXPECTED_TOKEN);
+        error(UNEXPECTED_TOKEN, pData.currentLine);
     }
 }
 
@@ -1034,7 +1034,7 @@ void analyse_id()
             }
             else if(pData.token.type != END_OF_FILE && pData.token.type != END_OF_LINE)
             {
-                error(UNEXPECTED_TOKEN);
+                error(UNEXPECTED_TOKEN, pData.currentLine);
             }
             GET_TOKEN();
             start();
@@ -1051,7 +1051,7 @@ void analyse_id()
         GET_TOKEN();
         if(pData.token.type == ASSIGNMENT)
         {
-            error(IDF_REDEF);
+            error(IDF_REDEF, pData.currentLine);
         }
         tToken temp = head_stack(pData.stack);
         pop_stack(pData.stack);
@@ -1095,7 +1095,7 @@ void analyse_id()
     }
     else
     {
-        error(WRONG_PARAM);
+        error(WRONG_PARAM, pData.currentLine);
     }
 
     if(pData.token.type == END)
@@ -1113,6 +1113,7 @@ void analyse_id()
  */
 void start()
 {
+    pData.currentLine++;
     CREATE_NORETVAL_TOKEN();
     switch(pData.token.type)
     {
@@ -1151,7 +1152,7 @@ void start()
             // If there no scopes, and END is called = syntax error
             if(pData.scopes == 0)
             {
-                error(SY_ERR);
+                error(SY_ERR, pData.currentLine);
             }
             // If there are scopes, end just returns back to the parsing function (parser_function_definition, while_function, if_function)
             return;
@@ -1183,7 +1184,7 @@ void start()
             break;
 
         default:
-            error(UNEXPECTED_TOKEN);
+            error(UNEXPECTED_TOKEN, pData.currentLine);
     }
 }
 

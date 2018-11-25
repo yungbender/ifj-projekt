@@ -48,5 +48,5 @@
 #define EXPECTED_EXPR 123
 #define ID_REDEF 124
 
-void print_error_exit(int id);
+void print_error_exit(int id, int line);
 #endif // _ERR_H
