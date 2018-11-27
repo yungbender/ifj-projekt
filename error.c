@@ -30,7 +30,7 @@ void print_error_exit(int id, int line)
             exit(DEF_ERR);
         case SAME_PARAM:
             fprintf(stderr,"Semantic error, parameters cannot have same name! Line: %d\n", line);
-            exit(DEF_ERR);
+            exit(SE_ERR);
         case UNDEF_F:
             fprintf(stderr,"Semantic error, calling undefined function! Line: %d\n", line);
             exit(DEF_ERR);

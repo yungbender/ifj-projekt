@@ -237,7 +237,7 @@ void free_plist(tPList *plist)
  */
 FILE* generate_head()
 {
-    FILE *f = fopen("prg.out","w");
+    FILE *f = stdout;
     fprintf(f,".IFJcode18\n");
     fprintf(f,"CREATEFRAME\n\n");
     return f;

@@ -407,6 +407,12 @@ void params(tNode *function)
         function->paramsNum++;
         // Now needs to compare, if parameters doesnt have same name
         tStack *stackHead = pData.stack;
+        // Search the parameter inside global table, if exists, redefiniton
+        tNode *result = search_table(pData.global->root, pData.token.attr.str);
+        if(result != NULL)
+        {
+            error(IDF_REDEF, pData.currentLine);
+        }
         // Compare every parameter
         while(stackHead->head.type != EMPTY)
         {
@@ -706,12 +712,20 @@ void function_call(bool moved, bool pushed)
         }
         // Get next parameter and parse
         GET_TOKEN();
-        // Expecting comma or EOL
     }
     // Here is EOL, need to check parenths are allright
     if(leftbracket == true && rightbracket != true)
     {
         error(WRONG_PARAM, pData.currentLine);
+    }
+    // Expection EOL or EOF
+    else if(rightbracket == true)
+    {
+        GET_TOKEN();
+        if(pData.token.type != END_OF_FILE && pData.token.type != END_OF_LINE)
+        {
+            error(UNEXPECTED_TOKEN, pData.currentLine);
+        }
     }
     // Function call is parsed, get next token and continue parsing.
     GET_TOKEN();
@@ -903,6 +917,7 @@ void assignment()
         result = search_table(pData.local->root, where.attr.str);
         if(result == NULL)
         {
+            validate_variable(where.attr.str);
             if(pData.local->root == NULL)
             {
                 pData.local->root = insert_var(pData.local->root, where);
@@ -924,6 +939,7 @@ void assignment()
             result = search_table(pData.local->root, where.attr.str);
             if(result == NULL)
             {
+                validate_variable(where.attr.str);
                 insert_instr(pData.instrs, DEFVAR);
                 insert_param(pData.instrs, where);
                 if(pData.local->root == NULL)
@@ -969,6 +985,7 @@ void assignment()
         result = search_table(pData.local->root, where.attr.str);
         if(result == NULL)
         {
+            validate_variable(where.attr.str);
             insert_instr(pData.instrs, DEFVAR);
             insert_param(pData.instrs, where);
             // and insert it inside local table

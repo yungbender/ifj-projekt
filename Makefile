@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS= -std=c99 -pedantic -Wall -Wextra -g
 
-all: ifj2018 test_scanner
+all: ifj2018
 
 ifj2018: ifj2018.c parser.c scanner.c str.c symtable.c error.c code_generator.c expression.c
 	$(CC) $(CFLAGS) ifj2018.c parser.c scanner.c str.c symtable.c error.c code_generator.c expression.c -o ifj2018
