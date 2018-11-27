@@ -133,6 +133,10 @@ void reduce_by_rule(tStack *tmp_stack)
 				pop_stack(tmp_stack);
 				push_stack(pData.stack, rule_token);
 			}
+			else
+			{
+				error(UNEXPECTED_EXPR, pData.currentLine);
+			}
 		}
 	}
 	else if(head.type == NONTERM)
@@ -150,6 +154,10 @@ void reduce_by_rule(tStack *tmp_stack)
 				push_stack(pData.stack, rule_token);
 				insert_instr(pData.instrs, ADDS);
 			}
+			else
+			{
+				error(UNEXPECTED_EXPR, pData.currentLine);
+			}
 		}
 		//E->E-E
 		else if(head.type == MINUS)
@@ -161,6 +169,10 @@ void reduce_by_rule(tStack *tmp_stack)
 				pop_stack(tmp_stack);
 				push_stack(pData.stack, rule_token);
 				insert_instr(pData.instrs, SUBS);
+			}
+			else
+			{
+				error(UNEXPECTED_EXPR, pData.currentLine);
 			}
 		}
 		//E->E*E
@@ -174,6 +186,10 @@ void reduce_by_rule(tStack *tmp_stack)
 				push_stack(pData.stack, rule_token);
 				insert_instr(pData.instrs, MULS);
 			}
+			else
+			{
+				error(UNEXPECTED_EXPR, pData.currentLine);
+			}
 		}
 		//E->E/E
 		else if(head.type == SLASH)
@@ -186,6 +202,10 @@ void reduce_by_rule(tStack *tmp_stack)
 				push_stack(pData.stack, rule_token);
 				insert_instr(pData.instrs, DIVS);
 			}
+			else
+			{
+				error(UNEXPECTED_EXPR, pData.currentLine);
+			}
 		}
 		//E->E==E
 		else if(head.type == EQUAL)
@@ -197,6 +217,10 @@ void reduce_by_rule(tStack *tmp_stack)
 				pop_stack(tmp_stack);
 				push_stack(pData.stack, rule_token);
 				insert_instr(pData.instrs, EQS);
+			}
+			else
+			{
+				error(UNEXPECTED_EXPR, pData.currentLine);
 			}
 		}
 		//E->E!=E
@@ -211,6 +235,10 @@ void reduce_by_rule(tStack *tmp_stack)
 				insert_instr(pData.instrs,EQS);
 				insert_instr(pData.instrs,NOTS);
 			}
+			else
+			{
+				error(UNEXPECTED_EXPR, pData.currentLine);
+			}
 		}
 		//E->E>E
 		else if(head.type == GREATER_THAN)
@@ -223,6 +251,10 @@ void reduce_by_rule(tStack *tmp_stack)
 				push_stack(pData.stack, rule_token);
 				insert_instr(pData.instrs, GTS);
 			}
+			else
+			{
+				error(UNEXPECTED_EXPR, pData.currentLine);
+			}
 		}
 		//E->E<E
 		else if(head.type == LESS_THAN)
@@ -234,6 +266,10 @@ void reduce_by_rule(tStack *tmp_stack)
 				pop_stack(tmp_stack);
 				push_stack(pData.stack, rule_token);
 				insert_instr(pData.instrs, LTS);
+			}
+			else
+			{
+				error(UNEXPECTED_EXPR, pData.currentLine);
 			}
 		}
 		//E->E>=E
@@ -248,6 +284,10 @@ void reduce_by_rule(tStack *tmp_stack)
 				insert_instr(pData.instrs,LTS);
 				insert_instr(pData.instrs,NOTS);
 			}
+			else
+			{
+				error(UNEXPECTED_EXPR, pData.currentLine);
+			}
 		}
 		//E->E<=E
 		else if(head.type == LESS_EQUAL)
@@ -261,6 +301,14 @@ void reduce_by_rule(tStack *tmp_stack)
 				insert_instr(pData.instrs,GTS);
 				insert_instr(pData.instrs,NOTS);
 			}
+			else
+			{
+				error(UNEXPECTED_EXPR, pData.currentLine);
+			}
+		}
+		else
+		{
+			error(UNEXPECTED_EXPR, pData.currentLine);
 		}
 	}
 	head = head_stack(tmp_stack);
