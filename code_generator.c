@@ -1088,93 +1088,86 @@ void generate_length(FILE *f)
 void generate_substr(FILE *f)
 {
     fprintf(f, "# DEFINITION OF BUILTIN FUNCTION SUBSTR()\n\n");
-    // Generate correct funcion label
     fprintf(f, "LABEL $substr\n\n");
     fprintf(f, "MOVE TF@$retval string@\n");
     fprintf(f, "DEFVAR TF@string\n");
+    fprintf(f, "DEFVAR TF@start\n");
+    fprintf(f, "DEFVAR TF@lenght\n");
     fprintf(f, "DEFVAR TF@string$type\n");
-    fprintf(f, "DEFVAR TF@from\n");
-    fprintf(f, "DEFVAR TF@from$type\n");
-    fprintf(f, "DEFVAR TF@from$BOOL\n");
-    fprintf(f, "DEFVAR TF@to\n");
-    fprintf(f, "DEFVAR TF@to$type\n");
-    fprintf(f, "DEFVAR TF@string$length\n");
-    fprintf(f, "DEFVAR TF@$tmpstr\n");
-    fprintf(f, "DEFVAR TF@$cnt\n");
-    fprintf(f, "DEFVAR TF@$max\n\n");
-    // Get params
+    fprintf(f, "DEFVAR TF@start$type\n");
+    fprintf(f, "DEFVAR TF@lenght$type\n");
+    fprintf(f, "DEFVAR TF@string$lenght\n");
+    fprintf(f, "DEFVAR TF@lenght_control1\n");
+    fprintf(f, "DEFVAR TF@is_bigger\n");
+    fprintf(f, "DEFVAR TF@is_bigger2\n");
+    fprintf(f, "DEFVAR TF@max_lenght\n");
+    fprintf(f, "DEFVAR TF@temp_char\n");
+    fprintf(f, "DEFVAR TF@negative_start\n");
+    fprintf(f, "DEFVAR TF@greater_start\n");
+    fprintf(f, "DEFVAR TF@max\n");
+    //Getting params
     fprintf(f, "MOVE TF@string TF@$0\n");
-    fprintf(f, "MOVE TF@from TF@$1\n");
-    fprintf(f, "MOVE TF@to TF@$2\n");
-    // Check types
+    fprintf(f, "MOVE TF@start TF@$1\n");
+    fprintf(f, "MOVE TF@lenght TF@$2\n");
+    //Getting type of params
     fprintf(f, "TYPE TF@string$type TF@string\n");
-    fprintf(f, "JUMPIFEQ $string$OKK TF@string$type string@string\n");
-    fprintf(f, "EXIT int@4\n\n");
-    // Get length of string
-    fprintf(f, "LABEL $string$OKK\n");
-    fprintf(f, "STRLEN TF@string$length TF@string\n\n");
-    // Check types, if int its ok, if float, change to float
-    fprintf(f, "TYPE TF@from$type TF@from\n");
-    fprintf(f, "JUMPIFEQ $from$FLOAT TF@from$type string@float\n");
-    fprintf(f, "JUMPIFEQ $from$LT TF@from$type string@int\n");
-    fprintf(f, "EXIT int@4\n\n");
-    fprintf(f, "LABEL $from$FLOAT\n");
-    fprintf(f, "FLOAT2INT TF@from TF@from\n\n");
-    fprintf(f, "LABEL $from$LT\n");
-    // If i is lower than 0 return nil
-    fprintf(f, "LT TF@from$BOOL TF@from int@0\n");
-    fprintf(f, "JUMPIFEQ $from$GT TF@from$BOOL bool@false\n");
+    fprintf(f, "TYPE TF@start$type TF@start\n");
+    fprintf(f, "TYPE TF@lenght$type TF@lenght\n");
+    //Controling if is first parameter string
+    fprintf(f, "JUMPIFEQ $is_string TF@string$type string@string\n");
+    fprintf(f, "EXIT int@4\n");
+    fprintf(f, "LABEL $is_string\n");
+    //Controling if is secong parameter int or float, if it is float, retyping
+    fprintf(f, "JUMPIFEQ $is_int1 TF@start$type string@int\n");
+    fprintf(f, "JUMPIFEQ $retype1 TF@start$type string@float\n");
+    fprintf(f, "EXIT int@4\n");
+    fprintf(f, "LABEL $retype1\n");
+    fprintf(f, "FLOAT2INT TF@start TF@start\n");
+    fprintf(f, "LABEL $is_int1\n");
+    //Controling if is third parameter int or float, if it is float, retyping
+    fprintf(f, "JUMPIFEQ $is_int2 TF@lenght$type string@int\n");
+    fprintf(f, "JUMPIFEQ $retype2 TF@start$type string@float\n");
+    fprintf(f, "EXIT int@4\n");
+    fprintf(f, "LABEL $retype2\n");
+    fprintf(f, "FLOAT2INT TF@start TF@start\n");
+    fprintf(f, "LABEL $is_int2\n");
+    //Controling if is secong paramter greater then lenght of string and lower then 0
+    fprintf(f, "STRLEN TF@string$lenght TF@string\n");
+    fprintf(f, "LT TF@negative_start TF@start int@0\n");
+    fprintf(f, "JUMPIFNEQ $not_negative TF@negative_start bool@true\n");
     fprintf(f, "MOVE TF@$retval nil@nil\n");
-    fprintf(f, "RETURN\n\n");
-    // If i is higher than length of the string, also return nil
-    fprintf(f, "LABEL $from$GT\n");
-    fprintf(f, "GT TF@from$BOOL TF@from TF@string$length\n");
-    fprintf(f, "JUMPIFEQ $from$OK TF@from$BOOL bool@false\n");
+    fprintf(f, "RETURN\n");
+    fprintf(f, "LABEL $not_negative\n");
+    fprintf(f, "SUB TF@string$lenght TF@string$lenght int@1\n");
+    fprintf(f, "GT TF@greater_start TF@start TF@string$lenght\n");
+    fprintf(f, "JUMPIFNEQ $not_greater TF@greater_start bool@true\n");
     fprintf(f, "MOVE TF@$retval nil@nil\n");
-    fprintf(f, "RETURN\n\n");
-    // Check n datatype, if float retype, if string exit, if int is ok
-    fprintf(f, "LABEL $from$OK\n");
-    fprintf(f, "TYPE TF@to$type TF@to\n");
-    fprintf(f, "JUMPIFEQ $to$FLOAT TF@to$type string@float\n");
-    fprintf(f, "JUMPIFEQ $LT$length TF@to$type string@int\n");
-    fprintf(f, "EXIT int@4\n\n");
-
-    fprintf(f, "LABEL $to$FLOAT\n");
-    fprintf(f, "FLOAT2INT TF@to TF@to\n\n");
-    // Check if i is less than 1, if yes, return empty string
-    fprintf(f, "LABEL $LT$length\n");
-    fprintf(f, "LT TF@from$BOOL TF@to int@1\n");
-    fprintf(f, "JUMPIFEQ $to$OK TF@from$BOOL bool@false\n");
-    fprintf(f, "RETURN\n\n");
-    // If n < lenstr(s), max = n, cnt = 0 
-    fprintf(f, "LABEL $to$OK\n");
-    fprintf(f, "LT TF@from$BOOL TF@to TF@string$length\n");
-    fprintf(f, "JUMPIFEQ $if$else TF@from$BOOL bool@false\n");
-    fprintf(f, "MOVE TF@$max TF@to\n");
-    fprintf(f, "MOVE TF@$cnt int@0\n");
-    fprintf(f, "JUMP $endif$substr\n\n");
-    // If n => lenstr(s), max = lenstr(s), cnt = i
-    fprintf(f, "LABEL $if$else\n");
-    fprintf(f, "MOVE TF@$max TF@string$length\n");
-    fprintf(f, "MOVE TF@$cnt Tf@from\n\n");
-    // End if
-    fprintf(f, "LABEL $endif$substr\n\n");
-    // While(cnt != max)
-    fprintf(f, "LABEL $while$substr\n");
-    fprintf(f, "EQ TF@from$BOOL TF@$cnt TF@$max\n");
-    fprintf(f, "JUMPIFEQ $while$end$substr TF@from$BOOL bool@true\n");
-    // tmpstr = Getchar(s, from)
-    fprintf(f, "GETCHAR TF@$tmpstr TF@string TF@from\n");
-    // retval = retval + tmpstr
-    fprintf(f, "CONCAT TF@$retval TF@$retval TF@$tmpstr\n");
-    // from++ cnt++
-    fprintf(f, "ADD TF@from TF@from int@1\n");
-    fprintf(f, "ADD TF@$cnt TF@$cnt int@1\n");
-    // GOTO while
-    fprintf(f, "JUMP $while$substr\n");
-    // End of while
-    fprintf(f, "LABEL $while$end$substr\n\n");
-    fprintf(f, "RETURN\n\n");
+    fprintf(f, "RETURN\n");
+    fprintf(f, "LABEL $not_greater\n");
+    fprintf(f, "ADD TF@string$lenght TF@string$lenght int@1\n");
+    //Controling how long substring gonna be
+    fprintf(f, "STRLEN TF@string$lenght TF@string\n");
+    fprintf(f, "SUB TF@lenght_control1 TF@string$lenght TF@start\n");
+    fprintf(f, "GT TF@is_bigger TF@lenght TF@lenght_control1\n");
+    //fprintf(f, "EQ TF@is_bigger2 TF@string$lenght TF@lenght_control1\n");
+    //fprintf(f, "OR TF@is_bigger TF@is_bigger TF@is_bigger2 \n");
+    fprintf(f, "JUMPIFNEQ $not_bigger TF@is_bigger bool@true\n");
+    fprintf(f, "SUB TF@max_lenght TF@string$lenght TF@start\n");
+    fprintf(f, "JUMP $okok\n");
+    fprintf(f, "LABEL $not_bigger\n");
+    fprintf(f, "MOVE TF@max_lenght TF@lenght\n");
+    fprintf(f, "LABEL $okok\n");
+    //getting substring
+    fprintf(f, "ADD TF@max TF@start TF@max_lenght\n");
+    //fprintf(f, "SUB TF@max TF@max int@1\n");
+    fprintf(f, "LABEL $for\n");
+    fprintf(f, "JUMPIFEQ $for_end TF@max TF@start\n");
+    fprintf(f, "GETCHAR TF@temp_char TF@string TF@start\n");
+    fprintf(f, "CONCAT TF@$retval TF@$retval TF@temp_char\n");
+    fprintf(f, "ADD TF@start TF@start int@1\n");
+    fprintf(f, "JUMP $for\n");
+    fprintf(f, "LABEL $for_end\n");
+    fprintf(f, "RETURN\n");
     fprintf(f, "# END OF DEFINITION OF BUILTIN FUNCTION SUBSTR()\n\n");
 }
 
