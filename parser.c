@@ -464,7 +464,7 @@ void function_declaration()
     }
     // Expecting valid function ID, that means: no keyword, no redefinition of built-in functions
     int result = validate_symbol(pData.token.attr.str);
-    if(result != OK || search_table(pData.global->root, pData.token.attr.str) != NULL)
+    if(result != OK)
     {
         error(IDF_REDEF, pData.currentLine);
     }
@@ -742,7 +742,7 @@ void while_loop()
     insert_instr(pData.instrs, WHILE_CALL);
     GET_TOKEN();
     // If is in condition something else then variable, float, int or string constant
-    if(pData.token.type != ID && pData.token.type != INTEGER && pData.token.type != FLOAT && pData.token.type != STRING)
+    if(pData.token.type != ID && pData.token.type != INTEGER && pData.token.type != FLOAT && pData.token.type != STRING && pData.token.type != NIL && pData.token.type != OPEN_PARENTH)
     {
         error(EXPECTED_EXPR, pData.currentLine);
     } 
@@ -790,7 +790,7 @@ void if_condition()
     pData.scopes++;
     insert_instr(pData.instrs, IF_CALL);
     GET_TOKEN(); // Expression starts with one of the following tokens
-    if(pData.token.type != ID && pData.token.type != INTEGER && pData.token.type != FLOAT && pData.token.type != STRING && pData.token.type != OPEN_PARENTH)
+    if(pData.token.type != ID && pData.token.type != INTEGER && pData.token.type != FLOAT && pData.token.type != STRING && pData.token.type != OPEN_PARENTH && pData.token.type != NIL)
     {
         error(EXPECTED_EXPR, pData.currentLine);
     }
