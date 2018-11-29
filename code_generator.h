@@ -151,5 +151,5 @@ void free_ilist(tIList *instrs);
 void free_plist(tPList *plist);
 void generate_code();
 void generate_instruction(FILE *f, tInstr *instruction);
-void generate_if(FILE *f, tInstr *instruction, bool scoped, int uniqueIf);
-void generate_while(FILE *f, tInstr *instruction, bool scoped, int uniqueWhile);
+int generate_if(FILE *f, tInstr *instruction, bool scoped, int uniqueIf);
+int generate_while(FILE *f, tInstr *instruction, bool scoped, int uniqueWhile);
