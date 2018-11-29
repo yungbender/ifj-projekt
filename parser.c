@@ -1113,7 +1113,7 @@ void analyse_id()
         error(WRONG_PARAM, pData.currentLine);
     }
 
-    if(pData.token.type == END)
+    if(pData.token.type == END || pData.token.type == ELSE)
     {
         return;
     }
