@@ -628,145 +628,325 @@ void generate_pops(FILE *f, tInstr *instruction)
     }
 }
 
-/**
- * Function generates while operation inside code.
- * @param f Pointer to the IFJcode2018 source code.
- * @param instruction Pointer to the single instruction from inside code.
- */
-void generate_while(FILE *f, tInstr *instruction)
-{
-    tInstr *actualInstr = instruction;
-    int scopeWhile = 0;
-    int tempUniqueCounter = uniqueCounter;
-
-    do
-    {
-        if(actualInstr->instr == DEFVAR)
-        {
-            fprintf(f, "DEFVAR TF@%s\n", instruction->params->param.attr.str.str);
-            fprintf(f, "DEFVAR TF@%s nil@nil\n", instruction->params->param.attr.str.str);
-            actualInstr->instr = NOP;
-        }
-        else if(actualInstr->instr == WHILE_END)
-        {
-            scopeWhile--;
-        }
-        else if(actualInstr->instr == WHILE_CALL)
-        {
-            scopeWhile++;
-        }
-
-        actualInstr = actualInstr->next;
-    } while(scopeWhile != 0);
-
-    fprintf(f, "DEFVAR TF@condition%d\n", tempUniqueCounter);
-    fprintf(f, "DEFVAR TF@condition$type%d\n", tempUniqueCounter);
-    fprintf(f, "LABEL $while_start%d\n", tempUniqueCounter);
-
-    instruction = instruction->next;
-
-    while(instruction->instr != WHILE_COND_END)
-    {
-        generate_instruction(f, instruction);
-        instruction = instruction->next;
-    }
-
-    fprintf(f, "POPS TF@condition%d\n", tempUniqueCounter);
-    fprintf(f, "TYPE TF@condition$type%d TF@condition%d\n", tempUniqueCounter, tempUniqueCounter);
-    fprintf(f, "JUMPIFEQ $while%d TF@condition$type%d string@nil\n", tempUniqueCounter, tempUniqueCounter);
-    fprintf(f, "JUMPIFNEQ $while_ok%d TF@condition$type%d string@bool\n", tempUniqueCounter, tempUniqueCounter);
-    fprintf(f, "JUMPIFEQ $while%d TF@condition%d bool@false\n", tempUniqueCounter, tempUniqueCounter);
-    fprintf(f, "LABEL $while_ok%d\n", tempUniqueCounter);
-
-    instruction = instruction->next;
-    uniqueCounter++;
-
-    while(instruction->instr != WHILE_END)
-    {
-        generate_instruction(f, instruction);
-        instruction->instr = NOP;
-        instruction = instruction->next;
-    }
-
-    fprintf(f, "JUMP $while_start%d\n", tempUniqueCounter);
-    fprintf(f, "LABEL $while%d\n", tempUniqueCounter);
-    uniqueCounter++;
-
-}
 
 /**
  * Function generates if operation inside code.
  * @param f Pointer to the IFJcode2018 source code.
  * @param instruction Pointer to the single instruction from inside code.
  */
-void generate_if(FILE *f, tInstr *instruction)
+void generate_if(FILE *f, tInstr *instruction, bool scoped, int uniqueIf)
 {
-    tInstr *actualInstr = instruction;
-    int scopeIf = 0;
-    int tempUniqueCounter = uniqueCounter;
-
-    do
+    if(scoped)
     {
-        if(actualInstr->instr == DEFVAR)
-        {
-            fprintf(f, "DEFVAR TF@%s\n", instruction->params->param.attr.str.str);
-            fprintf(f, "DEFVAR TF@%s nil@nil\n", instruction->params->param.attr.str.str);
-            actualInstr->instr = NOP;
-        }
-        else if(actualInstr->instr == IF_END)
-        {
-            scopeIf--;
-        }
-        else if(actualInstr->instr == IF_CALL)
-        {
-            scopeIf++;
-        }
-
-        actualInstr = actualInstr->next;
-    } while(scopeIf != 0);
-
-    instruction = instruction->next;
-
-    while(instruction->instr != IF_COND_END)
-    {
-        generate_instruction(f, instruction);
-        instruction = instruction->next;
-    }
-
-    fprintf(f, "DEFVAR TF@condition%d\n", tempUniqueCounter);
-    fprintf(f, "DEFVAR TF@condition$type%d\n", tempUniqueCounter);
-    fprintf(f, "POPS TF@condition%d\n", tempUniqueCounter);
-    fprintf(f, "TYPE TF@condition$type%d TF@condition%d\n", tempUniqueCounter, tempUniqueCounter);
-    fprintf(f, "JUMPIFEQ $else%d TF@condition$type%d string@nil\n", tempUniqueCounter, tempUniqueCounter);
-    fprintf(f, "JUMPIFNEQ $if_ok%d TF@condition$type%d string@bool\n", tempUniqueCounter, tempUniqueCounter);
-    fprintf(f, "JUMPIFEQ $else%d TF@condition%d bool@false\n", tempUniqueCounter, tempUniqueCounter);
-    fprintf(f, "LABEL $if_ok%d\n", tempUniqueCounter);
-
-    instruction = instruction->next;
-    uniqueCounter++;
-
-    while(instruction->instr != ELSE_CALL)
-    {
-        generate_instruction(f, instruction);
         instruction->instr = NOP;
         instruction = instruction->next;
-    }
 
-    fprintf(f, "JUMP $else_end%d\n", tempUniqueCounter);
-    fprintf(f, "LABEL $else%d\n", tempUniqueCounter);
-    uniqueCounter++;
-    instruction = instruction->next;
+        while(instruction->instr != IF_COND_END)
+        {
+            generate_instruction(f, instruction);
+            instruction->instr = NOP;
+            instruction = instruction->next;
+        }
 
-    while(instruction->instr != IF_END)
-    {
-        generate_instruction(f, instruction);
+        fprintf(f, "POPS TF@condition%d\n", uniqueIf);
+        fprintf(f, "TYPE TF@condition$type%d TF@condition%d\n", uniqueIf, uniqueIf);
+        fprintf(f, "JUMPIFEQ $else%d TF@condition$type%d string@nil\n", uniqueIf, uniqueIf);
+        fprintf(f, "JUMPIFNEQ $if_ok%d TF@condition$type%d string@bool\n", uniqueIf, uniqueIf);
+        fprintf(f, "JUMPIFEQ $else%d TF@condition%d bool@false\n", uniqueIf, uniqueIf);
+        fprintf(f, "LABEL $if_ok%d\n", uniqueIf);
+
         instruction->instr = NOP;
         instruction = instruction->next;
-    }
+        uniqueCounter++;
 
-    fprintf(f, "LABEL $else_end%d\n", tempUniqueCounter);
-    uniqueCounter++;
+        while(instruction->instr != ELSE_CALL)
+        {
+            if(instruction->instr == WHILE_CALL)
+            {
+                generate_while(f, instruction, true, uniqueIf + 1);
+            }
+            else if(instruction->instr == IF_CALL)
+            {
+                generate_if(f, instruction, true, uniqueIf + 1);
+            }
+            else
+            {
+                generate_instruction(f, instruction);
+            }
+            instruction->instr = NOP;
+            instruction = instruction->next;
+        }
+
+        fprintf(f, "JUMP $else_end%d\n", uniqueIf);
+        fprintf(f, "LABEL $else%d\n", uniqueIf);
+        uniqueCounter++;
+        instruction->instr = NOP;
+        instruction = instruction->next;
+
+        while(instruction->instr != IF_END)
+        {
+            if(instruction->instr == WHILE_CALL)
+            {
+                generate_while(f, instruction, true, uniqueIf + 1);
+                uniqueCounter++;
+            }
+            else if(instruction->instr == IF_CALL)
+            {
+                generate_if(f, instruction, true, uniqueIf + 1);
+                uniqueCounter++;
+            }
+            else
+            {
+                generate_instruction(f, instruction);
+            }
+            instruction->instr = NOP;
+            instruction = instruction->next;
+        }
+        if(instruction->instr == IF_END)
+        {
+            instruction->instr = NOP;
+        }
+
+        fprintf(f, "LABEL $else_end%d\n", uniqueIf);
+        uniqueCounter++;
+    }
+    else
+    {
+        tInstr *actualInstr = instruction;
+        int scopeIf = 0;
+        int tempUniqueCounter = uniqueCounter;
+
+        do
+        {
+            if(actualInstr->instr == DEFVAR)
+            {
+                fprintf(f, "DEFVAR TF@%s\n", instruction->params->param.attr.str.str);
+                fprintf(f, "DEFVAR TF@%s nil@nil\n", instruction->params->param.attr.str.str);
+                actualInstr->instr = NOP;
+            }
+            else if(actualInstr->instr == IF_END)
+            {
+                scopeIf--;
+            }
+            else if(actualInstr->instr == IF_CALL)
+            {
+                scopeIf++;
+                if(scopeIf == 1)
+                {
+                    actualInstr->instr = NOP;
+                }
+            }
+
+            actualInstr = actualInstr->next;
+        } while(scopeIf != 0);
+
+        instruction = instruction->next;
+
+        while(instruction->instr != IF_COND_END)
+        {
+            generate_instruction(f, instruction);
+            instruction->instr = NOP;
+            instruction = instruction->next;
+        }
+
+        fprintf(f, "DEFVAR TF@condition%d\n", tempUniqueCounter);
+        fprintf(f, "DEFVAR TF@condition$type%d\n", tempUniqueCounter);
+        fprintf(f, "POPS TF@condition%d\n", tempUniqueCounter);
+        fprintf(f, "TYPE TF@condition$type%d TF@condition%d\n", tempUniqueCounter, tempUniqueCounter);
+        fprintf(f, "JUMPIFEQ $else%d TF@condition$type%d string@nil\n", tempUniqueCounter, tempUniqueCounter);
+        fprintf(f, "JUMPIFNEQ $if_ok%d TF@condition$type%d string@bool\n", tempUniqueCounter, tempUniqueCounter);
+        fprintf(f, "JUMPIFEQ $else%d TF@condition%d bool@false\n", tempUniqueCounter, tempUniqueCounter);
+        fprintf(f, "LABEL $if_ok%d\n", tempUniqueCounter);
+
+        instruction->instr = NOP;
+        instruction = instruction->next;
+        uniqueCounter++;
+
+        while(instruction->instr != ELSE_CALL)
+        {
+            generate_instruction(f, instruction);
+            instruction->instr = NOP;
+            instruction = instruction->next;
+        }
+
+        fprintf(f, "JUMP $else_end%d\n", tempUniqueCounter);
+        fprintf(f, "LABEL $else%d\n", tempUniqueCounter);
+        uniqueCounter++;
+        instruction->instr = NOP;
+        instruction = instruction->next;
+
+        while(instruction->instr != IF_END)
+        {
+            generate_instruction(f, instruction);
+            instruction->instr = NOP;
+            instruction = instruction->next;
+        }
+        if(instruction->instr == IF_END)
+        {
+            instruction->instr = NOP;
+        }
+
+        fprintf(f, "LABEL $else_end%d\n", tempUniqueCounter);
+        uniqueCounter++;
+    }
 }
+/**
+ * Function generates while operation inside code.
+ * @param f Pointer to the IFJcode2018 source code.
+ * @param instruction Pointer to the single instruction from inside code.
+ */
+void generate_while(FILE *f, tInstr *instruction, bool scoped, int uniqueWhile)
+{
+    if(scoped)
+    {
+        instruction = instruction->next;
+        fprintf(f, "LABEL $while_start%d\n", uniqueWhile);
+        while(instruction->instr != WHILE_COND_END)
+        {
+            generate_instruction(f, instruction);
+            instruction->instr = NOP;
+            instruction = instruction->next;
+        }
+
+        fprintf(f, "POPS TF@condition%d\n", uniqueWhile);
+        fprintf(f, "TYPE TF@condition$type%d TF@condition%d\n", uniqueWhile, uniqueWhile);
+        fprintf(f, "JUMPIFEQ $while%d TF@condition$type%d string@nil\n", uniqueWhile, uniqueWhile);
+        fprintf(f, "JUMPIFNEQ $while_ok%d TF@condition$type%d string@bool\n", uniqueWhile, uniqueWhile);
+        fprintf(f, "JUMPIFEQ $while%d TF@condition%d bool@false\n", uniqueWhile, uniqueWhile);
+        fprintf(f, "LABEL $while_ok%d\n", uniqueWhile);
+
+        instruction->instr = NOP;
+        instruction = instruction->next;
+        uniqueCounter++;
+
+        while(instruction->instr != WHILE_END)
+        {
+            if(instruction->instr == IF_CALL)
+            {
+                generate_if(f, instruction, true, uniqueWhile + 1);
+                uniqueCounter++;
+            }
+            else if(instruction->instr == WHILE_CALL)
+            {
+                generate_while(f, instruction, true, uniqueWhile + 1);
+                uniqueCounter++;
+            }
+            else
+            {
+                generate_instruction(f, instruction);
+            }
+            instruction->instr = NOP;
+            instruction = instruction->next;
+        }
+        if(instruction->instr == WHILE_END)
+        {
+            instruction->instr = NOP;
+        }
+
+        fprintf(f, "JUMP $while_start%d\n", uniqueWhile);
+        fprintf(f, "LABEL $while%d\n", uniqueWhile);
+        uniqueCounter++;
+    }
+    else
+    {
+        tInstr *actualInstr = instruction;
+        int scopeWhile = 0;
+        int tempUniqueCounter = uniqueCounter;
+        int tempIfWhileUnique = uniqueCounter + 1;
+        int temp = tempIfWhileUnique;
+
+        do
+        {
+            if(actualInstr->instr == DEFVAR)
+            {
+                fprintf(f, "DEFVAR TF@%s\n", instruction->params->param.attr.str.str);
+                fprintf(f, "DEFVAR TF@%s nil@nil\n", instruction->params->param.attr.str.str);
+                actualInstr->instr = NOP;
+            }
+            else if(actualInstr->instr == IF_CALL)
+            {
+                fprintf(f, "DEFVAR TF@condition%d\n", tempIfWhileUnique);
+                fprintf(f, "DEFVAR TF@condition$type%d\n", tempIfWhileUnique);
+                tempIfWhileUnique++;
+                uniqueCounter++;
+            }
+            else if(actualInstr->instr == WHILE_END)
+            {
+                scopeWhile--;
+            }
+            else if(actualInstr->instr == WHILE_CALL)
+            {
+                fprintf(f, "DEFVAR TF@condition%d\n", tempIfWhileUnique);
+                fprintf(f, "DEFVAR TF@condition$type%d\n", tempIfWhileUnique);
+                tempIfWhileUnique++;
+                scopeWhile++;
+                if(scopeWhile == 1)
+                {
+                    instruction->instr = NOP;
+                }
+            }
+
+            actualInstr = actualInstr->next;
+        } while(scopeWhile != 0);
+
+        fprintf(f, "DEFVAR TF@condition%d\n", tempUniqueCounter);
+        fprintf(f, "DEFVAR TF@condition$type%d\n", tempUniqueCounter);
+        fprintf(f, "LABEL $while_start%d\n", tempUniqueCounter);
+
+        instruction = instruction->next;
+
+        while(instruction->instr != WHILE_COND_END)
+        {
+            generate_instruction(f, instruction);
+            instruction->instr = NOP;
+            instruction = instruction->next;
+        }
+
+        fprintf(f, "POPS TF@condition%d\n", tempUniqueCounter);
+        fprintf(f, "TYPE TF@condition$type%d TF@condition%d\n", tempUniqueCounter, tempUniqueCounter);
+        fprintf(f, "JUMPIFEQ $while%d TF@condition$type%d string@nil\n", tempUniqueCounter, tempUniqueCounter);
+        fprintf(f, "JUMPIFNEQ $while_ok%d TF@condition$type%d string@bool\n", tempUniqueCounter, tempUniqueCounter);
+        fprintf(f, "JUMPIFEQ $while%d TF@condition%d bool@false\n", tempUniqueCounter, tempUniqueCounter);
+        fprintf(f, "LABEL $while_ok%d\n", tempUniqueCounter);
+
+        instruction->instr = NOP;
+        instruction = instruction->next;
+        uniqueCounter++;
+        tempIfWhileUnique = temp;
+
+        while(instruction->instr != WHILE_END)
+        {
+            if(instruction->instr == IF_CALL)
+            {
+                generate_if(f, instruction, true, tempIfWhileUnique);
+                tempIfWhileUnique++;
+            }
+            else if(instruction->instr == WHILE_CALL)
+            {
+                generate_while(f, instruction, true, tempIfWhileUnique);
+                tempIfWhileUnique++;
+            }
+            else
+            {
+                generate_instruction(f, instruction);
+            }
+            instruction->instr = NOP;
+            instruction = instruction->next;
+        }
+        if(instruction->instr == WHILE_END)
+        {
+            instruction->instr = NOP;
+        }
+
+        fprintf(f, "JUMP $while_start%d\n", tempUniqueCounter);
+        fprintf(f, "LABEL $while%d\n", tempUniqueCounter);
+        uniqueCounter++;
+    }
+
+}
+
+
+
 
 /**
  * Function generates function call with return value which is going to be saved, inside source code.
@@ -1256,10 +1436,10 @@ void generate_instruction(FILE *f, tInstr *instruction)
     {
         // In this case cannot be case for function definition
         case WHILE_CALL:
-            generate_while(f,instruction);
+            generate_while(f,instruction, false, 0);
             break;
         case IF_CALL:
-            generate_if(f,instruction);
+            generate_if(f,instruction, false, 0);
             break;
         case FUN_CALL:
             generate_funcall(f,instruction,false);

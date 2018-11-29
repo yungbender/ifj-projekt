@@ -790,7 +790,7 @@ void if_condition()
     pData.scopes++;
     insert_instr(pData.instrs, IF_CALL);
     GET_TOKEN(); // Expression starts with one of the following tokens
-    if(pData.token.type != ID && pData.token.type != INTEGER && pData.token.type != FLOAT && pData.token.type != STRING && pData.token.type != OPEN_PARENTH && pData.token.type != NIL)
+    if(pData.token.type != ID && pData.token.type != INTEGER && pData.token.type != FLOAT && pData.token.type != STRING && pData.token.type != OPEN_PARENTH && pData.token.type != NOINPUTS_CALL)
     {
         error(EXPECTED_EXPR, pData.currentLine);
     }
@@ -995,21 +995,12 @@ void assignment()
             }
             insert_var(pData.local->root, where);
         }
-        if(pData.token.type == INTEGER || pData.token.type == FLOAT || pData.token.type == OPEN_PARENTH || pData.token.type == NIL)
+        if(pData.token.type == INTEGER || pData.token.type == FLOAT || pData.token.type == OPEN_PARENTH || pData.token.type == NIL || pData.token.type == STRING)
         {
             // Expression is parsed, 
             pars_expression();
             // need to pop it out from stack and save POPS to the ilist
             insert_instr(pData.instrs, POPS);
-            insert_param(pData.instrs, where);
-        }
-        else if(pData.token.type == STRING)
-        {
-            insert_instr(pData.instrs, CONCAT_CALL);
-            insert_param(pData.instrs, where);
-            parse_concatenation();
-            // Need save where to save the concatenation
-            insert_instr(pData.instrs, CONCAT_END);
             insert_param(pData.instrs, where);
         }
         return;
@@ -1188,6 +1179,7 @@ void start()
         case NIL:
         case INTEGER:
         case FLOAT:
+        case STRING:
              //Just calculate the expression 
             pars_expression();
             // Insert empty POPS to pop to RETVAL
@@ -1196,16 +1188,6 @@ void start()
             GET_TOKEN();
             start();
             break;
-        case STRING:
-            insert_instr(pData.instrs, CONCAT_CALL);
-            insert_param(pData.instrs, noretval);
-            parse_concatenation();
-            insert_instr(pData.instrs, CONCAT_END);
-            insert_param(pData.instrs, noretval);
-            GET_TOKEN();
-            start();
-            break;
-
         default:
             error(UNEXPECTED_TOKEN, pData.currentLine);
     }
