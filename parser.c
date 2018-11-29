@@ -1029,7 +1029,7 @@ void analyse_id()
         {
             push_stack(pData.stack, where);
             assignment();
-            if(pData.token.type == END)
+            if(pData.token.type == END || pData.token.type == ELSE)
             {
                 return;
             }

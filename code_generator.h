@@ -141,6 +141,7 @@ typedef struct instructionList
  */
 tIList *ilist;
 
+tToken choose_return(tInstr *instruction);
 void init_plist(tPList *plist);
 void init_ilist(tIList *instrs);
 void insert_instr(tIList *instrs, int instr);

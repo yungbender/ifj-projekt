@@ -763,28 +763,45 @@ int generate_if(FILE *f, tInstr *instruction, bool scoped, int uniqueIf)
         fprintf(f, "LABEL $if_ok%d\n", tempUniqueCounter);
 
         instruction->instr = NOP;
-        instruction = instruction->next;
         uniqueCounter++;
 
-        while(instruction->instr != ELSE_CALL)
+        while(instruction->next->instr != ELSE_CALL)
         {
             generate_instruction(f, instruction);
             instruction->instr = NOP;
             instruction = instruction->next;
         }
+
+        generate_instruction(f, instruction);
+        tToken ret = choose_return(instruction);
+        if(ret.type != NOP)
+        {
+            fprintf(f, "MOVE TF@$noretval TF@%s\n",ret.attr.str.str);
+        }
+        instruction->instr = NOP;
+        instruction = instruction->next; 
 
         fprintf(f, "JUMP $else_end%d\n", tempUniqueCounter);
         fprintf(f, "LABEL $else%d\n", tempUniqueCounter);
         uniqueCounter++;
         instruction->instr = NOP;
-        instruction = instruction->next;
 
-        while(instruction->instr != IF_END)
+        while(instruction->next->instr != IF_END)
         {
             generate_instruction(f, instruction);
             instruction->instr = NOP;
             instruction = instruction->next;
         }
+
+        generate_instruction(f, instruction);
+        ret = choose_return(instruction);
+        if(ret.type != NOP)
+        {
+            fprintf(f, "MOVE TF@$noretval TF@%s\n",ret.attr.str.str);
+        }
+        instruction->instr = NOP;
+        instruction = instruction->next;
+
         if(instruction->instr == IF_END)
         {
             instruction->instr = NOP;
@@ -1655,6 +1672,7 @@ tToken choose_return(tInstr *instruction)
         case NOSUBSTR_CALL:
         case NOORD_CALL:
         case NOCHR_CALL:
+        case NOP:
             // return $noretval
             noretval.type = NORETVAL;
             return noretval;
