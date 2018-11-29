@@ -460,7 +460,7 @@ void function_declaration()
     GET_TOKEN();
     if(pData.token.type != IDF && pData.token.type != ID)
     {
-        error(IDF, pData.currentLine);
+        error(EXPECTED_IDF, pData.currentLine);
     }
     // Expecting valid function ID, that means: no keyword, no redefinition of built-in functions
     int result = validate_symbol(pData.token.attr.str);
@@ -790,7 +790,7 @@ void if_condition()
     pData.scopes++;
     insert_instr(pData.instrs, IF_CALL);
     GET_TOKEN(); // Expression starts with one of the following tokens
-    if(pData.token.type != ID && pData.token.type != INTEGER && pData.token.type != FLOAT && pData.token.type != STRING && pData.token.type != OPEN_PARENTH && pData.token.type != NOINPUTS_CALL)
+    if(pData.token.type != ID && pData.token.type != INTEGER && pData.token.type != FLOAT && pData.token.type != STRING && pData.token.type != OPEN_PARENTH && pData.token.type != NIL)
     {
         error(EXPECTED_EXPR, pData.currentLine);
     }
@@ -1113,7 +1113,7 @@ void analyse_id()
         error(WRONG_PARAM, pData.currentLine);
     }
 
-    if(pData.token.type == END || pData.token.type == ELSE)
+    if(pData.token.type == END)
     {
         return;
     }
@@ -1166,7 +1166,7 @@ void start()
             // If there no scopes, and END is called = syntax error
             if(pData.scopes == 0)
             {
-                error(SY_ERR, pData.currentLine);
+                error(UNEXPECTED_TOKEN, pData.currentLine);
             }
             // If there are scopes, end just returns back to the parsing function (parser_function_definition, while_function, if_function)
             break;

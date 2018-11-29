@@ -720,7 +720,7 @@ fi
 i=$((i+1))
 echo -e "TEST$i: Wrong relation operator syntax in expression \c"
 ./ifj2018 <tests_compiler/test$i &>/dev/null 
-if [ $? -eq 4 ]; then
+if [ $? -eq 2 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
     success=1
@@ -730,7 +730,7 @@ fi
 i=$((i+1))
 echo -e "TEST$i: Wrong compare operator syntax in expression \c"
 ./ifj2018 <tests_compiler/test$i &>/dev/null 
-if [ $? -eq 4 ]; then
+if [ $? -eq 2 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
     success=1
@@ -800,7 +800,7 @@ fi
 i=$((i+1))
 echo -e "TEST$i: Combination of relation and compare operators \c"
 ./ifj2018 <tests_compiler/test$i &>/dev/null 
-if [ $? -eq 4 ]; then
+if [ $? -eq 2 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
     success=1

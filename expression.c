@@ -19,11 +19,10 @@ typedef enum {
 	S = 500,	// < shift
 	R, 			// > reduce
 	E, 			// = equal
-	N4,	  		// error number 4
 	N2,			// error number 2
 	K			// expression OK
 } T_sign;
-
+	
 typedef enum {
 	I_plus_minus,	// 0 +-
 	I_mul_div,		// 1 */
@@ -40,8 +39,8 @@ int prec_table[8][8] = {
 //	   +-  */  RO  CO  (   )   i   $
 	{  R,  S,  R,  R,  S,  R,  S,  R  }, // +-
 	{  R,  R,  R,  R,  S,  R,  S,  R  }, // */
-	{  S,  S,  N4, N4, S,  R,  S,  R  }, // RO (relation operators) < > <= >=
-	{  S,  S,  N4, N4, S,  R,  S,  R  }, // CO (compare operators) == !=
+	{  S,  S,  N2, N2, S,  R,  S,  R  }, // RO (relation operators) < > <= >=
+	{  S,  S,  N2, N2, S,  R,  S,  R  }, // CO (compare operators) == !=
 	{  S,  S,  S,  S,  S,  E,  S,  N2 }, // (
 	{  R,  R,  R,  R,  N2, R,  N2, R  }, // )
 	{  R,  R,  R,  R,  N2, R,  N2, R  }, // i
@@ -408,10 +407,6 @@ void pars_expression()
 		{
 			opt_eq();
 		}
-		else if((prec_table[top][activ]) == N4)
-		{
-			error(INCOMPATIBLE_EXPR, pData.currentLine);
-		}
 		else if((prec_table[top][activ]) == N2)
 		{
 			error(UNEXPECTED_EXPR, pData.currentLine);
@@ -424,3 +419,34 @@ void pars_expression()
 		}
 	}
 }
+
+void parse_concatenation()
+{
+ 	while(pData.token.type != END_OF_LINE || pData.token.type != END_OF_FILE)
+	{
+		// string + string + string + id
+		if(pData.token.type == STRING || pData.token.type == ID)
+		{
+			insert_instr(pData.instrs, CONCAT);
+			insert_param(pData.instrs, pData.token);
+			GET_TOKEN();
+		}
+		else
+		{
+			error(WRONG_OP_CONCAT, pData.currentLine);
+		}
+		if(pData.token.type == PLUS)
+		{
+			GET_TOKEN();
+		}
+		else if(pData.token.type == END_OF_FILE || pData.token.type == END_OF_LINE)
+		{
+			break;
+		}
+		else
+		{
+			error(WRONG_OP_CONCAT, pData.currentLine);
+		}
+	}
+}
+
