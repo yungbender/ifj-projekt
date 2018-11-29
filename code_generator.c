@@ -659,6 +659,7 @@ void generate_if(FILE *f, tInstr *instruction, bool scoped, int uniqueIf)
         instruction = instruction->next;
         uniqueCounter++;
 
+        // If IF founds another scoped while or if, it must be generated first, but with increased unique number because the first "boss" while generated compiler variables for them already
         while(instruction->instr != ELSE_CALL)
         {
             if(instruction->instr == WHILE_CALL)
@@ -819,6 +820,7 @@ void generate_while(FILE *f, tInstr *instruction, bool scoped, int uniqueWhile)
         instruction = instruction->next;
         uniqueCounter++;
 
+        // If WHILE founds another scoped while or if, it must be generated first, but with increased unique number because the first "boss" while generated compiler variables for them already
         while(instruction->instr != WHILE_END)
         {
             if(instruction->instr == IF_CALL)
@@ -914,6 +916,7 @@ void generate_while(FILE *f, tInstr *instruction, bool scoped, int uniqueWhile)
         uniqueCounter++;
         tempIfWhileUnique = temp;
 
+        // This "boss" WHILE generated compiler variables for scoped if or while already, so interpreter will not fail, if "boss" founds them, they will be generated, with their correct unique number
         while(instruction->instr != WHILE_END)
         {
             if(instruction->instr == IF_CALL)
@@ -944,9 +947,6 @@ void generate_while(FILE *f, tInstr *instruction, bool scoped, int uniqueWhile)
     }
 
 }
-
-
-
 
 /**
  * Function generates function call with return value which is going to be saved, inside source code.
