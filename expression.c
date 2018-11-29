@@ -419,34 +419,3 @@ void pars_expression()
 		}
 	}
 }
-
-void parse_concatenation()
-{
- 	while(pData.token.type != END_OF_LINE || pData.token.type != END_OF_FILE)
-	{
-		// string + string + string + id
-		if(pData.token.type == STRING || pData.token.type == ID)
-		{
-			insert_instr(pData.instrs, CONCAT);
-			insert_param(pData.instrs, pData.token);
-			GET_TOKEN();
-		}
-		else
-		{
-			error(WRONG_OP_CONCAT, pData.currentLine);
-		}
-		if(pData.token.type == PLUS)
-		{
-			GET_TOKEN();
-		}
-		else if(pData.token.type == END_OF_FILE || pData.token.type == END_OF_LINE)
-		{
-			break;
-		}
-		else
-		{
-			error(WRONG_OP_CONCAT, pData.currentLine);
-		}
-	}
-}
-
