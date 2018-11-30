@@ -1,6 +1,20 @@
-// LEXICAL ANALYZATOR
-#include "str.h"
+#ifndef _SCAN_H
+#define _SCAN_H
+/************************************************************************
+ * 
+ * Compiler implementation for imperative programming language IFJ18
+ * 
+ * Autors:
+ * Sasák Tomáš - xsasak01
+ * Venkrbec Tomáš - xvenkr01
+ * Krajči Martin - xkrajc21
+ * Dižová Natália - xdizov00 
+ * 
+ ***********************************************************************/
+// LEXICAL ANALYSER
 
+#include "str.h"
+#include <stdio.h>
 /* init state = 0
  * state after white space/comment = 1
  */
@@ -33,19 +47,14 @@ enum string { 	SL = 10000,	// FS: string literal
 
 
 // TOKEN STRUCTURE
-struct token{
+typedef struct token{
 	int type;
 	union {
 		int i;
-		float f;
+		double f;
 		string str;
 	} attr ;
-};
-
-
-// ======= LEXICAL ERROR =======
-#define L_ERR     -1
-#define INT_ERR	  99
+}tToken;
 
 // ======= TYPES OF TOKEN =======
 #define IDF     0
@@ -55,8 +64,10 @@ struct token{
 #define STRING  4
 
 #define END_OF_FILE 5
+#define END_OF_LINE 6
+#define NORETVAL	7
 
-// KEYWORD
+// KEYWORDS
 #define DEF   10
 #define DO    11
 #define ELSE  12
@@ -67,7 +78,7 @@ struct token{
 #define THEN  17
 #define WHILE 18
 
-// OPERATOR
+// OPERATORS
 #define PLUS          20 // '+'
 #define MINUS         21 // '-'
 #define ASTERISK      22 // '*'
@@ -80,7 +91,7 @@ struct token{
 #define GREATER_EQUAL 29 // '>='
 #define NOT_EQUAL     30 // '!='
 
-// SPECIAL
+// SPECIAL CHARACTERS
 #define OPEN_PARENTH  40 // '('
 #define CLOSE_PARENTH 41 // ')'
 #define OPEN_BRACKET  42 // '['
@@ -89,6 +100,7 @@ struct token{
 #define CLOSE_BRACE   45 // '}'
 #define COMMA         46 // ','
 
-// hlavicka funkcie simulujuca lexikalny analyzator
-//void set_source_file(FILE *f);
-//int get_token();
+// Function headers
+void set_source_file(FILE *f);
+struct token get_token();
+#endif // _SCAN_H

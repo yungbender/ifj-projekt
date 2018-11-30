@@ -1,0 +1,5 @@
+def ahoj? ()
+	inputs
+end
+
+ahoj?

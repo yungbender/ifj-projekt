@@ -1,12 +1,35 @@
+/************************************************************************
+ * 
+ * Compiler implementation for imperative programming language IFJ18
+ * 
+ * Autors:
+ * Sasák Tomáš - xsasak01
+ * Venkrbec Tomáš - xvenkr01
+ * Krajči Martin - xkrajc21
+ * Dižová Natália - xdizov00 
+ * 
+ ***********************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <stdbool.h>
 #include "scanner.h"
+#include "error.h"
 
-int line = 1;
+
+int line = 0; // Line counter
+bool lineBeginning = true; // Global variable indicating that we're on the beginning of line
 FILE *source;
 
-/* checking if identifier is key word  */
+/* Function for setting the input file */
+void set_source_file(FILE *f)
+{
+	source = f;
+	lineBeginning = true; // If we somehow changed file in the middle of program (ie. testing), we reset global variables
+	line = 0;
+}
+
+/* Checking if identifier is key word  */
 void is_key_word (struct token *LEX)
 {
 	if(str_cmp_const_str(&LEX->attr.str, "nil") == 0) 
@@ -53,13 +76,23 @@ void is_key_word (struct token *LEX)
 	str_free(&LEX->attr.str); // If we changed id to keyword, we dont need the string
 }
 
-/* analyzes and returns next token, returns ID and value, if possible */
+/* Analyzes and returns next token, returns ID and value/line number, if possible */
 struct token get_token()
 {
+	// Check if stdin is empty
+/* 	if ((fseek(stdin, 0, SEEK_END), ftell(stdin)) < 0)
+	{
+		fprintf(stderr,"Error, no ifj2018 source code found! \n");
+		exit (L_ERR);
+	} */
+
 	struct token T1;
 	int state = 0;
 	int c;
 	int i = 0;
+	unsigned int convertedDecimal;
+	char decimal[3] = {0,};
+	char hexa[2] = {0,}; // Variable used to store hexadecimal escape sequence, we need it so we can convert it into decimal
 
 	string attr; 
 	if(str_init(&attr) == STR_ERROR) // Memory allocation for string failed
@@ -70,17 +103,24 @@ struct token get_token()
 
 	while(1)
 	{
+
 		c = getc(source);
 		switch(state)
 		{
 			case 0: // init state
-				if(c == '\n' || line == 1) // looking for =begin string, line condition for comments to work on first line
+				if(c == '\n' && lineBeginning == false) // New line, returning EOL token
 				{
-					if(line > 1)
-					{
-						c = getc(source); // To skip reading 2nd char on beginning of file
-						line++;
-					}
+					lineBeginning = true;
+					T1.type = END_OF_LINE;
+					T1.attr.i = line;
+					str_free(&attr);
+					return T1;	
+				}
+				else if(lineBeginning == true && c != EOF) // looking for =begin string, line condition for comments to work on first line
+				{
+					line++;
+					lineBeginning = false;
+
 					if(c == '=')
 					{
 						c = getc(source);
@@ -90,13 +130,26 @@ struct token get_token()
 						}
 						if(i == 5) // =begin string found
 						{
+								
 							ungetc(c, source);
-							state = BC;
+							if(isspace(c))
+							{
+								state = BC;	
+							}
+							else
+							{
+								T1.type = L_ERR;
+								T1.attr.i = line;
+								str_free(&attr);
+								return T1;
+							}
 						}
 						else // =begin string wasnt found, reverting read characters
 						{
-							fseek(source, -2 - i, SEEK_CUR);
-							state = 0;
+							T1.type = L_ERR;
+							T1.attr.i = line;
+							str_free(&attr);
+							return T1;
 						}
 					}
 					else
@@ -105,17 +158,18 @@ struct token get_token()
 						state = 0;
 					}
 				}
-				else if(isspace(c))	
-				{
-					state = 0; // white space
-				}
 				else if(c == '#') 
 				{
 					state = LC; // line comment
 				}
+				else if(isspace(c))	
+				{
+					state = 0; // white space
+				}
 				else if(c == EOF)
 				{
 					T1.type = END_OF_FILE;
+					T1.attr.i = line;
 					str_free(&attr);
 					return T1;
 				}  
@@ -149,7 +203,16 @@ struct token get_token()
 					}
 					if(i == 3)
 					{
-						state = END_C;
+						c = getc(source);
+						if(isspace(c) || c == EOF)
+						{
+							ungetc(c, source);
+							state = END_C;
+						}
+						else
+						{
+							state = TMP_C;
+						}
 					}
 					else
 					{
@@ -181,7 +244,12 @@ struct token get_token()
 					}
 					if(i == 3)
 					{
-						state = END_C;
+						c = getc(source);
+						if(isspace(c) || c == EOF)
+						{
+							state = END_C;
+						}
+						ungetc(c, source);
 					}
 				}
 				else if(c == EOF)
@@ -237,7 +305,6 @@ struct token get_token()
 				}
 				else if(c == '\"')
 				{
-					str_add_char(&attr, c);
 					state = TMP_SL; // string literal
 				}
 				else if(c == EOF)
@@ -365,7 +432,7 @@ struct token get_token()
 				{
 					str_add_char(&attr, c);
 				}
-				else if(c == '!' ||c == '?')
+				else if(c == '!' || c == '?')
 				{
 					state = ID_F;
 					str_add_char(&attr, c);
@@ -381,6 +448,7 @@ struct token get_token()
 					}
 					str_copy_string(&T1.attr.str, &attr);
 					str_free(&attr);
+					is_key_word(&T1);
 					return T1;
 				}
 				break;
@@ -399,7 +467,7 @@ struct token get_token()
 					T1.type = IDF;
 					if(str_init(&T1.attr.str) == STR_ERROR)
 					{
-						T1.type = INT_ERR; // TODO: Add to #define list
+						T1.type = INT_ERR;
 						return T1;
 					}
 					str_copy_string(&T1.attr.str, &attr);
@@ -408,11 +476,7 @@ struct token get_token()
 				}
 
 			case ZERO: // FS: zero
-				if(c == ZERO)
-				{
-					state = ZERO;
-				}
-				else if(c == '.')
+				if(c == '.')
 				{
 					str_add_char(&attr, '0');
 					str_add_char(&attr, c);
@@ -421,12 +485,15 @@ struct token get_token()
 				else if(c == 'e' || c == 'E')
 				{
 					state = TMP_I_EX;
+					str_add_char(&attr, '0');
 					str_add_char(&attr, c);
 				}
-				else if(isdigit(c)) // If other letters start, we discard the zero
+				else if(isdigit(c)) // There cant be zeros before other numbers
 				{
-					state = IL;
-					str_add_char(&attr, c);
+					T1.type = L_ERR;
+					T1.attr.i = line;
+					str_free(&attr);
+					return T1;
 				}
 				else // We return zero as standalone integer token
 				{ 
@@ -492,7 +559,7 @@ struct token get_token()
 				{
 					ungetc(c, source);
 					T1.type = FLOAT;
-					T1.attr.f = atof(attr.str);
+					T1.attr.f = strtod(attr.str, NULL);
 					str_free(&attr);
 					return T1;
 				}
@@ -542,7 +609,7 @@ struct token get_token()
 				{
 					ungetc(c, source);
 					T1.type = FLOAT;
-					T1.attr.f = atof(attr.str);
+					T1.attr.f = strtod(attr.str, NULL);
 					str_free(&attr);
 					return T1;
 				}
@@ -591,8 +658,17 @@ struct token get_token()
 				else
 				{
 					ungetc(c, source);
-					T1.type = INTEGER;
-					T1.attr.i = atof(attr.str); // We use atof because atoi wont work with exponent, so we convert it and then cut the decimal part
+					if((strtod(attr.str, NULL) - (int)strtod(attr.str, NULL)) == 0) // We test whether we created a floating point number
+					{
+						T1.type = INTEGER;
+						T1.attr.i = strtod(attr.str, NULL); // We use strtod because atoi wont work with exponent, so we convert it and then cut the decimal part
+					}
+					else
+					{
+						T1.type = FLOAT; //Negative exponent created negative number, so we use float
+						T1.attr.f = strtod(attr.str, NULL);
+					} 
+					
 					str_free(&attr);
 					return T1;
 				}
@@ -602,16 +678,25 @@ struct token get_token()
 				if(c == '\\') // escape sequence
 				{
 					state = ES;
-					str_add_char(&attr, c);
 				}
 				else if(c == '\"') //string ending
 				{
 					state = SL;
-					str_add_char(&attr, c);
 				}
 				else if(c > 31) // accepting characters with ASCII value over 31
 				{
-					str_add_char(&attr, c);
+					if(c == 32)
+					{
+						str_add_string(&attr, "\\032");	
+					}
+					else if(c == '#')
+					{
+						str_add_string(&attr, "\\035");	// Hash sign has to be written as escape sequence
+					}
+					else
+					{
+						str_add_char(&attr, c);		
+					}
 				}
 				else
 				{
@@ -626,12 +711,30 @@ struct token get_token()
 				if(c == 'x')
 				{
 					state = X_ES;
-					str_add_char(&attr, c);
 				}
 				else if(c == '\"' || c == '\\' || c == 'n' || c == 't' || c == 's') // Accepted escape sequences
 				{
 					state = TMP_SL;
-					str_add_char(&attr, c);	
+					if(c == '\"')
+					{
+						str_add_string(&attr, "\\034");
+					}
+					else if(c == '\\')
+					{
+						str_add_string(&attr, "\\092");
+					}
+					else if(c == 'n')
+					{
+						str_add_string(&attr, "\\010");
+					}
+					else if(c == 't')
+					{
+						str_add_string(&attr, "\\009");
+					}
+					else if(c == 's')
+					{
+						str_add_string(&attr, "\\032");
+					}
 				}
 				else
 				{
@@ -643,10 +746,12 @@ struct token get_token()
 				break;
 
 			case X_ES: // hexadecimal escape sequence \xh
-				if((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F')) // Accepted hexadecimal alphanumericals
+				if((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f')) // Accepted hexadecimal alphanumericals
 				{
 					state = XHH_ES;
-					str_add_char(&attr, c);	
+					hexa[0] = c; // We save the first digit of hexa number
+					hexa[1] = 0;
+					hexa[2] = '\0';
 				}
 				else
 				{
@@ -661,17 +766,18 @@ struct token get_token()
 				if(c == '\\')
 				{
 					state = ES;
-					str_add_char(&attr, c);
 				}
 				else if(c == '\"')
 				{
 					state = SL;
-					str_add_char(&attr, c);
 				}
 				else if(c > 31)
 				{
 					state = TMP_SL;
-					str_add_char(&attr, c);
+					if((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f')) // Accepted hexadecimal alphanumericals
+					{
+						hexa[1] = c; // We save the second digit of hexa number
+					}
 				}
 				else
 				{
@@ -680,6 +786,26 @@ struct token get_token()
 					str_free(&attr);
 					return T1;
 				}
+
+				// We need to convert hexa number into decimal and store it
+				sscanf(hexa, "%x", &convertedDecimal); //Convert hexa string into decimal
+				sprintf(decimal, "%d", convertedDecimal); //Convert decimal number into string
+				str_add_char(&attr, '\\'); // Start escape sequence
+				if(atoi(decimal) < 100)
+				{
+					str_add_char(&attr, '0'); // If the number consists of less than 3 digits, we need to add zero 
+				}
+				if(atoi(decimal) < 10)
+				{
+					str_add_char(&attr, '0'); // If the number consists of less than 2 digits, we need to add another zero
+				}
+				str_add_string(&attr, decimal);
+
+				if(!((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f') || c == '\"' || c == '\\'))
+				{
+					str_add_char(&attr, c);	// If we have short hexa sequence, dont forget the letter that ended the sequence
+				}				
+
 				break;
 
 			case SL: // FS: string literal
@@ -695,50 +821,4 @@ struct token get_token()
 				return T1;
 		}
 	}
-}	
-
-
-int main(void)
-{	
-	source = stdin;
-	struct token LEX;
-	LEX.type = -2;	// temporary, doesnt mean anything, just so we dont get EOF value by random
-
-	while(LEX.type != 5)
-	{ // Simulace lexikalni analyzy
-		LEX = get_token(); 
-		if(LEX.type == 1)
-		{
-			is_key_word(&LEX);
-		}
-		else if(LEX.type == INT_ERR)
-		{
-			fprintf(stderr, "ERROR: Internal compiler error\n");
-			return INT_ERR;
-		}
-		if(LEX.type == -1)
-		{
-			fprintf(stderr,"ERROR: Lexical analyzer error at line: %d\n", line);
-			//return 1;
-		}
-		else if(LEX.type == 2)
-		{ // Zkusebni vypis podle typu lexemu
-			printf("Lexem je typu %d s hodnotou %d\n", LEX.type, LEX.attr.i);
-		}
-		else if(LEX.type == 3)
-		{
-			printf("Lexem je typu %d s hodnotou %f\n", LEX.type, LEX.attr.f);
-		}
-		else if(LEX.type == 0 || LEX.type == 1 || LEX.type == 4)
-		{
-			printf("Lexem je typu %d s hodnotou %s\n", LEX.type, LEX.attr.str.str);
-			str_free(&LEX.attr.str);
-		}
-		else
-		{
-			printf("Lexem je typu %d\n", LEX.type);
-		}
-	}
-	return 0;
 }
-

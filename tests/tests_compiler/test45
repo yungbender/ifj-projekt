@@ -1,0 +1,8 @@
+def ahoj(test1,test2)
+	inputi
+	inputs
+end
+
+test1 = 2
+test2 = 3
+test3 = ahoj test1 test2
