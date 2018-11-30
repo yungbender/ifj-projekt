@@ -625,6 +625,12 @@ void generate_pops(FILE *f, tInstr *instruction)
     if(instruction->params->param.type == ID)
     {
         fprintf(f, "POPS TF@%s\n", instruction->params->param.attr.str.str);
+        fprintf(f, "DEFVAR TF@$pops$type$%d\n", uniqueCounter);
+        fprintf(f, "TYPE TF@$pops$type$%d TF@%s\n", uniqueCounter, instruction->params->param.attr.str.str);
+        fprintf(f, "JUMPIFNEQ $pops$notBOOL$%d TF@$pops$type$%d string@bool\n", uniqueCounter, uniqueCounter);
+        fprintf(f, "EXIT int@4\n");
+        fprintf(f, "LABEL $pops$notBOOL$%d\n", uniqueCounter);
+        uniqueCounter++;
     }
 }
 
