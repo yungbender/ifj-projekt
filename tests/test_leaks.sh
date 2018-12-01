@@ -1608,10 +1608,316 @@ else
 fi
 rm output
 
+i=$((i+1))
+echo -e "TEST$i: Function definition in scope \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Definition of function with wrong name \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Definition of function with name of builtin function \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Redefinition of function with its name already used as variable \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Redefinition of function \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Function definition wasn't ended with end \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Function has parameters with same name \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Function parameter name has been already used as variable \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Wrong token after expression \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Calling undefined function from function \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Calling undefined function from main \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Wrong token after assignment \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Calling function with undefined parameters \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Extra end when not in scope \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Undefined variable inside expression \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Calling function with wrong number of parameters \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Function parameter name has been already used as other function name \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Function parameter name is the same as function name \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
 if [ "$errors" == 0 ]; then
     echo -e "\nAll error tests were ${GREEN}[OK]${NOCOLOR}.\n"
 else
-    echo -e "\n Sorry, but" $errors "error tests ${RED}[FAILED]${NOCOLOR}.\n"
+    echo -e "\nSorry, but" $errors "error tests ${RED}[FAILED]${NOCOLOR}.\n"
 fi
 
 if [ "$leaks" == 0 ]; then

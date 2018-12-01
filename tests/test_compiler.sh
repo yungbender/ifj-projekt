@@ -1151,6 +1151,208 @@ else
 fi
 sleep 0.005
 
+i=$((i+1))
+echo -e "TEST$i: Function definition in scope \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null 
+if [ $? -eq 2 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Definition of function with wrong name \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null 
+if [ $? -eq 2 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Definition of function with name of builtin function \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null 
+if [ $? -eq 3 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Redefinition of function with its name already used as variable \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null 
+if [ $? -eq 3 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Redefinition of function \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null 
+if [ $? -eq 3 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Function definition wasn't ended with end \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null 
+if [ $? -eq 2 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Function has parameters with same name \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null 
+if [ $? -eq 3 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Function parameter name has been already used as variable \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 0 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Wrong token after expression \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null 
+if [ $? -eq 2 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Calling undefined function from function \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 0 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Calling undefined function from main \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null 
+if [ $? -eq 3 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Wrong token after assignment \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null 
+if [ $? -eq 2 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Calling function with undefined parameters \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null 
+if [ $? -eq 3 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Extra end when not in scope \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null 
+if [ $? -eq 2 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Undefined variable inside expression \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null 
+if [ $? -eq 3 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Calling function with wrong number of parameters \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null 
+if [ $? -eq 5 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Function parameter name has been already used as other function name \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null 
+if [ $? -eq 3 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Function parameter name is the same as function name \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null 
+if [ $? -eq 3 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
 if [ "$success" == 0 ]; then
     echo -e "\nAll tests were ${GREEN}[OK]${NOCOLOR}.\n"
 else
