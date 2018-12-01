@@ -1353,6 +1353,40 @@ else
 fi
 sleep 0.005
 
+i=$((i+1))
+echo -e "TEST$i: Wrong token after end in function definition \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null 
+if [ $? -eq 2 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Calling function that calls undefined function, before the definition \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null 
+if [ $? -eq 2 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Calling function that calls undefined function, after the definition \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null 
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+
 if [ "$success" == 0 ]; then
     echo -e "\nAll tests were ${GREEN}[OK]${NOCOLOR}.\n"
 else
