@@ -1,0 +1,8 @@
+test = inputs()
+test = inputi()
+test = inputf()
+test = print ("ahoj", 1, 2.3, "cau", nil)
+test = length("zdar")
+test = substr("ahojjaksemas", 4, 3)
+test = ord("cus", 2)
+test = chr("69")
