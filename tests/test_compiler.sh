@@ -606,7 +606,7 @@ echo -e "TEST$i: Wrong token after id \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
 ./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
-if [ $? -eq 0 -a $returnval -eq 0 ]; then
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
     success=$((success+1))
@@ -821,7 +821,7 @@ echo -e "TEST$i: Various RO and CO expressions without assignment \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
 ./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
-if [ $? -eq 0 -a $returnval -eq 0 ]; then
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
     success=$((success+1))
@@ -834,7 +834,7 @@ echo -e "TEST$i: Various RO and CO expressions with assignment \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
 ./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
-if [ $? -eq 0 -a $returnval -eq 0 ]; then
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
     success=$((success+1))
@@ -987,7 +987,7 @@ echo -e "TEST$i: Compare operation with nil, without assignment \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
 ./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
-if [ $? -eq 0 -a $returnval -eq 0 ]; then
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
     success=$((success+1))
@@ -1016,7 +1016,7 @@ echo -e "TEST$i: Compare operation with nil, with assignment \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
 ./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
-if [ $? -eq 0 -a $returnval -eq 0 ]; then
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
     success=$((success+1))
@@ -1043,7 +1043,7 @@ echo -e "TEST$i: Comparing nil with integer, without assignment \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
 ./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
-if [ $? -eq 0 -a $returnval -eq 0 ]; then
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
     success=$((success+1))
@@ -1056,7 +1056,7 @@ echo -e "TEST$i: Comparing nil with integer, with assignment \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
 ./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
-if [ $? -eq 0 -a $returnval -eq 0 ]; then
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
     success=$((success+1))
