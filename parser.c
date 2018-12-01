@@ -1044,7 +1044,6 @@ void analyse_id()
         // Precedence was calculated
         else
         {
-            CREATE_NORETVAL_TOKEN();
             insert_instr(pData.instrs, POPS);
             insert_param(pData.instrs, noretval);
             if(pData.token.type == END)

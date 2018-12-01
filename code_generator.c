@@ -784,6 +784,10 @@ int generate_if(FILE *f, tInstr *instruction, bool scoped, int uniqueIf)
         {
             fprintf(f, "MOVE TF@$noretval TF@%s\n",ret.attr.str.str);
         }
+        if(ret.type == NORETVAL) 
+        {
+            str_free(&ret.attr.str);
+        }
         instruction->instr = NOP;
         instruction = instruction->next; 
 
@@ -804,6 +808,10 @@ int generate_if(FILE *f, tInstr *instruction, bool scoped, int uniqueIf)
         if(ret.type != NOP)
         {
             fprintf(f, "MOVE TF@$noretval TF@%s\n",ret.attr.str.str);
+        }
+        if(ret.type == NORETVAL) 
+        {
+            str_free(&ret.attr.str);
         }
         instruction->instr = NOP;
         instruction = instruction->next;

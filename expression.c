@@ -92,8 +92,9 @@ PT_idx table_index(tToken token)
 	}
 }
 
-// Function chcek if the variable is inside table
-void check_data(tToken id){
+// Function check if the variable is inside table
+void check_data(tToken id)
+{
 	tNode *result = search_table(pData.local->root, id.attr.str);
 	if(result == NULL)
 	{
@@ -108,7 +109,7 @@ void reduce_by_rule(tStack *tmp_stack)
 	//E->i
 	if(head.type == ID || head.type == INTEGER || head.type == FLOAT || head.type == STRING || head.type == NIL)
 	{	
-		// Chcek if the variable is defined
+		// Check if the variable is defined
 		if(head.type == ID)
 		{
 			check_data(head);
@@ -134,6 +135,7 @@ void reduce_by_rule(tStack *tmp_stack)
 			}
 			else
 			{
+				clear_stack(tmp_stack);
 				error(UNEXPECTED_EXPR, pData.currentLine);
 			}
 		}
@@ -155,6 +157,7 @@ void reduce_by_rule(tStack *tmp_stack)
 			}
 			else
 			{
+				clear_stack(tmp_stack);
 				error(UNEXPECTED_EXPR, pData.currentLine);
 			}
 		}
@@ -171,6 +174,7 @@ void reduce_by_rule(tStack *tmp_stack)
 			}
 			else
 			{
+				clear_stack(tmp_stack);
 				error(UNEXPECTED_EXPR, pData.currentLine);
 			}
 		}
@@ -187,6 +191,7 @@ void reduce_by_rule(tStack *tmp_stack)
 			}
 			else
 			{
+				clear_stack(tmp_stack);
 				error(UNEXPECTED_EXPR, pData.currentLine);
 			}
 		}
@@ -203,6 +208,7 @@ void reduce_by_rule(tStack *tmp_stack)
 			}
 			else
 			{
+				clear_stack(tmp_stack);
 				error(UNEXPECTED_EXPR, pData.currentLine);
 			}
 		}
@@ -219,6 +225,7 @@ void reduce_by_rule(tStack *tmp_stack)
 			}
 			else
 			{
+				clear_stack(tmp_stack);
 				error(UNEXPECTED_EXPR, pData.currentLine);
 			}
 		}
@@ -236,6 +243,7 @@ void reduce_by_rule(tStack *tmp_stack)
 			}
 			else
 			{
+				clear_stack(tmp_stack);
 				error(UNEXPECTED_EXPR, pData.currentLine);
 			}
 		}
@@ -252,6 +260,7 @@ void reduce_by_rule(tStack *tmp_stack)
 			}
 			else
 			{
+				clear_stack(tmp_stack);
 				error(UNEXPECTED_EXPR, pData.currentLine);
 			}
 		}
@@ -268,6 +277,7 @@ void reduce_by_rule(tStack *tmp_stack)
 			}
 			else
 			{
+				clear_stack(tmp_stack);
 				error(UNEXPECTED_EXPR, pData.currentLine);
 			}
 		}
@@ -285,6 +295,7 @@ void reduce_by_rule(tStack *tmp_stack)
 			}
 			else
 			{
+				clear_stack(tmp_stack);
 				error(UNEXPECTED_EXPR, pData.currentLine);
 			}
 		}
@@ -302,17 +313,20 @@ void reduce_by_rule(tStack *tmp_stack)
 			}
 			else
 			{
+				clear_stack(tmp_stack);
 				error(UNEXPECTED_EXPR, pData.currentLine);
 			}
 		}
 		else
 		{
+			clear_stack(tmp_stack);
 			error(UNEXPECTED_EXPR, pData.currentLine);
 		}
 	}
 	head = head_stack(tmp_stack);
 	if(head.type != EMPTY)
 	{
+		clear_stack(tmp_stack);
 		error(UNEXPECTED_EXPR, pData.currentLine);
 	}
 }
