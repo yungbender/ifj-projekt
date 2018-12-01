@@ -53,6 +53,10 @@ void error(int id, int line)
     str_free(&noretval.attr.str);
     free_ilist(pData.instrs);
     free_stack(pData.stack);
+    if(pData.token.type == ID || pData.token.type == STRING || pData.token.type == IDF)
+    {
+        str_free(&pData.token.attr.str);
+    }
 
     print_error_exit(id, line);
 }

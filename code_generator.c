@@ -1734,12 +1734,13 @@ void generate_fundef(FILE *f)
                 fprintf(f, "MOVE TF@$retval TF@%s\n",ret.attr.str.str);
             }
             fprintf(f, "RETURN\n\n");
+            // If we stored string in ret token, we need to free it
+            if(ret.type == NORETVAL) 
+            {
+                str_free(&ret.attr.str);
+            }
         }
         begin = begin->next;
-    }
-    if(ret.type == NORETVAL) // If we stored string in ret token, we need to free it
-    {
-        str_free(&ret.attr.str);
     }
 }
 
