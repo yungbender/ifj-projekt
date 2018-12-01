@@ -1149,7 +1149,6 @@ else
     success=$((success+1))
     echo -e "${RED}[FAILED]${NOCOLOR}"
 fi
-rm output
 sleep 0.005
 
 if [ "$success" == 0 ]; then
