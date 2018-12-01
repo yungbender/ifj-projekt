@@ -1,0 +1,7 @@
+def ahoj(test1,test2)
+
+end
+
+test1 = 5
+
+ahoj (test1, test2)

@@ -1,0 +1,9 @@
+def ahoj (cau, zdar)
+
+end
+
+cau = 5
+zdar = 6
+cauky = 7
+
+ahoj cau,zdar,cauky
