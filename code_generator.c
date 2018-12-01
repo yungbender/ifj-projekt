@@ -143,6 +143,12 @@ void free_ilist(tIList *instrs)
         instrs->head = temp;
     }
     free(instrs);
+
+    extern tToken noretval;
+    if(search_ptr(freeList, noretval.attr.str) == false)
+    {
+        insert_ptr(freeList, noretval.attr.str);
+    }
     free_plist(freeList);
 }
 

@@ -50,8 +50,8 @@ void error(int id, int line)
 {
     free_symtable(pData.global);
     free_symtable(pData.local);
-    str_free(&noretval.attr.str);
     free_ilist(pData.instrs);
+    //str_free(&noretval.attr.str);
     free_stack(pData.stack);
     if(pData.token.type == ID || pData.token.type == STRING || pData.token.type == IDF)
     {
@@ -365,11 +365,15 @@ void parse_function_definition()
     start();
     if(pData.token.type != END)
     {
+        free_tree(pData.local->root);
+        pData.local->root = temp;
         error(EXPECTED_END, pData.currentLine);
     }
     GET_TOKEN();
     if(pData.token.type != END_OF_FILE && pData.token.type != END_OF_LINE)
     {
+        free_tree(pData.local->root);
+        pData.local->root = temp;
         error(UNEXPECTED_END, pData.currentLine);
     }
     // Function is parsed without error, saving end keyword
@@ -406,22 +410,23 @@ void params(tNode *function)
     // Clear out the so parser can save params one by one and compare them 
     while(pData.token.type == ID)
     {
-        // Need to save the parameter inside instruction list
-        insert_param(pData.instrs, pData.token);
-        function->paramsNum++;
-        // Now needs to compare, if parameters doesnt have same name
-        tStack *stackHead = pData.stack;
         // Search the parameter inside global table, if exists, redefiniton
         tNode *result = search_table(pData.global->root, pData.token.attr.str);
         if(result != NULL)
         {
             error(IDF_REDEF, pData.currentLine);
         }
+        // Need to save the parameter inside instruction list
+        insert_param(pData.instrs, pData.token);
+        function->paramsNum++;
+        // Now needs to compare, if parameters doesnt have same name
+        tStack *stackHead = pData.stack;
         // Compare every parameter
         while(stackHead->head.type != EMPTY)
         {
             if((str_cmp_string(&(pData.token.attr.str),&(stackHead->head.attr.str)) == 0))
             {
+                pData.token.type = NIL; // Change token type of second parameter, to prevent double free
                 error(SAME_PARAM, pData.currentLine);
             }
             stackHead = stackHead->next;
@@ -864,8 +869,12 @@ void end_of_file()
 {
     if(endoffile == false)
     {
-        // Check for unexpected end of file (in definition or in while)
-        if(pData.inDefinition == true || pData.scopes > 0)
+        if(pData.inDefinition == true) // Function wasn't ended
+        {
+            return; // We will handle error in function
+        }
+        // Check for unexpected end of file (in while or if)
+        if(pData.scopes > 0)
         {
             error(UNEXPECTED_EOF, pData.currentLine);
         }

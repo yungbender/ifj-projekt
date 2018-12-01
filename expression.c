@@ -92,16 +92,6 @@ PT_idx table_index(tToken token)
 	}
 }
 
-// Function check if the variable is inside table
-void check_data(tToken id)
-{
-	tNode *result = search_table(pData.local->root, id.attr.str);
-	if(result == NULL)
-	{
-		error(UNDEF_V, pData.currentLine);
-	}
-}
-
 void reduce_by_rule(tStack *tmp_stack)
 {
 	rule_token.type = NONTERM;
@@ -112,7 +102,13 @@ void reduce_by_rule(tStack *tmp_stack)
 		// Check if the variable is defined
 		if(head.type == ID)
 		{
-			check_data(head);
+			tNode *result = search_table(pData.local->root, head.attr.str);
+			if(result == NULL)
+			{
+				clear_stack(tmp_stack);
+				str_free(&head.attr.str);
+				error(UNDEF_V, pData.currentLine);
+			}
 		}
 		insert_instr(pData.instrs, PUSHS);
 		insert_param(pData.instrs, head);
