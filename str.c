@@ -13,7 +13,10 @@
 #include <malloc.h>
 #include "str.h"
 
-// Initialization of string
+/**
+ * Function initalizes string before it's first use.
+ * @param s Pointer to the string.
+ */
 int str_init(string *s)
 {
 	if ((s->str = (char*) malloc(STR_LEN_INC)) == NULL)
@@ -24,20 +27,20 @@ int str_init(string *s)
 	return STR_SUCCESS;
 }
 
-// Function frees the string from memory
+/**
+ * Function free's out the string used memory.
+ * @param s Pointer to the string.
+ */
 void str_free(string *s)
 {
 	free(s->str);
 }
 
-// Function clears the contents of string
-void str_clear(string *s)
-{
-	s->str[0] = '\0';
-	s->length = 0;
-}
-
-// Function adds char array on the end of string s1
+/**
+ * Function appends char array on the end of string.
+ * @param s1 Pointer to the string.
+ * @param c Pointer to the string array which will be appended.
+ */
 int str_add_string(string *s1, char* c)
 {
 	int length = strlen(c);
@@ -48,7 +51,11 @@ int str_add_string(string *s1, char* c)
 	return STR_SUCCESS;
 }
 
-// Function adds one char on the end of string s1
+/** 
+ * Function appends one char on the end of string.
+ * @param s1 Pointer to the string.
+ * @param c Char which will be appended at the end of s1.
+ */
 int str_add_char(string *s1, char c)
 {
 	if (s1->length + 1 >= s1->allocSize) {     // Not enough memory, we need to reallocate
@@ -62,7 +69,11 @@ int str_add_char(string *s1, char c)
 	return STR_SUCCESS;
 }
 
-// Function copies string s2 into s1
+/**
+ * Function copies second string into first string.
+ * @param s1 Pointer to the string (destination).
+ * @param s2 Pointer to the string (source).
+ */
 int str_copy_string(string *s1, string *s2)
 {
 	int newLength = s2->length;
@@ -76,7 +87,11 @@ int str_copy_string(string *s1, string *s2)
 	return STR_SUCCESS;
 }
 
-// Function copies string s2 into s1
+/**
+ * Function copies constant string array into string.
+ * @param s1 Pointer to the string (destination).
+ * @param s2 Pointer to the constant char array (source).
+ */
 int str_copy_const_string(string *s1, char *s2)
 {
 	int newLength = strlen(s2);
@@ -90,26 +105,22 @@ int str_copy_const_string(string *s1, char *s2)
 	return STR_SUCCESS;
 }
 
-// Function compares strings s1 and s2
+/**
+ * Function compares right string with left string and returns result.
+ * @param s1 Pointer to the left string.
+ * @param s2 Pointer to the right string.
+ */
 int str_cmp_string(string *s1, string *s2)
 {
 	return strcmp(s1->str, s2->str);
 }
 
-// Function compares string s1 with constant char array s2
+/**
+ * Function compares left string with constant char array and returns result.
+ * @param s1 Pointer to the left string.
+ * @param s2 Constant char array.
+ */
 int str_cmp_const_str(string *s1, char* s2)
 {
 	return strcmp(s1->str, s2);
-}
-
-// Function returns the char* part from string structure
-char *str_get_str(string *s)
-{
-	return s->str;
-}
-
-// Function returns length of string
-int str_get_length(string *s)
-{
-	return s->length;
 }
