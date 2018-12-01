@@ -1,0 +1,8 @@
+def foo()
+	ahoj()
+end
+
+foo
+
+def ahoj()
+end
