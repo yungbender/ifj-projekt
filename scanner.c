@@ -341,22 +341,6 @@ struct token get_token()
 					{
 						T1.type = CLOSE_PARENTH;
 					}
-					else if(c == '[') 
-					{
-						T1.type = OPEN_BRACKET;
-					}
-					else if(c == ']') 
-					{
-						T1.type = CLOSE_BRACKET;
-					}
-					else if(c == '{') 
-					{
-						T1.type = OPEN_BRACE;
-					}
-					else if(c == '}') 
-					{
-						T1.type = CLOSE_BRACE;
-					}
 					else if(c == ',') 
 					{
 						T1.type = COMMA;

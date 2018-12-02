@@ -94,11 +94,7 @@ typedef struct token{
 // SPECIAL CHARACTERS
 #define OPEN_PARENTH  40 // '('
 #define CLOSE_PARENTH 41 // ')'
-#define OPEN_BRACKET  42 // '['
-#define CLOSE_BRACKET 43 // ']'
-#define OPEN_BRACE    44 // '{'
-#define CLOSE_BRACE   45 // '}'
-#define COMMA         46 // ','
+#define COMMA         42 // ','
 
 // Function headers
 void set_source_file(FILE *f);
