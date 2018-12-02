@@ -25,7 +25,7 @@ i=$((i+1))
 echo -e "TEST0$i: Function without parameters \c"
 ./ifj2018 <tests/tests_compiler/test0$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test0$i >test & ./tests/ic18int test
+./ifj2018 <tests/tests_compiler/test0$i >test & ./ic18int test
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -38,7 +38,7 @@ i=$((i+1))
 echo -e "TEST0$i: Function with one parameter \c"
 ./ifj2018 <tests/tests_compiler/test0$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test0$i >test & ./tests/ic18int test
+./ifj2018 <tests/tests_compiler/test0$i >test & ./ic18int test
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -51,7 +51,7 @@ i=$((i+1))
 echo -e "TEST0$i: Function with two parameters \c"
 ./ifj2018 <tests/tests_compiler/test0$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test0$i >test & ./tests/ic18int test &>/dev/null
+./ifj2018 <tests/tests_compiler/test0$i >test & ./ic18int test &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -64,7 +64,7 @@ i=$((i+1))
 echo -e "TEST0$i: Function returns string value \c"
 ./ifj2018 <tests/tests_compiler/test0$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test0$i >test & echo ahoj >output & ./tests/ic18int test <output &>/dev/null
+./ifj2018 <tests/tests_compiler/test0$i >test & echo ahoj >output & ./ic18int test <output &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -77,7 +77,7 @@ i=$((i+1))
 echo -e "TEST0$i: Function returns float value \c"
 ./ifj2018 <tests/tests_compiler/test0$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test0$i >test & echo 1.5 >output & ./tests/ic18int test <output &>/dev/null
+./ifj2018 <tests/tests_compiler/test0$i >test & echo 1.5 >output & ./ic18int test <output &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -90,7 +90,7 @@ i=$((i+1))
 echo -e "TEST0$i: Function returns integer value \c"
 ./ifj2018 <tests/tests_compiler/test0$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test0$i >test & echo 1 >output & ./tests/ic18int test <output &>/dev/null
+./ifj2018 <tests/tests_compiler/test0$i >test & echo 1 >output & ./ic18int test <output &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -213,7 +213,7 @@ i=$((i+1))
 echo -e "TEST$i: Multiple functions \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & ./tests/ic18int test &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -228,7 +228,7 @@ i=$((i+1))
 echo -e "TEST$i: While loop \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & ./tests/ic18int test &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -241,7 +241,7 @@ i=$((i+1))
 echo -e "TEST$i: Multiple while loops inside each other \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & ./tests/ic18int test &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -254,7 +254,7 @@ i=$((i+1))
 echo -e "TEST$i: Multiple while loops \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & ./tests/ic18int test
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -313,7 +313,7 @@ i=$((i+1))
 echo -e "TEST$i: Single if condition \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & ./tests/ic18int test &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -326,7 +326,7 @@ i=$((i+1))
 echo -e "TEST$i: Nested if conditions \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & ./tests/ic18int test &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -339,7 +339,7 @@ i=$((i+1))
 echo -e "TEST$i: Many if conditions \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & ./tests/ic18int test &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -442,7 +442,7 @@ i=$((i+1))
 echo -e "TEST$i: Assignment from integer \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & ./tests/ic18int test &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -455,7 +455,7 @@ i=$((i+1))
 echo -e "TEST$i: Assignment from float \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & ./tests/ic18int test &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -468,7 +468,7 @@ i=$((i+1))
 echo -e "TEST$i: Assignment from string \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & ./tests/ic18int test &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -481,7 +481,7 @@ i=$((i+1))
 echo -e "TEST$i: Assignment from function \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & echo test >output & ./tests/ic18int test <output &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & echo test >output & ./ic18int test <output &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -494,7 +494,7 @@ i=$((i+1))
 echo -e "TEST$i: Assignment from id \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & echo test >output & ./tests/ic18int test <output &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & echo test >output & ./ic18int test <output &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -507,7 +507,7 @@ i=$((i+1))
 echo -e "TEST$i: Initialization of id with the same id (id = id) \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & ./tests/ic18int test &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -520,7 +520,7 @@ i=$((i+1))
 echo -e "TEST$i: Only id on the line \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & ./tests/ic18int test &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -533,7 +533,7 @@ i=$((i+1))
 echo -e "TEST$i: Assignment from expression \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & ./tests/ic18int test &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -568,7 +568,7 @@ i=$((i+1))
 echo -e "TEST$i: Assignment from function with parameters separated by comma in parentheses \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & echo 1 \n ahoj >output & ./tests/ic18int test <output &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & echo 1 \n ahoj >output & ./ic18int test <output &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -581,7 +581,7 @@ i=$((i+1))
 echo -e "TEST$i: Assignment from function with parameters separated by comma \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & echo 1 \n ahoj >output & ./tests/ic18int test <output &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & echo 1 \n ahoj >output & ./ic18int test <output &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -605,7 +605,7 @@ i=$((i+1))
 echo -e "TEST$i: Wrong token after id \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & ./tests/ic18int test &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
 if [ $? -eq 4 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -629,7 +629,7 @@ i=$((i+1))
 echo -e "TEST$i: Calling function without parameters \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & echo 1 \n ahoj >output & ./tests/ic18int test <output &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & echo 1 \n ahoj >output & ./ic18int test <output &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -642,7 +642,7 @@ i=$((i+1))
 echo -e "TEST$i: Calling function with one parameter, without parentheses \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & echo 1 \n ahoj >output & ./tests/ic18int test <output &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & echo 1 \n ahoj >output & ./ic18int test <output &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -655,7 +655,7 @@ i=$((i+1))
 echo -e "TEST$i: Calling function with one parameter, with parentheses \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & echo 1 \n ahoj >output & ./tests/ic18int test <output &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & echo 1 \n ahoj >output & ./ic18int test <output &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -690,7 +690,7 @@ i=$((i+1))
 echo -e "TEST$i: Calling function with more parameters, with parentheses and commas \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & echo 1 \n ahoj >output & ./tests/ic18int test <output &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & echo 1 \n ahoj >output & ./ic18int test <output &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -703,7 +703,7 @@ i=$((i+1))
 echo -e "TEST$i: Calling function without parameters, with parentheses\c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & echo 1 \n ahoj >output & ./tests/ic18int test <output &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & echo 1 \n ahoj >output & ./ic18int test <output &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -729,7 +729,7 @@ i=$((i+1))
 echo -e "TEST$i: Various add and substract expressions without assignment \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & ./tests/ic18int test &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -742,7 +742,7 @@ i=$((i+1))
 echo -e "TEST$i: Concatenation of expressions without assignment \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & ./tests/ic18int test &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -755,7 +755,7 @@ i=$((i+1))
 echo -e "TEST$i: Concatenation of expressions in assignment \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & ./tests/ic18int test &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -768,7 +768,7 @@ i=$((i+1))
 echo -e "TEST$i: Various add and substract expressions with assignment \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & ./tests/ic18int test &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -781,7 +781,7 @@ i=$((i+1))
 echo -e "TEST$i: Nil assignment \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & ./tests/ic18int test &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -794,7 +794,7 @@ i=$((i+1))
 echo -e "TEST$i: Various multiply and divide expressions without assignment \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & ./tests/ic18int test &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -807,7 +807,7 @@ i=$((i+1))
 echo -e "TEST$i: Various multiply and divide expressions with assignment \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & ./tests/ic18int test &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -820,7 +820,7 @@ i=$((i+1))
 echo -e "TEST$i: Various RO and CO expressions without assignment \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & ./tests/ic18int test &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
 if [ $? -eq 4 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -833,7 +833,7 @@ i=$((i+1))
 echo -e "TEST$i: Various RO and CO expressions with assignment \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & ./tests/ic18int test &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
 if [ $? -eq 4 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -846,7 +846,7 @@ i=$((i+1))
 echo -e "TEST$i: Various expressions with parantheses, no assignment \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & ./tests/ic18int test &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -859,7 +859,7 @@ i=$((i+1))
 echo -e "TEST$i: Various expressions with parantheses, and assigned \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & ./tests/ic18int test &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -894,7 +894,7 @@ i=$((i+1))
 echo -e "TEST$i: Just parentheses in expression \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & ./tests/ic18int test &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -986,7 +986,7 @@ i=$((i+1))
 echo -e "TEST$i: Compare operation with nil, without assignment \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & ./tests/ic18int test &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
 if [ $? -eq 4 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -1000,7 +1000,7 @@ i=$((i+1))
 echo -e "TEST$i: Nil in parentheses, without assignment \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & ./tests/ic18int test &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -1015,7 +1015,7 @@ i=$((i+1))
 echo -e "TEST$i: Compare operation with nil, with assignment \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & ./tests/ic18int test &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
 if [ $? -eq 4 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -1029,7 +1029,7 @@ i=$((i+1))
 echo -e "TEST$i: Nil in parentheses, with assignment \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & ./tests/ic18int test &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -1042,7 +1042,7 @@ i=$((i+1))
 echo -e "TEST$i: Comparing nil with integer, without assignment \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & ./tests/ic18int test &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
 if [ $? -eq 4 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -1055,7 +1055,7 @@ i=$((i+1))
 echo -e "TEST$i: Comparing nil with integer, with assignment \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & ./tests/ic18int test &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
 if [ $? -eq 4 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -1092,7 +1092,7 @@ i=$((i+1))
 echo -e "TEST$i: Calling function with IDF token name, without assignment \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & echo test >output & ./tests/ic18int test <output &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & echo test >output & ./ic18int test <output &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -1105,7 +1105,7 @@ i=$((i+1))
 echo -e "TEST$i: Calling function with IDF token name, with assignment \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & echo test >output & ./tests/ic18int test <output &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & echo test >output & ./ic18int test <output &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -1129,7 +1129,7 @@ i=$((i+1))
 echo -e "TEST$i: Calling builtin functions, without assignment \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & echo test \n 1 \n 1.1 >output & ./tests/ic18int test <output &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & echo test \n 1 \n 1.1 >output & ./ic18int test <output &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -1142,7 +1142,7 @@ i=$((i+1))
 echo -e "TEST$i: Calling builtin functions, with assignment \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & echo test \n 1 \n 1.1 >output & ./tests/ic18int test <output &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & echo test \n 1 \n 1.1 >output & ./ic18int test <output &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -1232,7 +1232,7 @@ i=$((i+1))
 echo -e "TEST$i: Function parameter name has been already used as variable \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & ./tests/ic18int test &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -1256,7 +1256,7 @@ i=$((i+1))
 echo -e "TEST$i: Calling undefined function from function \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
 returnval="$?"
-./ifj2018 <tests/tests_compiler/test$i >test & ./tests/ic18int test &>/dev/null
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
 if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
@@ -1391,9 +1391,9 @@ if [ "$success" == 0 ]; then
     echo -e "\nAll tests were ${GREEN}[OK]${NOCOLOR}.\n"
 else
     echo -e "\n Sorry, but" $success "tests ${RED}[FAILED]${NOCOLOR}.\n"
-    if [ -e tests/ic18int ]; then
+    if [ -e ic18int ]; then
         echo -e "\n"
     else
-        echo -e "Warning! ic18int interpreter was not found inside folder tests, some tests will definetly end up as ${RED}[FAILED]${NOCOLOR}.\n"
+        echo -e "Warning ic18int interpreter was not found inside folder main folder, some tests will definetly end up as ${RED}[FAILED]${NOCOLOR}.\n"
     fi
 fi
