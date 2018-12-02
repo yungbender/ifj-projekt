@@ -1965,6 +1965,23 @@ else
 fi
 rm output
 
+i=$((i+1))
+echo -e "TEST$i: Function has variable with name already used as variable in main \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
 if [ "$errors" == 0 ]; then
     echo -e "\nAll error tests were ${GREEN}[OK]${NOCOLOR}.\n"
 else

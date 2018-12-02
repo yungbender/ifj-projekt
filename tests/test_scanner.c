@@ -351,7 +351,7 @@ int main()
 
 	open_file("tests/tests_scanner/test25");
 	puts("TEST25 -- Special characters");
-	for(int i = 0; i < 6; i++)
+	for(int i = 0; i < 2; i++)
 	{
 		LEX = get_token();
 		assert(LEX.type == 40 + i);
@@ -359,9 +359,9 @@ int main()
 		assert(LEX.type == END_OF_LINE && LEX.attr.i == i + 1);
 	}
 	LEX = get_token();
-	assert(LEX.type == 46);
+	assert(LEX.type == 42);
 	LEX = get_token();
-	assert(LEX.type == END_OF_FILE && LEX.attr.i == 7);
+	assert(LEX.type == END_OF_FILE && LEX.attr.i == 3);
 	fclose(f);
 
 	open_file("tests/tests_scanner/test26");
