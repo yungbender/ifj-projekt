@@ -45,6 +45,7 @@ void parser_init()
  * Function free's out all parser resources (pData) and call's error print function.
  * Function is only called when semantic or synthathic analysis fails.
  * @param id Type of error.
+ * @param line Number of line where is error.
  */
 void error(int id, int line)
 {
@@ -64,7 +65,7 @@ void error(int id, int line)
 /**
  * Function searches if string is keyword or built-in function.
  * @param name Name of the function/variable.
- * @return Macro number of keyword or builtin function from scanner.h.
+ * @return Macro number of keyword or builtin function from code_generator.h.
  **/ 
 int validate_symbol(string name)
 {
@@ -922,6 +923,14 @@ void assignment()
         int builtin = validate_symbol(pData.token.attr.str);
         if(result != NULL || builtin != OK)
         {
+            // User is calling function which was already called recursive, but was still not defined and is inside main
+            if(result != NULL)
+            {
+                if(result->wasDefined == false && pData.inDefinition == false)
+                {
+                    error(UNDEF_F, pData.currentLine);
+                }
+            }
             function_call(true, false);
             return;
         }
@@ -1073,6 +1082,14 @@ void analyse_id()
     int builtin = validate_symbol(pData.token.attr.str);
     if(result != NULL || builtin != OK)
     {
+        // User is calling function which was already called recursive, but was still not defined and is inside main
+        if(result != NULL)
+        {
+            if(result->wasDefined == false && pData.inDefinition == false)
+            {
+                error(UNDEF_F, pData.currentLine);
+            }
+        }
         // Now parser needs to check if user is not assigning to the function
         push_stack(pData.stack, pData.token);
         GET_TOKEN();

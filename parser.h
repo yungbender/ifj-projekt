@@ -40,7 +40,7 @@ typedef struct parserdata
     tStack *stack; //< Stack with tokens, which can be used next time, used if parser must "eat" one more token to choose correct derivation tree, or used for expression parsing.
     int scopes; //< Counter of how many scopes parser is inside.
     bool inDefinition; //< Bool which signifies if parser is inside function definition.
-    int currentLine;
+    int currentLine; //< Counter which counts on which line is parser
 }tPData;
 
 extern tPData pData;
