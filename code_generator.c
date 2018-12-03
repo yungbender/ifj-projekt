@@ -1351,10 +1351,10 @@ void generate_substr(FILE *f)
     fprintf(f, "LABEL $is_int1\n");
     //Controling if is third parameter int or float, if it is float, retyping
     fprintf(f, "JUMPIFEQ $is_int2 TF@lenght$type string@int\n");
-    fprintf(f, "JUMPIFEQ $retype2 TF@start$type string@float\n");
+    fprintf(f, "JUMPIFEQ $retype2 TF@lenght$type string@float\n");
     fprintf(f, "EXIT int@4\n");
     fprintf(f, "LABEL $retype2\n");
-    fprintf(f, "FLOAT2INT TF@start TF@start\n");
+    fprintf(f, "FLOAT2INT TF@lenght TF@lenght\n");
     fprintf(f, "LABEL $is_int2\n");
     //Controling if is secong paramter greater then lenght of string and lower then 0
     fprintf(f, "STRLEN TF@string$lenght TF@string\n");
