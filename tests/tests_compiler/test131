@@ -1,0 +1,1 @@
+substr(nil, 1, 2)

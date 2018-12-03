@@ -1,0 +1,1 @@
+substr("ahoj", nil, 2)

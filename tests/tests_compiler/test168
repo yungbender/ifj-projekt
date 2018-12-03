@@ -1,0 +1,5 @@
+test1 = "ahoj"
+test2 = "cau"
+test3 = "zdar"
+
+ahoj = test1 + test2 * test3
