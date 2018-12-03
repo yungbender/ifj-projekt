@@ -16,12 +16,25 @@
 #include "scanner.h"
 #include "error.h"
 
+/*
+ * Global variable for keeping track which line we're on, for more accurate error messages 
+ */
+int line = 0;
 
-int line = 0; // Line counter
-bool lineBeginning = true; // Global variable indicating that we're on the beginning of line
+/*
+ * Global variable indicating that we're on the beginning of line, helps us distinguish block comments
+ */
+bool lineBeginning = true;
+
+/*
+ * Global variable for input file
+ */
 FILE *source;
 
-/* Function for setting the input file */
+/**
+ * Function for initialising scanner source file and setting the global variables to default value
+ * @param f Contains opened input file
+ */
 void set_source_file(FILE *f)
 {
 	source = f;
@@ -29,7 +42,10 @@ void set_source_file(FILE *f)
 	line = 0;
 }
 
-/* Checking if identifier is key word  */
+/**
+ * Function for initialising scanner source file and setting the global variables to default value
+ * @param f Contains opened input file
+ */
 void is_key_word (struct token *LEX)
 {
 	if(str_cmp_const_str(&LEX->attr.str, "nil") == 0) 
@@ -76,26 +92,22 @@ void is_key_word (struct token *LEX)
 	str_free(&LEX->attr.str); // If we changed id to keyword, we dont need the string
 }
 
-/* Analyzes and returns next token, returns ID and value/line number, if possible */
+/*
+ * Function analyzes and returns next token, returns ID and value/line number, if possible
+ * @return Functions returns next token from input file
+ */
 struct token get_token()
 {
-	// Check if stdin is empty
-/* 	if ((fseek(stdin, 0, SEEK_END), ftell(stdin)) < 0)
-	{
-		fprintf(stderr,"Error, no ifj2018 source code found! \n");
-		exit (L_ERR);
-	} */
+	struct token T1; // Made for storing token type and data
+	int state = 0; // Integer containing current state in FSM
+	int c; // Last loaded character from input file
+	int i = 0; 
+	unsigned int convertedDecimal; // Unsigned value of converted escape sequence
+	char decimal[3] = {0,}; // Just for storing numbers when converting hexadecimal escape sequence to decimal
+	char hexa[2] = {0,}; // Used to store hexadecimal escape sequence, we need it so we can convert it into decimal
 
-	struct token T1;
-	int state = 0;
-	int c;
-	int i = 0;
-	unsigned int convertedDecimal;
-	char decimal[3] = {0,};
-	char hexa[2] = {0,}; // Variable used to store hexadecimal escape sequence, we need it so we can convert it into decimal
-
-	string attr; 
-	if(str_init(&attr) == STR_ERROR) // Memory allocation for string failed
+	string attr; // The dynamic string contains identifier names and string values
+	if(str_init(&attr) == STR_ERROR) // Error when allocating memory for string
 	{
 		T1.type = INT_ERR;
 		return T1;
@@ -104,11 +116,11 @@ struct token get_token()
 	while(1)
 	{
 
-		c = getc(source);
+		c = getc(source); // Next character
 		switch(state)
 		{
-			case 0: // init state
-				if(c == '\n' && lineBeginning == false) // New line, returning EOL token
+			case 0: // Awaiting non-whitespace or comment, initial state
+				if(c == '\n' && lineBeginning == false) // The line ends, returning EOL token
 				{
 					lineBeginning = true;
 					T1.type = END_OF_LINE;
@@ -116,12 +128,12 @@ struct token get_token()
 					str_free(&attr);
 					return T1;	
 				}
-				else if(lineBeginning == true && c != EOF) // looking for =begin string, line condition for comments to work on first line
+				else if(lineBeginning == true && c != EOF) // Yet we haven't looked for =begin string
 				{
 					line++;
 					lineBeginning = false;
 
-					if(c == '=')
+					if(c == '=') // Checking if block comment is starting
 					{
 						c = getc(source);
 						for(i = 0; i < 5 && c == "begin"[i]; i++)
@@ -144,7 +156,7 @@ struct token get_token()
 								return T1;
 							}
 						}
-						else // =begin string wasnt found, reverting read characters
+						else // =begin string wasnt found, error
 						{
 							T1.type = L_ERR;
 							T1.attr.i = line;
@@ -158,29 +170,29 @@ struct token get_token()
 						state = 0;
 					}
 				}
-				else if(c == '#') 
+				else if(c == '#') // Line comment
 				{
-					state = LC; // line comment
+					state = LC; 
 				}
-				else if(isspace(c))	
+				else if(isspace(c))	// White space
 				{
-					state = 0; // white space
+					state = 0; 
 				}
-				else if(c == EOF)
+				else if(c == EOF) // End of file
 				{
 					T1.type = END_OF_FILE;
 					T1.attr.i = line;
 					str_free(&attr);
 					return T1;
 				}  
-				else
+				else // Non-whitespace or comment, moving to state 1
 				{ 
 					state = 1;
 					ungetc(c, source);
 				}
 				break;
 
-			case LC: // line comment
+			case LC: // Line comment, just waiting for EOL or EOF
 				if(c == '\n' || c == EOF)
 				{
 					ungetc(c, source);
@@ -188,7 +200,7 @@ struct token get_token()
 				}
 				break;
 
-			case BC: // block comment
+			case BC: // Block comment
 				if(c == '\t' || c == ' ')
 				{
 					state = TMP_C;
@@ -228,17 +240,17 @@ struct token get_token()
 				}
 				break;
 
-			case TMP_C: // temporary state for BC
+			case TMP_C: // Temporary state for BC
 				if(c == '\n')
 				{
 					line++;
 					c = getc(source);
-					if(c == '\n') // Seems unnecessary, but its needed for not messing up line number
+					if(c == '\n') // Needed for having correct line number
 					{
 						line++;
 						break;
 					}
-					for(i = 0; i < 3 && c == "=end"[i] && c != EOF; i++) // checking for the end on the beginning of each line
+					for(i = 0; i < 3 && c == "=end"[i] && c != EOF; i++) // Checking for the =end string on the beginning of each line
 					{
 						c = getc(source);
 					}
@@ -261,15 +273,15 @@ struct token get_token()
 				}
 				break;
 
-			case END_C: // end of block comment	
-				if(c == '\n' || c == EOF) //comment ends
+			case END_C: // End of block comment	
+				if(c == '\n' || c == EOF) // Comment ends
 				{
 					state = 0;
 					ungetc(c, source);
 				}
-				else if(c == '\t' || c == ' ') // comment continues on the same line
+				else if(c == '\t' || c == ' ') // Comment continues on the same line
 				{
-					state = COMM;
+					state = LC;
 				}
 				else
 				{
@@ -280,32 +292,24 @@ struct token get_token()
 				}
 				break;
 
-			case COMM: // line comment after END_C
-				if(c == '\n' || c == EOF)
-				{
-					state = 0;
-					ungetc(c, source);
-				}
-				break;
-
-			case 1: // state after white space/comment
+			case 1: // State after whitespace/comment
 				if(islower(c) || c == '_')
 				{
-					str_add_char(&attr, c); // save the first letter
+					str_add_char(&attr, c); // Save the first letter
 					state = ID_STATE; // Identifier
 				}
 				else if(c == '0')
 				{
-					 state = ZERO; // zero state to get rid of extra zeros
+					 state = ZERO; // Zero number state
 				}
 				else if(isdigit(c))
 				{
-					str_add_char(&attr, c); // save the first number
-					state = IL; // integer literal
+					str_add_char(&attr, c); // Save the first number
+					state = IL; // Integer literal
 				}
 				else if(c == '\"')
 				{
-					state = TMP_SL; // string literal
+					state = TMP_SL; // String literal
 				}
 				else if(c == EOF)
 				{
@@ -313,7 +317,7 @@ struct token get_token()
 					str_free(&attr);
 					return T1;
 				}
-				else
+				else // Special character or error
 				{
 					// Testing if c is unique one-letter operator
 					if(c == '+') 
@@ -416,10 +420,18 @@ struct token get_token()
 				{
 					str_add_char(&attr, c);
 				}
-				else if(c == '!' || c == '?')
+				else if(c == '!' || c == '?') // Function identifier can end with ? or !
 				{
-					state = ID_F;
 					str_add_char(&attr, c);
+					T1.type = IDF;
+					if(str_init(&T1.attr.str) == STR_ERROR)
+					{
+						T1.type = INT_ERR;
+						return T1;
+					}
+					str_copy_string(&T1.attr.str, &attr);
+					str_free(&attr);
+					return T1;
 				}
 				else 
 				{ 
@@ -436,28 +448,6 @@ struct token get_token()
 					return T1;
 				}
 				break;
-
-			case ID_F: // FS: identifier of function
-				if(isalnum(c))
-				{ // Nothing is allowed after question or exclamation mark
-					T1.type = L_ERR;
-					T1.attr.i = line;
-					str_free(&attr);
-					return T1;
-				}
-				else
-				{
-					ungetc(c, source);
-					T1.type = IDF;
-					if(str_init(&T1.attr.str) == STR_ERROR)
-					{
-						T1.type = INT_ERR;
-						return T1;
-					}
-					str_copy_string(&T1.attr.str, &attr);
-					str_free(&attr);
-					return T1;
-				}
 
 			case ZERO: // FS: zero
 				if(c == '.')
@@ -514,7 +504,7 @@ struct token get_token()
 				}
 				break;
 
-			case TMP_FL: // temporary state for FL
+			case TMP_FL: // Temporary state for FL
 				if(isdigit(c))
 				{
 					state = FL;
@@ -529,7 +519,7 @@ struct token get_token()
 				}
 				break;
 
-			case FL: // FS: floating literal
+			case FL: // FS: Floating literal
 				if(isdigit(c))
 				{
 					str_add_char(&attr, c);
@@ -549,7 +539,7 @@ struct token get_token()
 				}
 				break;
 
-			case TMP_F_EX: // temporary state for FL with exponent
+			case TMP_F_EX: // Temporary state for FL with exponent
 				if(isdigit(c))
 				{
 					state = FL_EX;
@@ -569,7 +559,7 @@ struct token get_token()
 				}
 				break;
 
-			case SIGN_F: // signed exponent for FL
+			case SIGN_F: // Signed exponent for FL
 				if(isdigit(c))
 				{
 					state = FL_EX;
@@ -584,7 +574,7 @@ struct token get_token()
 				}
 				break;
 
-			case FL_EX: // FS: floating literal with exponent
+			case FL_EX: // FS: Floating literal with exponent
 				if(isdigit(c))
 				{
 					str_add_char(&attr, c);
@@ -599,7 +589,7 @@ struct token get_token()
 				}
 				break;
 
-			case TMP_I_EX: // temporary state for IL with exponent
+			case TMP_I_EX: // Temporary state for IL with exponent
 				if(isdigit(c))
 				{
 					state = IL_EX;
@@ -619,7 +609,7 @@ struct token get_token()
 				}
 				break;
 
-			case SIGN_I: // signed exponent for IL
+			case SIGN_I: // Signed exponent for IL
 				if(isdigit(c))
 				{
 					state = IL_EX;
@@ -634,7 +624,7 @@ struct token get_token()
 				}
 				break;
 
-			case IL_EX: // FS: integer literal with exponent
+			case IL_EX: // FS: Integer literal with exponent
 				if(isdigit(c))
 				{
 					str_add_char(&attr, c);
@@ -649,7 +639,7 @@ struct token get_token()
 					}
 					else
 					{
-						T1.type = FLOAT; //Negative exponent created negative number, so we use float
+						T1.type = FLOAT; // Negative exponent created negative number, so we use float
 						T1.attr.f = strtod(attr.str, NULL);
 					} 
 					
@@ -658,24 +648,24 @@ struct token get_token()
 				}
 				break;
 
-			case TMP_SL: // temporary state for SL
-				if(c == '\\') // escape sequence
+			case TMP_SL: // Temporary state for SL
+				if(c == '\\') // Escape sequence
 				{
 					state = ES;
 				}
-				else if(c == '\"') //string ending
+				else if(c == '\"') // String is ending
 				{
 					state = SL;
 				}
-				else if(c > 31) // accepting characters with ASCII value over 31
+				else if(c > 31) // Accepting characters with ASCII value over 31
 				{
-					if(c == 32)
+					if(c == 32) // Space has to be written as escape sequence
 					{
 						str_add_string(&attr, "\\032");	
 					}
-					else if(c == '#')
+					else if(c == '#') // Hash sign has to be written as escape sequence
 					{
-						str_add_string(&attr, "\\035");	// Hash sign has to be written as escape sequence
+						str_add_string(&attr, "\\035");	
 					}
 					else
 					{
@@ -691,7 +681,7 @@ struct token get_token()
 				}
 				break;
 
-			case ES: // escape sequence
+			case ES: // Start of escape sequence
 				if(c == 'x')
 				{
 					state = X_ES;
@@ -699,23 +689,23 @@ struct token get_token()
 				else if(c == '\"' || c == '\\' || c == 'n' || c == 't' || c == 's') // Accepted escape sequences
 				{
 					state = TMP_SL;
-					if(c == '\"')
+					if(c == '\"') // Saving quotation mark as ascape sequence
 					{
 						str_add_string(&attr, "\\034");
 					}
-					else if(c == '\\')
+					else if(c == '\\') // Saving backslash as escape sequence
 					{
 						str_add_string(&attr, "\\092");
 					}
-					else if(c == 'n')
+					else if(c == 'n') // Newline escape sequence
 					{
 						str_add_string(&attr, "\\010");
 					}
-					else if(c == 't')
+					else if(c == 't') // Tab indent escape sequence
 					{
 						str_add_string(&attr, "\\009");
 					}
-					else if(c == 's')
+					else if(c == 's') // Space escape sequence
 					{
 						str_add_string(&attr, "\\032");
 					}
@@ -729,11 +719,11 @@ struct token get_token()
 				}
 				break;
 
-			case X_ES: // hexadecimal escape sequence \xh
+			case X_ES: // Hexadecimal escape sequence \xh
 				if((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f')) // Accepted hexadecimal alphanumericals
 				{
 					state = XHH_ES;
-					hexa[0] = c; // We save the first digit of hexa number
+					hexa[0] = c; // We save the first digit of hexadecimal number
 					hexa[1] = 0;
 					hexa[2] = '\0';
 				}
@@ -746,7 +736,7 @@ struct token get_token()
 				}
 				break;
 
-			case XHH_ES: // hexadecimal escape sequence \xhh
+			case XHH_ES: // Hexadecimal escape sequence \xhh
 				if(c == '\\')
 				{
 					state = ES;
