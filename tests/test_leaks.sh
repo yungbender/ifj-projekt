@@ -1982,6 +1982,805 @@ else
 fi
 rm output
 
+i=$((i+1))
+echo -e "TEST$i: Calling input function with wrong number of parameters \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Calling length function with wrong number of parameters \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Calling chr function with wrong number of parameters \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Calling ord function with wrong number of parameters \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Calling substr function with wrong number of parameters \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Calling print function with wrong number of parameters \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Length function data type tests \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Length function data type tests \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Length function data type tests \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Substr function data type tests \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Substr function data type tests \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Substr function data type tests \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Substr function data type tests \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Substr function data type tests \c" 
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Substr function data type tests \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Substr function data type tests \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Substr function data type tests \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Substr function data type tests \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Ord function data type tests \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Ord function data type tests \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Ord function data type tests \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Ord function data type tests \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Ord function data type tests \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Ord function data type tests \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Chr function data type tests \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Chr function data type tests \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Chr function data type tests \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Float -> integer implicit conversion \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Illegal operation with nil \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Illegal operation with nil \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Illegal operation with nil \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Illegal operation with nil \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Concatenation \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Illegal operation in concatenation \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Illegal operation in concatenation \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Illegal operation in concatenation \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Illegal operation in concatenation \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Float -> integer implicit conversion with IDs\c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Illegal operation with nil in IDs \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Illegal operation with nil in IDs \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Illegal operation with nil in IDs \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Illegal operation with nil in IDs \c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Concatenation with IDs\c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Illegal operation in concatenation with IDs\c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Illegal operation in concatenation with IDs\c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Illegal operation in concatenation with IDs\c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
+i=$((i+1))
+echo -e "TEST$i: Illegal operation in concatenation with IDs\c"
+valgrind --log-file="output" ./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+if grep -q -e "ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)" output ; then
+    echo -e "## Error ${GREEN}[OK]${NOCOLOR} \c"
+else
+    errors=$((errors+1))
+    echo -e "## Error ${RED}[FAILED]${NOCOLOR} \c"
+fi
+if grep -q -e "All heap blocks were freed -- no leaks are possible" output ; then
+    echo -e "Leak ${GREEN}[OK]${NOCOLOR}"
+else
+    leaks=$((leaks+1))
+    echo -e "Leak ${RED}[FAILED]${NOCOLOR}"
+fi
+rm output
+
 if [ "$errors" == 0 ]; then
     echo -e "\nAll error tests were ${GREEN}[OK]${NOCOLOR}.\n"
 else

@@ -1367,8 +1367,10 @@ sleep 0.005
 i=$((i+1))
 i=$((i+1))
 echo -e "TEST$i: Calling function that calls undefined function, after the definition \c"
-./ifj2018 <tests/tests_compiler/test$i &>/dev/null 
-if [ $? -eq 0 ]; then
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 0 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
     success=$((success+1))
@@ -1378,8 +1380,609 @@ sleep 0.005
 
 i=$((i+1))
 echo -e "TEST$i: Function has variable with name already used as variable in main \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 0 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Calling input function with wrong number of parameters \c"
 ./ifj2018 <tests/tests_compiler/test$i &>/dev/null 
-if [ $? -eq 0 ]; then
+if [ $? -eq 5 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Calling length function with wrong number of parameters \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null 
+if [ $? -eq 5 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Calling chr function with wrong number of parameters \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null 
+if [ $? -eq 5 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Calling ord function with wrong number of parameters \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null 
+if [ $? -eq 5 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Calling substr function with wrong number of parameters \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null 
+if [ $? -eq 5 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Calling print function with wrong number of parameters \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null 
+if [ $? -eq 5 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Length function data type tests \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Length function data type tests \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Length function data type tests \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Substr function data type tests \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Substr function data type tests \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Substr function data type tests \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Substr function data type tests \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Substr function data type tests \c" 
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 0 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Substr function data type tests \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Substr function data type tests \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 0 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Substr function data type tests \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Substr function data type tests \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Ord function data type tests \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Ord function data type tests \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Ord function data type tests \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Ord function data type tests \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 0 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Ord function data type tests \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Ord function data type tests \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Chr function data type tests \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 0 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Chr function data type tests \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Chr function data type tests \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Float -> integer implicit conversion \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 0 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Illegal operation with nil \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Illegal operation with nil \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Illegal operation with nil \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Illegal operation with nil \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Concatenation \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 0 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Illegal operation in concatenation \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Illegal operation in concatenation \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Illegal operation in concatenation \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Illegal operation in concatenation \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Float -> integer implicit conversion with IDs\c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 0 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Illegal operation with nil in IDs \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Illegal operation with nil in IDs \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Illegal operation with nil in IDs \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Illegal operation with nil in IDs \c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Concatenation with IDs\c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 0 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Illegal operation in concatenation with IDs\c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Illegal operation in concatenation with IDs\c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Illegal operation in concatenation with IDs\c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
+    echo -e "${GREEN}[OK]${NOCOLOR}"
+else
+    success=$((success+1))
+    echo -e "${RED}[FAILED]${NOCOLOR}"
+fi
+sleep 0.005
+
+i=$((i+1))
+echo -e "TEST$i: Illegal operation in concatenation with IDs\c"
+./ifj2018 <tests/tests_compiler/test$i &>/dev/null
+returnval="$?"
+./ifj2018 <tests/tests_compiler/test$i >test & ./ic18int test &>/dev/null
+if [ $? -eq 4 -a $returnval -eq 0 ]; then
     echo -e "${GREEN}[OK]${NOCOLOR}"
 else
     success=$((success+1))
@@ -1391,9 +1994,7 @@ if [ "$success" == 0 ]; then
     echo -e "\nAll tests were ${GREEN}[OK]${NOCOLOR}.\n"
 else
     echo -e "\n Sorry, but" $success "tests ${RED}[FAILED]${NOCOLOR}.\n"
-    if [ -e ic18int ]; then
-        echo -e "\n"
-    else
+    if [ ! -e ic18int ]; then
         echo -e "Warning ic18int interpreter was not found inside folder main folder, some tests will definetly end up as ${RED}[FAILED]${NOCOLOR}.\n"
     fi
 fi
