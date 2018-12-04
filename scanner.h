@@ -1,5 +1,3 @@
-#ifndef _SCAN_H
-#define _SCAN_H
 /************************************************************************
  * 
  * Compiler implementation for imperative programming language IFJ18
@@ -11,22 +9,25 @@
  * Dižová Natália - xdizov00 
  * 
  ***********************************************************************/
-// LEXICAL ANALYSER
+
+#ifndef _SCAN_H
+#define _SCAN_H
 
 #include "str.h"
 #include <stdio.h>
-/* init state = 0
- * state after white space/comment = 1
- */
-enum comment { 	LC = 10,	// line comment
-		BC,		// block comment
+
+enum comment { 	
+		LC = 10,	// line comment
+		BC,			// block comment
 		END_C,		// end of block comment	
 		TMP_C,		// temporary state for BC
 		COMM		// line comment after END_C
 };
-enum number { 	ZERO = 100,	// FS: zero
-		IL,		// FS: integer literal
-		FL,		// FS: floating literal
+
+enum number { 	
+		ZERO = 100,	// FS: zero
+		IL,			// FS: integer literal
+		FL,			// FS: floating literal
 		TMP_FL,		// temporary state for FL
 		TMP_F_EX,	// temporary state for FL with exponent
 		TMP_I_EX,	// temporary state for IL with exponent
@@ -35,10 +36,13 @@ enum number { 	ZERO = 100,	// FS: zero
 		FL_EX,		// FS: floating literal with exponent
 		IL_EX		// FS: integer literal with exponent
 };
-enum ident { 	ID_STATE = 1000,// FS: identifier
-		ID_F 		// FS: identifier of function
+
+enum ident { 	
+		ID_STATE = 1000,	// FS: identifier
 };
-enum string { 	SL = 10000,	// FS: string literal
+
+enum string { 	
+		SL = 10000,	// FS: string literal
 		TMP_SL,		// temporary state for SL
 		ES,			// escape sequence
 		X_ES,		// hexadecimal escape sequence \xh
@@ -46,10 +50,13 @@ enum string { 	SL = 10000,	// FS: string literal
 };
 
 
-// TOKEN STRUCTURE
-typedef struct token{
-	int type;
-	union {
+/**
+ * Structure which represents token
+ */
+typedef struct token
+{
+	int type; // Type of token from defines below
+	union { // Union containing token data, depending on the type of token
 		int i;
 		double f;
 		string str;
@@ -96,7 +103,6 @@ typedef struct token{
 #define CLOSE_PARENTH 41 // ')'
 #define COMMA         42 // ','
 
-// Function headers
 void set_source_file(FILE *f);
 struct token get_token();
 #endif // _SCAN_H

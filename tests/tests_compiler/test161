@@ -1,0 +1,4 @@
+test1 = nil
+test2 = 1
+
+ahoj = test1 + test2

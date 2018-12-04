@@ -373,7 +373,13 @@ int main()
 	open_file("tests/tests_scanner/test27");
 	puts("TEST27 -- ERROR: Wrong function identifier");
 	LEX = get_token();
-	assert(LEX.type == L_ERR && LEX.attr.i == 1);
+	assert(LEX.type == IDF && str_cmp_const_str(&LEX.attr.str, "ahoj?") == 0);
+	str_free(&LEX.attr.str);
+	LEX = get_token();
+	assert(LEX.type == ID && str_cmp_const_str(&LEX.attr.str, "a") == 0);
+	str_free(&LEX.attr.str);
+	LEX = get_token();
+	assert(LEX.type == END_OF_FILE && LEX.attr.i == 1);
 	fclose(f);
 
 	open_file("tests/tests_scanner/test28");
