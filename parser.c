@@ -890,7 +890,8 @@ void end_of_file()
         insert_instr(pData.instrs, NOP);
         insert_param(pData.instrs, noretval);
         // Give the final instruction list to the code generator
-        ilist = pData.instrs;
+        init_cgData();
+        cgData.ilist = pData.instrs;
         endoffile = true;
     }
 }

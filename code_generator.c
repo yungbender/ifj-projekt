@@ -16,19 +16,18 @@
 #include "error.h"
 
 /**
- * Counter for making unique labels.
+ * Function initalizes instruction list working structure data.
  */
-int uniqueCounter = 0;
-bool inExpression = false;
-
-/** @name These bools, signifies, if builtin functions needs to be generated, so they cannot generate two times, or will not generate at all if thy were not called
-*/
-//@{
-bool lengthRequest = false;
-bool substrRequest = false;
-bool ordRequest = false;
-bool chrRequest = false;
-//@}
+void init_cgData()
+{
+    cgData.ilist = NULL;
+    cgData.chrRequest = false;
+    cgData.inExpression = false;
+    cgData.lengthRequest = false;
+    cgData.ordRequest = false;
+    cgData.substrRequest = false;
+    cgData.uniqueCounter = 0;
+}
 
 /**
  * Function initializes instruction list for first use.
@@ -260,39 +259,39 @@ void generate_adds(FILE *f, tInstr *instruction)
     fprintf(f, "POPS TF@op2\n");
     fprintf(f, "TYPE TF@op1$type TF@op1\n");
     fprintf(f, "TYPE TF@op2$type TF@op2\n");
-    fprintf(f, "JUMPIFNEQ $add_nil$op1$%d TF@op1$type string@nil\n", uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $add_nil$op1$%d TF@op1$type string@nil\n", cgData.uniqueCounter);
     fprintf(f, "EXIT int@4\n");
-    fprintf(f, "LABEL $add_nil$op1$%d\n", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $add_nil$op2$%d TF@op2$type string@nil\n", uniqueCounter);
+    fprintf(f, "LABEL $add_nil$op1$%d\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $add_nil$op2$%d TF@op2$type string@nil\n", cgData.uniqueCounter);
     fprintf(f, "EXIT int@4\n");
-    fprintf(f, "LABEL $add_nil$op2$%d\n", uniqueCounter);
-    fprintf(f, "JUMPIFEQ $add_ok%d TF@op1$type TF@op2$type\n", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $checktype1%d TF@op1$type string@string\n", uniqueCounter);
+    fprintf(f, "LABEL $add_nil$op2$%d\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFEQ $add_ok%d TF@op1$type TF@op2$type\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $checktype1%d TF@op1$type string@string\n", cgData.uniqueCounter);
     fprintf(f, "EXIT int@4\n");
-    fprintf(f, "LABEL $checktype1%d\n", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $checktype2%d TF@op2$type string@string\n", uniqueCounter);
+    fprintf(f, "LABEL $checktype1%d\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $checktype2%d TF@op2$type string@string\n", cgData.uniqueCounter);
     fprintf(f, "EXIT int@4\n");
-    fprintf(f, "LABEL $checktype2%d\n", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $add-retype1%d TF@op1$type string@int\n", uniqueCounter);
+    fprintf(f, "LABEL $checktype2%d\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $add-retype1%d TF@op1$type string@int\n", cgData.uniqueCounter);
     fprintf(f, "INT2FLOAT TF@op1 TF@op1\n");
-    fprintf(f, "LABEL $add-retype1%d\n", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $add_ok%d TF@op2$type string@int\n", uniqueCounter);
+    fprintf(f, "LABEL $add-retype1%d\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $add_ok%d TF@op2$type string@int\n", cgData.uniqueCounter);
     fprintf(f, "INT2FLOAT TF@op2 TF@op2\n");
-    fprintf(f, "LABEL $add_ok%d\n", uniqueCounter);
-    fprintf(f, "JUMPIFEQ $concat%d TF@op1$type string@string\n", uniqueCounter);
+    fprintf(f, "LABEL $add_ok%d\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFEQ $concat%d TF@op1$type string@string\n", cgData.uniqueCounter);
 
     fprintf(f, "PUSHS TF@op2\n");
     fprintf(f, "PUSHS TF@op1\n");
     fprintf(f, "ADDS\n");
-    fprintf(f, "JUMP $add_end%d\n", uniqueCounter);
+    fprintf(f, "JUMP $add_end%d\n", cgData.uniqueCounter);
 
-    fprintf(f, "LABEL $concat%d\n", uniqueCounter);
+    fprintf(f, "LABEL $concat%d\n", cgData.uniqueCounter);
     fprintf(f, "CONCAT TF@op2 TF@op2 TF@op1\n");
     fprintf(f, "PUSHS TF@op2\n");
-    fprintf(f, "LABEL $add_end%d\n", uniqueCounter);
+    fprintf(f, "LABEL $add_end%d\n", cgData.uniqueCounter);
 
     instruction->instr = NOP;
-    uniqueCounter++;
+    cgData.uniqueCounter++;
     
 }
 
@@ -307,31 +306,31 @@ void generate_subs(FILE *f, tInstr *instruction)
     fprintf(f, "POPS TF@op2\n");
     fprintf(f, "TYPE TF@op1$type TF@op1\n");
     fprintf(f, "TYPE TF@op2$type TF@op2\n");
-    fprintf(f, "JUMPIFNEQ $sub_nil$op1$%d TF@op1$type string@nil\n", uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $sub_nil$op1$%d TF@op1$type string@nil\n", cgData.uniqueCounter);
     fprintf(f, "EXIT int@4\n");
-    fprintf(f, "LABEL $sub_nil$op1$%d\n", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $sub_nil$op2$%d TF@op2$type string@nil\n", uniqueCounter);
+    fprintf(f, "LABEL $sub_nil$op1$%d\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $sub_nil$op2$%d TF@op2$type string@nil\n", cgData.uniqueCounter);
     fprintf(f, "EXIT int@4\n");
-    fprintf(f, "LABEL $sub_nil$op2$%d\n", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $checktype1%d TF@op1$type string@string\n", uniqueCounter);
+    fprintf(f, "LABEL $sub_nil$op2$%d\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $checktype1%d TF@op1$type string@string\n", cgData.uniqueCounter);
     fprintf(f, "EXIT int@4\n");
-    fprintf(f, "LABEL $checktype1%d\n", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $checktype2%d TF@op2$type string@string\n", uniqueCounter);
+    fprintf(f, "LABEL $checktype1%d\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $checktype2%d TF@op2$type string@string\n", cgData.uniqueCounter);
     fprintf(f, "EXIT int@4\n");
-    fprintf(f, "LABEL $checktype2%d\n", uniqueCounter);
-    fprintf(f, "JUMPIFEQ $sub_ok%d TF@op1$type TF@op2$type\n", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $sub-retype1%d TF@op1$type string@int\n", uniqueCounter);
+    fprintf(f, "LABEL $checktype2%d\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFEQ $sub_ok%d TF@op1$type TF@op2$type\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $sub-retype1%d TF@op1$type string@int\n", cgData.uniqueCounter);
     fprintf(f, "INT2FLOAT TF@op1 TF@op1\n");
-    fprintf(f, "LABEL $sub-retype1%d\n", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $sub_ok%d TF@op2$type string@int\n", uniqueCounter);
+    fprintf(f, "LABEL $sub-retype1%d\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $sub_ok%d TF@op2$type string@int\n", cgData.uniqueCounter);
     fprintf(f, "INT2FLOAT TF@op2 TF@op2\n");
-    fprintf(f, "LABEL $sub_ok%d\n", uniqueCounter);
+    fprintf(f, "LABEL $sub_ok%d\n", cgData.uniqueCounter);
     fprintf(f, "PUSHS TF@op2\n");
     fprintf(f, "PUSHS TF@op1\n");
     fprintf(f, "SUBS\n");
 
     instruction->instr = NOP;
-    uniqueCounter++;
+    cgData.uniqueCounter++;
 }
 
 /**
@@ -345,31 +344,31 @@ void generate_muls(FILE *f, tInstr *instruction)
     fprintf(f, "POPS TF@op2\n");
     fprintf(f, "TYPE TF@op1$type TF@op1\n");
     fprintf(f, "TYPE TF@op2$type TF@op2\n");
-    fprintf(f, "JUMPIFNEQ $mul_nil$op1$%d TF@op1$type string@nil\n", uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $mul_nil$op1$%d TF@op1$type string@nil\n", cgData.uniqueCounter);
     fprintf(f, "EXIT int@4\n");
-    fprintf(f, "LABEL $mul_nil$op1$%d\n", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $mul_nil$op2$%d TF@op2$type string@nil\n", uniqueCounter);
+    fprintf(f, "LABEL $mul_nil$op1$%d\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $mul_nil$op2$%d TF@op2$type string@nil\n", cgData.uniqueCounter);
     fprintf(f, "EXIT int@4\n");
-    fprintf(f, "LABEL $mul_nil$op2$%d\n", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $checktype1%d TF@op1$type string@string\n", uniqueCounter);
+    fprintf(f, "LABEL $mul_nil$op2$%d\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $checktype1%d TF@op1$type string@string\n", cgData.uniqueCounter);
     fprintf(f, "EXIT int@4\n");
-    fprintf(f, "LABEL $checktype1%d\n", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $checktype2%d TF@op2$type string@string\n", uniqueCounter);
+    fprintf(f, "LABEL $checktype1%d\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $checktype2%d TF@op2$type string@string\n", cgData.uniqueCounter);
     fprintf(f, "EXIT int@4\n");
-    fprintf(f, "LABEL $checktype2%d\n", uniqueCounter);
-    fprintf(f, "JUMPIFEQ $mul_ok%d TF@op1$type TF@op2$type\n", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $mul-retype1%d TF@op1$type string@int\n", uniqueCounter);
+    fprintf(f, "LABEL $checktype2%d\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFEQ $mul_ok%d TF@op1$type TF@op2$type\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $mul-retype1%d TF@op1$type string@int\n", cgData.uniqueCounter);
     fprintf(f, "INT2FLOAT TF@op1 TF@op1\n");
-    fprintf(f, "LABEL $mul-retype1%d\n", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $mul_ok%d TF@op2$type string@int\n", uniqueCounter);
+    fprintf(f, "LABEL $mul-retype1%d\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $mul_ok%d TF@op2$type string@int\n", cgData.uniqueCounter);
     fprintf(f, "INT2FLOAT TF@op2 TF@op2\n");
-    fprintf(f, "LABEL $mul_ok%d\n", uniqueCounter);
+    fprintf(f, "LABEL $mul_ok%d\n", cgData.uniqueCounter);
     fprintf(f, "PUSHS TF@op2\n");
     fprintf(f, "PUSHS TF@op1\n");
     fprintf(f, "MULS\n");
 
     instruction->instr = NOP;
-    uniqueCounter++;
+    cgData.uniqueCounter++;
 }
 
 /**
@@ -383,47 +382,47 @@ void generate_divs(FILE *f, tInstr *instruction)
     fprintf(f, "POPS TF@op1\n\n");
     fprintf(f, "TYPE TF@op1$type TF@op1\n");
     fprintf(f, "TYPE TF@op2$type TF@op2\n\n");
-    fprintf(f, "JUMPIFNEQ $div_nil$op1$%d TF@op1$type string@nil\n", uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $div_nil$op1$%d TF@op1$type string@nil\n", cgData.uniqueCounter);
     fprintf(f, "EXIT int@4\n");
-    fprintf(f, "LABEL $div_nil$op1$%d\n", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $div_nil$op2$%d TF@op2$type string@nil\n", uniqueCounter);
+    fprintf(f, "LABEL $div_nil$op1$%d\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $div_nil$op2$%d TF@op2$type string@nil\n", cgData.uniqueCounter);
     fprintf(f, "EXIT int@4\n");
-    fprintf(f, "LABEL $div_nil$op2$%d\n", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $div$op1$ok$%d TF@op1$type string@string\n", uniqueCounter);
+    fprintf(f, "LABEL $div_nil$op2$%d\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $div$op1$ok$%d TF@op1$type string@string\n", cgData.uniqueCounter);
     fprintf(f, "EXIT int@4\n\n");
-    fprintf(f, "LABEL $div$op1$ok$%d\n", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $div$ok$type$%d TF@op2$type string@string\n", uniqueCounter);
+    fprintf(f, "LABEL $div$op1$ok$%d\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $div$ok$type$%d TF@op2$type string@string\n", cgData.uniqueCounter);
     fprintf(f, "EXIT int@4\n\n");
-    fprintf(f, "LABEL $div$ok$type$%d\n", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $div$retype$%d TF@op1$type TF@op2$type\n\n", uniqueCounter);
-    fprintf(f, "LABEL $div$ok$%d\n", uniqueCounter);
+    fprintf(f, "LABEL $div$ok$type$%d\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $div$retype$%d TF@op1$type TF@op2$type\n\n", cgData.uniqueCounter);
+    fprintf(f, "LABEL $div$ok$%d\n", cgData.uniqueCounter);
     fprintf(f, "TYPE TF@op1$type TF@op1\n");
-    fprintf(f, "JUMPIFEQ $idivs$%d TF@op1$type string@float\n\n", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $noti$op20$%d TF@op2 int@0\n", uniqueCounter);
+    fprintf(f, "JUMPIFEQ $idivs$%d TF@op1$type string@float\n\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $noti$op20$%d TF@op2 int@0\n", cgData.uniqueCounter);
     fprintf(f, "EXIT int@9\n\n");
-    fprintf(f, "LABEL $noti$op20$%d\n", uniqueCounter);
+    fprintf(f, "LABEL $noti$op20$%d\n", cgData.uniqueCounter);
     fprintf(f, "PUSHS TF@op1\n");
     fprintf(f, "PUSHS TF@op2\n");
     fprintf(f, "IDIVS\n");
-    fprintf(f, "JUMP $end$div$%d\n\n", uniqueCounter);
-    fprintf(f, "LABEL $idivs$%d\n", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $notf$op20$%d TF@op2 float@0x0p+0\n", uniqueCounter);
+    fprintf(f, "JUMP $end$div$%d\n\n", cgData.uniqueCounter);
+    fprintf(f, "LABEL $idivs$%d\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $notf$op20$%d TF@op2 float@0x0p+0\n", cgData.uniqueCounter);
     fprintf(f, "EXIT int@9\n\n");
-    fprintf(f, "LABEL $notf$op20$%d\n", uniqueCounter);
+    fprintf(f, "LABEL $notf$op20$%d\n", cgData.uniqueCounter);
     fprintf(f, "PUSHS TF@op1\n");
     fprintf(f, "PUSHS TF@op2\n");
     fprintf(f, "DIVS\n");
-    fprintf(f, "JUMP $end$div$%d\n", uniqueCounter);
-    fprintf(f, "LABEL $div$retype$%d\n", uniqueCounter);
-    fprintf(f, "JUMPIFEQ $div$retype1$%d TF@op1$type string@int\n", uniqueCounter);
+    fprintf(f, "JUMP $end$div$%d\n", cgData.uniqueCounter);
+    fprintf(f, "LABEL $div$retype$%d\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFEQ $div$retype1$%d TF@op1$type string@int\n", cgData.uniqueCounter);
     fprintf(f, "INT2FLOAT TF@op2 TF@op2\n");
-    fprintf(f, "JUMP $div$ok$%d\n\n", uniqueCounter);
-    fprintf(f, "LABEL $div$retype1$%d\n", uniqueCounter);
+    fprintf(f, "JUMP $div$ok$%d\n\n", cgData.uniqueCounter);
+    fprintf(f, "LABEL $div$retype1$%d\n", cgData.uniqueCounter);
     fprintf(f, "INT2FLOAT TF@op1 TF@op1\n");
-    fprintf(f, "JUMP $div$ok$%d\n\n", uniqueCounter);
-    fprintf(f, "LABEL $end$div$%d\n", uniqueCounter);
+    fprintf(f, "JUMP $div$ok$%d\n\n", cgData.uniqueCounter);
+    fprintf(f, "LABEL $end$div$%d\n", cgData.uniqueCounter);
 
-    uniqueCounter++;
+    cgData.uniqueCounter++;
     instruction->instr = NOP;
 }
 
@@ -440,36 +439,36 @@ void generate_lts(FILE *f, tInstr *instruction)
     fprintf(f, "POPS TF@op1\n\n");
     fprintf(f, "TYPE TF@op1$type TF@op1\n");
     fprintf(f, "TYPE TF@op2$type TF@op2\n\n");
-    fprintf(f, "JUMPIFNEQ $lt_nil$op1$%d TF@op1$type string@nil\n", uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $lt_nil$op1$%d TF@op1$type string@nil\n", cgData.uniqueCounter);
     fprintf(f, "EXIT int@4\n");
-    fprintf(f, "LABEL $lt_nil$op1$%d\n", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $lt_nil$op2$%d TF@op2$type string@nil\n", uniqueCounter);
+    fprintf(f, "LABEL $lt_nil$op1$%d\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $lt_nil$op2$%d TF@op2$type string@nil\n", cgData.uniqueCounter);
     fprintf(f, "EXIT int@4\n");
-    fprintf(f, "LABEL $lt_nil$op2$%d\n", uniqueCounter);
-    fprintf(f, "JUMPIFEQ $lt$string$%d TF@op1$type string@string\n", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $lt$retype$%d TF@op1$type TF@op2$type\n\n", uniqueCounter);
-    fprintf(f, "JUMPIFEQ $lt$ok$%d TF@op1$type TF@op2$type\n", uniqueCounter);
-    fprintf(f, "LABEL $lt$string$%d\n", uniqueCounter);
-    fprintf(f, "JUMPIFEQ $lt$ok$%d TF@op2$type string@string\n", uniqueCounter);
+    fprintf(f, "LABEL $lt_nil$op2$%d\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFEQ $lt$string$%d TF@op1$type string@string\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $lt$retype$%d TF@op1$type TF@op2$type\n\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFEQ $lt$ok$%d TF@op1$type TF@op2$type\n", cgData.uniqueCounter);
+    fprintf(f, "LABEL $lt$string$%d\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFEQ $lt$ok$%d TF@op2$type string@string\n", cgData.uniqueCounter);
     fprintf(f, "EXIT int@4\n\n");
-    fprintf(f, "LABEL $lt$ok$%d\n", uniqueCounter);
+    fprintf(f, "LABEL $lt$ok$%d\n", cgData.uniqueCounter);
     fprintf(f, "PUSHS TF@op1\n");
     fprintf(f, "PUSHS TF@op2\n");
     fprintf(f, "LTS\n");
-    fprintf(f, "JUMP $end$lt$%d\n\n", uniqueCounter);
-    fprintf(f, "LABEL $lt$retype$%d\n", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $lt$notstring$%d TF@op2$type string@string\n", uniqueCounter);
+    fprintf(f, "JUMP $end$lt$%d\n\n", cgData.uniqueCounter);
+    fprintf(f, "LABEL $lt$retype$%d\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $lt$notstring$%d TF@op2$type string@string\n", cgData.uniqueCounter);
     fprintf(f, "EXIT int@4\n\n");
-    fprintf(f, "LABEL $lt$notstring$%d\n", uniqueCounter);
-    fprintf(f, "JUMPIFEQ $lt$retype1$%d TF@op1$type string@int\n", uniqueCounter);
+    fprintf(f, "LABEL $lt$notstring$%d\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFEQ $lt$retype1$%d TF@op1$type string@int\n", cgData.uniqueCounter);
     fprintf(f, "INT2FLOAT TF@op2 TF@op2\n");
-    fprintf(f, "JUMP $lt$ok$%d\n", uniqueCounter);
-    fprintf(f, "LABEL $lt$retype1$%d\n", uniqueCounter);
+    fprintf(f, "JUMP $lt$ok$%d\n", cgData.uniqueCounter);
+    fprintf(f, "LABEL $lt$retype1$%d\n", cgData.uniqueCounter);
     fprintf(f, "INT2FLOAT TF@op1 TF@op1\n");
-    fprintf(f, "JUMP $lt$ok$%d\n\n", uniqueCounter);
-    fprintf(f, "LABEL $end$lt$%d\n", uniqueCounter);
+    fprintf(f, "JUMP $lt$ok$%d\n\n", cgData.uniqueCounter);
+    fprintf(f, "LABEL $end$lt$%d\n", cgData.uniqueCounter);
 
-    uniqueCounter++;
+    cgData.uniqueCounter++;
     instruction->instr = NOP;
 }
 
@@ -479,36 +478,36 @@ void generate_gts(FILE *f, tInstr *instruction)
     fprintf(f, "POPS TF@op1\n\n");
     fprintf(f, "TYPE TF@op1$type TF@op1\n");
     fprintf(f, "TYPE TF@op2$type TF@op2\n\n");
-    fprintf(f, "JUMPIFNEQ $gt_nil$op1$%d TF@op1$type string@nil\n", uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $gt_nil$op1$%d TF@op1$type string@nil\n", cgData.uniqueCounter);
     fprintf(f, "EXIT int@4\n");
-    fprintf(f, "LABEL $gt_nil$op1$%d\n", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $gt_nil$op2$%d TF@op2$type string@nil\n", uniqueCounter);
+    fprintf(f, "LABEL $gt_nil$op1$%d\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $gt_nil$op2$%d TF@op2$type string@nil\n", cgData.uniqueCounter);
     fprintf(f, "EXIT int@4\n");
-    fprintf(f, "LABEL $gt_nil$op2$%d\n", uniqueCounter);
-    fprintf(f, "JUMPIFEQ $gt$string$%d TF@op1$type string@string\n", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $gt$retype$%d TF@op1$type TF@op2$type\n\n", uniqueCounter);
-    fprintf(f, "JUMPIFEQ $gt$ok$%d TF@op1$type TF@op2$type\n", uniqueCounter);
-    fprintf(f, "LABEL $gt$string$%d\n", uniqueCounter);
-    fprintf(f, "JUMPIFEQ $gt$ok$%d TF@op2$type string@string\n", uniqueCounter);
+    fprintf(f, "LABEL $gt_nil$op2$%d\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFEQ $gt$string$%d TF@op1$type string@string\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $gt$retype$%d TF@op1$type TF@op2$type\n\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFEQ $gt$ok$%d TF@op1$type TF@op2$type\n", cgData.uniqueCounter);
+    fprintf(f, "LABEL $gt$string$%d\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFEQ $gt$ok$%d TF@op2$type string@string\n", cgData.uniqueCounter);
     fprintf(f, "EXIT int@4\n\n");
-    fprintf(f, "LABEL $gt$ok$%d\n", uniqueCounter);
+    fprintf(f, "LABEL $gt$ok$%d\n", cgData.uniqueCounter);
     fprintf(f, "PUSHS TF@op1\n");
     fprintf(f, "PUSHS TF@op2\n");
     fprintf(f, "GTS\n");
-    fprintf(f, "JUMP $end$gt$%d\n\n", uniqueCounter);
-    fprintf(f, "LABEL $gt$retype$%d\n", uniqueCounter);
-    fprintf(f, "JUMPIFNEQ $gt$notstring$%d TF@op2$type string@string\n", uniqueCounter);
+    fprintf(f, "JUMP $end$gt$%d\n\n", cgData.uniqueCounter);
+    fprintf(f, "LABEL $gt$retype$%d\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFNEQ $gt$notstring$%d TF@op2$type string@string\n", cgData.uniqueCounter);
     fprintf(f, "EXIT int@4\n\n");
-    fprintf(f, "LABEL $gt$notstring$%d\n", uniqueCounter);
-    fprintf(f, "JUMPIFEQ $gt$retype1$%d TF@op1$type string@int\n", uniqueCounter);
+    fprintf(f, "LABEL $gt$notstring$%d\n", cgData.uniqueCounter);
+    fprintf(f, "JUMPIFEQ $gt$retype1$%d TF@op1$type string@int\n", cgData.uniqueCounter);
     fprintf(f, "INT2FLOAT TF@op2 TF@op2\n");
-    fprintf(f, "JUMP $gt$ok$%d\n", uniqueCounter);
-    fprintf(f, "LABEL $gt$retype1$%d\n", uniqueCounter);
+    fprintf(f, "JUMP $gt$ok$%d\n", cgData.uniqueCounter);
+    fprintf(f, "LABEL $gt$retype1$%d\n", cgData.uniqueCounter);
     fprintf(f, "INT2FLOAT TF@op1 TF@op1\n");
-    fprintf(f, "JUMP $gt$ok$%d\n\n", uniqueCounter);
-    fprintf(f, "LABEL $end$gt$%d\n", uniqueCounter);
+    fprintf(f, "JUMP $gt$ok$%d\n\n", cgData.uniqueCounter);
+    fprintf(f, "LABEL $end$gt$%d\n", cgData.uniqueCounter);
 
-    uniqueCounter++;
+    cgData.uniqueCounter++;
     instruction->instr = NOP;
 }
 
@@ -518,16 +517,16 @@ void generate_eqs(FILE *f, tInstr *instruction)
     fprintf(f, "POPS TF@op1\n\n");
     fprintf(f, "TYPE TF@op1$type TF@op1\n");
     fprintf(f, "TYPE TF@op2$type TF@op2\n\n");
-    fprintf(f, "JUMPIFEQ $eq$ok$%d TF@op1$type TF@op2$type\n", uniqueCounter);
+    fprintf(f, "JUMPIFEQ $eq$ok$%d TF@op1$type TF@op2$type\n", cgData.uniqueCounter);
     fprintf(f, "PUSHS bool@false\n\n");
-    fprintf(f, "JUMP $end$eq$%d\n", uniqueCounter);
-    fprintf(f, "LABEL $eq$ok$%d\n", uniqueCounter);
+    fprintf(f, "JUMP $end$eq$%d\n", cgData.uniqueCounter);
+    fprintf(f, "LABEL $eq$ok$%d\n", cgData.uniqueCounter);
     fprintf(f, "PUSHS TF@op1\n");
     fprintf(f, "PUSHS TF@op2\n");
     fprintf(f, "EQS\n");
-    fprintf(f, "LABEL $end$eq$%d\n", uniqueCounter);
+    fprintf(f, "LABEL $end$eq$%d\n", cgData.uniqueCounter);
 
-    uniqueCounter++;
+    cgData.uniqueCounter++;
     instruction->instr = NOP;
 }
 
@@ -558,7 +557,7 @@ void generate_expression(FILE *f, tInstr *instruction)
 
 void generate_concatenation(FILE *f, tInstr *instruction)
 {
-    int defvarnum = uniqueCounter;
+    int defvarnum = cgData.uniqueCounter;
     tToken where = instruction->params->param;
     fprintf(f, "DEFVAR TF@$tmpconcat$type$%d\n", defvarnum);
     fprintf(f, "DEFVAR TF@$tmpconcat$%d\n", defvarnum);
@@ -576,13 +575,13 @@ void generate_concatenation(FILE *f, tInstr *instruction)
             else if(instruction->params->param.type == ID)
             {
                 fprintf(f, "TYPE TF@$tmpconcat$type$%d TF@%s\n", defvarnum, instruction->params->param.attr.str.str);
-                fprintf(f, "JUMPIFEQ $concat$%d TF@$tmpconcat$type$%d string@string\n", uniqueCounter, defvarnum);
+                fprintf(f, "JUMPIFEQ $concat$%d TF@$tmpconcat$type$%d string@string\n", cgData.uniqueCounter, defvarnum);
                 fprintf(f, "EXIT int@4\n");
-                fprintf(f, "LABEL $concat$%d\n", uniqueCounter);
+                fprintf(f, "LABEL $concat$%d\n", cgData.uniqueCounter);
                 fprintf(f, "CONCAT TF@$tmpconcat$%d TF@$tmpconcat$%d TF@%s\n\n", defvarnum, defvarnum, instruction->params->param.attr.str.str);
             }
         }
-        uniqueCounter++;
+        cgData.uniqueCounter++;
         if(instruction->next->instr == CONCAT_END)
         {
             break;
@@ -631,12 +630,12 @@ void generate_pops(FILE *f, tInstr *instruction)
     if(instruction->params->param.type == ID)
     {
         fprintf(f, "POPS TF@%s\n", instruction->params->param.attr.str.str);
-        fprintf(f, "DEFVAR TF@$pops$type$%d\n", uniqueCounter);
-        fprintf(f, "TYPE TF@$pops$type$%d TF@%s\n", uniqueCounter, instruction->params->param.attr.str.str);
-        fprintf(f, "JUMPIFNEQ $pops$notBOOL$%d TF@$pops$type$%d string@bool\n", uniqueCounter, uniqueCounter);
+        fprintf(f, "DEFVAR TF@$pops$type$%d\n", cgData.uniqueCounter);
+        fprintf(f, "TYPE TF@$pops$type$%d TF@%s\n", cgData.uniqueCounter, instruction->params->param.attr.str.str);
+        fprintf(f, "JUMPIFNEQ $pops$notBOOL$%d TF@$pops$type$%d string@bool\n", cgData.uniqueCounter, cgData.uniqueCounter);
         fprintf(f, "EXIT int@4\n");
-        fprintf(f, "LABEL $pops$notBOOL$%d\n", uniqueCounter);
-        uniqueCounter++;
+        fprintf(f, "LABEL $pops$notBOOL$%d\n", cgData.uniqueCounter);
+        cgData.uniqueCounter++;
     }
 }
 
@@ -671,7 +670,7 @@ int generate_if(FILE *f, tInstr *instruction, bool scoped, int uniqueIf)
 
         instruction->instr = NOP;
         instruction = instruction->next;
-        uniqueCounter++;
+        cgData.uniqueCounter++;
 
         // If IF founds another scoped while or if, it must be generated first, but with increased unique number because the first "boss" while generated compiler variables for them already
         while(instruction->instr != ELSE_CALL)
@@ -694,7 +693,7 @@ int generate_if(FILE *f, tInstr *instruction, bool scoped, int uniqueIf)
 
         fprintf(f, "JUMP $else_end%d\n", ownIf);
         fprintf(f, "LABEL $else%d\n", ownIf);
-        uniqueCounter++;
+        cgData.uniqueCounter++;
         instruction->instr = NOP;
         instruction = instruction->next;
 
@@ -703,12 +702,12 @@ int generate_if(FILE *f, tInstr *instruction, bool scoped, int uniqueIf)
             if(instruction->instr == WHILE_CALL)
             {
                 uniqueIf = generate_while(f, instruction, true, uniqueIf);
-                uniqueCounter++;
+                cgData.uniqueCounter++;
             }
             else if(instruction->instr == IF_CALL)
             {
                 uniqueIf = generate_if(f, instruction, true, uniqueIf);
-                uniqueCounter++;
+                cgData.uniqueCounter++;
             }
             else
             {
@@ -723,14 +722,14 @@ int generate_if(FILE *f, tInstr *instruction, bool scoped, int uniqueIf)
         }
 
         fprintf(f, "LABEL $else_end%d\n", ownIf);
-        uniqueCounter++;
+        cgData.uniqueCounter++;
         return uniqueIf;
     }
     else
     {
         tInstr *actualInstr = instruction;
         int scopeIf = 0;
-        int tempUniqueCounter = uniqueCounter;
+        int tempUniqueCounter = cgData.uniqueCounter;
 
         do
         {
@@ -775,7 +774,7 @@ int generate_if(FILE *f, tInstr *instruction, bool scoped, int uniqueIf)
         fprintf(f, "LABEL $if_ok%d\n", tempUniqueCounter);
 
         instruction->instr = NOP;
-        uniqueCounter++;
+        cgData.uniqueCounter++;
 
         while(instruction->next->instr != ELSE_CALL)
         {
@@ -799,7 +798,7 @@ int generate_if(FILE *f, tInstr *instruction, bool scoped, int uniqueIf)
 
         fprintf(f, "JUMP $else_end%d\n", tempUniqueCounter);
         fprintf(f, "LABEL $else%d\n", tempUniqueCounter);
-        uniqueCounter++;
+        cgData.uniqueCounter++;
         instruction->instr = NOP;
 
         while(instruction->next->instr != IF_END)
@@ -828,7 +827,7 @@ int generate_if(FILE *f, tInstr *instruction, bool scoped, int uniqueIf)
         }
 
         fprintf(f, "LABEL $else_end%d\n", tempUniqueCounter);
-        uniqueCounter++;
+        cgData.uniqueCounter++;
         return 0;
     }
 }
@@ -861,7 +860,7 @@ int generate_while(FILE *f, tInstr *instruction, bool scoped, int uniqueWhile)
 
         instruction->instr = NOP;
         instruction = instruction->next;
-        uniqueCounter++;
+        cgData.uniqueCounter++;
 
         // If WHILE founds another scoped while or if, it must be generated first, but with increased unique number because the first "boss" while generated compiler variables for them already
         while(instruction->instr != WHILE_END)
@@ -869,12 +868,12 @@ int generate_while(FILE *f, tInstr *instruction, bool scoped, int uniqueWhile)
             if(instruction->instr == IF_CALL)
             {
                 uniqueWhile = generate_if(f, instruction, true, uniqueWhile);
-                uniqueCounter++;
+                cgData.uniqueCounter++;
             }
             else if(instruction->instr == WHILE_CALL)
             {
                 uniqueWhile = generate_while(f, instruction, true, uniqueWhile);
-                uniqueCounter++;
+                cgData.uniqueCounter++;
             }
             else
             {
@@ -890,15 +889,15 @@ int generate_while(FILE *f, tInstr *instruction, bool scoped, int uniqueWhile)
 
         fprintf(f, "JUMP $while_start%d\n", ownWhile);
         fprintf(f, "LABEL $while%d\n", ownWhile);
-        uniqueCounter++;
+        cgData.uniqueCounter++;
         return uniqueWhile;
     }
     else
     {
         tInstr *actualInstr = instruction;
         int scopeWhile = 0;
-        int tempUniqueCounter = uniqueCounter;
-        int tempIfWhileUnique = uniqueCounter;
+        int tempUniqueCounter = cgData.uniqueCounter;
+        int tempIfWhileUnique = cgData.uniqueCounter;
         int temp = tempIfWhileUnique;
 
         do
@@ -914,7 +913,7 @@ int generate_while(FILE *f, tInstr *instruction, bool scoped, int uniqueWhile)
                 tempIfWhileUnique++;
                 fprintf(f, "DEFVAR TF@condition%d\n", tempIfWhileUnique);
                 fprintf(f, "DEFVAR TF@condition$type%d\n", tempIfWhileUnique);
-                uniqueCounter++;
+                cgData.uniqueCounter++;
             }
             else if(actualInstr->instr == WHILE_END)
             {
@@ -957,7 +956,7 @@ int generate_while(FILE *f, tInstr *instruction, bool scoped, int uniqueWhile)
 
         instruction->instr = NOP;
         instruction = instruction->next;
-        uniqueCounter++;
+        cgData.uniqueCounter++;
         tempIfWhileUnique = temp;
 
         // This "boss" WHILE generated compiler variables for scoped if or while already, so interpreter will not fail, if "boss" founds them, they will be generated, with their correct unique number
@@ -987,7 +986,7 @@ int generate_while(FILE *f, tInstr *instruction, bool scoped, int uniqueWhile)
 
         fprintf(f, "JUMP $while_start%d\n", tempUniqueCounter);
         fprintf(f, "LABEL $while%d\n", tempUniqueCounter);
-        uniqueCounter++;
+        cgData.uniqueCounter++;
         return 0;
     }
 
@@ -1070,19 +1069,19 @@ void generate_funcall(FILE *f, tInstr *instruction, bool builtin)
         {
             case LENGTH_CALL:
                 fprintf(f, "CALL $length\n");
-                lengthRequest = true;
+                cgData.lengthRequest = true;
                 break;
             case SUBSTR_CALL:
                 fprintf(f, "CALL $substr\n");
-                substrRequest = true;
+                cgData.substrRequest = true;
                 break;
             case ORD_CALL:
                 fprintf(f, "CALL $ord\n");
-                ordRequest = true;
+                cgData.ordRequest = true;
                 break;
             case CHR_CALL:
                 fprintf(f, "CALL $chr\n");
-                chrRequest = true;
+                cgData.chrRequest = true;
                 break;
         }
     }
@@ -1168,19 +1167,19 @@ void generate_nofuncall(FILE *f, tInstr *instruction, bool builtin)
             case NOLENGTH_CALL:
                 fprintf(f, "CALL $length\n");
                 // User called length, need to request code generator, to define it later
-                lengthRequest = true;
+                cgData.lengthRequest = true;
                 break;
             case NOSUBSTR_CALL:
                 fprintf(f, "CALL $substr\n");
-                substrRequest = true;
+                cgData.substrRequest = true;
                 break;
             case NOORD_CALL:
                 fprintf(f, "CALL $ord\n");
-                ordRequest = true;
+                cgData.ordRequest = true;
                 break;
             case NOCHR_CALL:
                 fprintf(f, "CALL $chr\n");
-                chrRequest = true;
+                cgData.chrRequest = true;
                 break;
         }
     }
@@ -1620,7 +1619,7 @@ void generate_defvar_fun(FILE *f, tInstr *instruction)
 void generate_main(FILE *f)
 {
     fprintf(f, "########## MAIN ##########\n");
-    tInstr *begin = ilist->head;
+    tInstr *begin = cgData.ilist->head;
     // DEFVARS must go first!
     // generating special variable noretval which saves return of nonreturn function, so nonreturn function can return value if was called inside return function
     fprintf(f, "DEFVAR TF@$noretval\n\n");
@@ -1708,7 +1707,7 @@ tToken choose_return(tInstr *instruction)
 void generate_fundef(FILE *f)
 {
     fprintf(f, "########## USER'S FUNCTIONS ##########\n");
-    tInstr *begin = ilist->head;
+    tInstr *begin = cgData.ilist->head;
     tTList *params = NULL;
     tToken ret;
     int paramsNum = 0;
@@ -1766,28 +1765,28 @@ void generate_builtin(FILE *f)
 {
     fprintf(f, "########## BUILTIN FUNCTIONS ##########\n");
     // If built in function was called, must check if it was generated already, if it was not generate it, else do nothing
-    while(chrRequest != false || lengthRequest != false || substrRequest != false || ordRequest != false)
+    while(cgData.chrRequest != false || cgData.lengthRequest != false || cgData.substrRequest != false || cgData.ordRequest != false)
     {
-        if(lengthRequest == true)
+        if(cgData.lengthRequest == true)
         {
             generate_length(f);
             // function was generated, set bool to false so function will not be generated again
-            lengthRequest = false;
+            cgData.lengthRequest = false;
         }
-        else if(substrRequest == true)
+        else if(cgData.substrRequest == true)
         {
             generate_substr(f);
-            substrRequest = false;
+            cgData.substrRequest = false;
         }
-        else if(ordRequest == true)
+        else if(cgData.ordRequest == true)
         {
             generate_ord(f);
-            ordRequest = false;
+            cgData.ordRequest = false;
         }
-        else if(chrRequest == true)
+        else if(cgData.chrRequest == true)
         {
             generate_chr(f);
-            chrRequest = false;
+            cgData.chrRequest = false;
         }
     }
 }
@@ -1798,7 +1797,7 @@ void generate_builtin(FILE *f)
  */
 void generate_code()
 {
-    if(ilist == NULL)
+    if(cgData.ilist == NULL)
     {
         return;
     }
@@ -1807,5 +1806,5 @@ void generate_code()
     generate_fundef(f);
     generate_builtin(f);
     fclose(f);
-    free_ilist(ilist);
+    free_ilist(cgData.ilist);
 }

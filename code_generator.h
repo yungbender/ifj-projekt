@@ -137,13 +137,26 @@ typedef struct instructionList
 }instructionList;
 
 /**
- * This global variable is pointer to the final mid-code, used by code generator.
+ * This global structure is code generator data structure, which holds final list instructions
+ * and requests for builtted-in functions.
  */
-tIList *ilist;
+typedef struct codegenData
+{
+    tIList *ilist;
+    bool lengthRequest;
+    bool substrRequest;
+    bool ordRequest;
+    bool chrRequest;
+    int uniqueCounter;
+    bool inExpression;
+}tcgData;
+
+tcgData cgData;
 
 tToken choose_return(tInstr *instruction);
 void init_plist(tPList *plist);
 void init_ilist(tIList *instrs);
+void init_cgData();
 void insert_instr(tIList *instrs, int instr);
 void insert_param(tIList *instrs, tToken param);
 void insert_ptr(tPList *plist, string freed);
