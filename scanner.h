@@ -16,12 +16,16 @@
 #include "str.h"
 #include <stdio.h>
 
+enum state {
+		S0 = 1,		// Initial state
+		S1			// State after whitespaces and comments
+};
+
 enum comment { 	
 		LC = 10,	// line comment
 		BC,			// block comment
 		END_C,		// end of block comment	
 		TMP_C,		// temporary state for BC
-		COMM		// line comment after END_C
 };
 
 enum number { 	
@@ -39,6 +43,7 @@ enum number {
 
 enum ident { 	
 		ID_STATE = 1000,	// FS: identifier
+		ID_F       			// FS: function identifier
 };
 
 enum string { 	
@@ -47,6 +52,23 @@ enum string {
 		ES,			// escape sequence
 		X_ES,		// hexadecimal escape sequence \xh
 		XHH_ES		// hexadecimal escape sequence \xhh
+};
+
+enum symbol {
+		S_PLUS = 100000, // '+'
+		S_MINUS,         // '-'
+		S_ASTERISK,      // '*'
+		S_SLASH,         // '/'
+		S_ASSIGNMENT,    // '='
+		S_EQUAL,         // '=='
+		S_LT,     		// '<'
+		S_LE,    		// '<='
+		S_GT,  			// '>'
+		S_GE, 			// '>='
+		S_NE,  	  		// '!='
+		S_OPEN_PARENTH,  // '('
+		S_CLOSE_PARENTH, // ')'
+		S_COMMA         // ','
 };
 
 

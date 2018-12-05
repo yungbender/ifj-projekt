@@ -99,7 +99,7 @@ void is_key_word (struct token *LEX)
 struct token get_token()
 {
 	struct token T1; // Made for storing token type and data
-	int state = 0; // Integer containing current state in FSM
+	int state = S0; // Integer containing current state in FSM
 	int c; // Last loaded character from input file
 	int i = 0; 
 	unsigned int convertedDecimal; // Unsigned value of converted escape sequence
@@ -119,7 +119,7 @@ struct token get_token()
 		c = getc(source); // Next character
 		switch(state)
 		{
-			case 0: // Awaiting non-whitespace or comment, initial state
+			case S0: // Awaiting non-whitespace or comment, initial state
 				if(c == '\n' && lineBeginning == false) // The line ends, returning EOL token
 				{
 					lineBeginning = true;
@@ -167,7 +167,7 @@ struct token get_token()
 					else
 					{
 						ungetc(c, source);
-						state = 0;
+						state = S0;
 					}
 				}
 				else if(c == '#') // Line comment
@@ -176,7 +176,7 @@ struct token get_token()
 				}
 				else if(isspace(c))	// White space
 				{
-					state = 0; 
+					state = S0; 
 				}
 				else if(c == EOF) // End of file
 				{
@@ -187,7 +187,7 @@ struct token get_token()
 				}  
 				else // Non-whitespace or comment, moving to state 1
 				{ 
-					state = 1;
+					state = S1;
 					ungetc(c, source);
 				}
 				break;
@@ -196,7 +196,7 @@ struct token get_token()
 				if(c == '\n' || c == EOF)
 				{
 					ungetc(c, source);
-					state = 0;
+					state = S0;
 				}
 				break;
 
@@ -276,7 +276,7 @@ struct token get_token()
 			case END_C: // End of block comment	
 				if(c == '\n' || c == EOF) // Comment ends
 				{
-					state = 0;
+					state = S0;
 					ungetc(c, source);
 				}
 				else if(c == '\t' || c == ' ') // Comment continues on the same line
@@ -292,7 +292,7 @@ struct token get_token()
 				}
 				break;
 
-			case 1: // State after whitespace/comment
+			case S1: // State after whitespace/comment
 				if(islower(c) || c == '_')
 				{
 					str_add_char(&attr, c); // Save the first letter
@@ -311,105 +311,179 @@ struct token get_token()
 				{
 					state = TMP_SL; // String literal
 				}
-				else if(c == EOF)
-				{
-					T1.type = END_OF_FILE;
-					str_free(&attr);
-					return T1;
-				}
 				else // Special character or error
 				{
 					// Testing if c is unique one-letter operator
 					if(c == '+') 
 					{
-						T1.type = PLUS;
+						state = S_PLUS;
 					}
 					else if(c == '-') 
 					{
-						T1.type = MINUS;
+						state = S_MINUS;
 					}
 					else if(c == '*') 
 					{
-						T1.type = ASTERISK;
+						state = S_ASTERISK;
 					}
 					else if(c == '/') 
 					{
-						T1.type = SLASH;
+						state = S_SLASH;
 					}
 					// Testing if c is special character
 					else if(c == '(') 
 					{
-						T1.type = OPEN_PARENTH;
+						state = S_OPEN_PARENTH;
 					}
 					else if(c == ')') 
 					{
-						T1.type = CLOSE_PARENTH;
+						state = S_CLOSE_PARENTH;
 					}
 					else if(c == ',') 
 					{
-						T1.type = COMMA;
+						state = S_COMMA;
 					}
 					//Testing if c is non-unique one or two letter operator
 					else if(c == '=')
 					{
-						c = getc(source);
-						if(c == '=') 
-						{
-							T1.type = EQUAL;
-						}
-						else
-						{
-							T1.type = ASSIGNMENT;
-							ungetc(c, source);
-						}
-
+						state = S_ASSIGNMENT;
 					}
 					else if(c == '<')
 					{
-						c = getc(source);
-						if(c == '=') 
-						{
-							T1.type = LESS_EQUAL;
-						}
-						else
-						{
-							T1.type = LESS_THAN;
-							ungetc(c, source);
-						}
-
+						state = S_LT;
 					}
 					else if(c == '>')
 					{
-						c = getc(source);
-						if(c == '=') 
-						{
-							T1.type = GREATER_EQUAL;
-						}
-						else
-						{
-							T1.type = GREATER_THAN;
-							ungetc(c, source);
-						}
-
+						state = S_GT;
 					}
 					else if(c == '!')
 					{
 						c = getc(source);
 						if(c == '=') 
 						{
-							T1.type = NOT_EQUAL;
+							state = S_NE;
 						}
 						else
 						{
 							T1.type = L_ERR;
 							T1.attr.i = line;
+							str_free(&attr);
+							return T1;
 						}
 					}
 					else // If c is none of the above, return error
 					{
 						T1.type = L_ERR;
 						T1.attr.i = line;
+						str_free(&attr);
+						return T1;
 					}
+				}
+				break;
+
+			case S_PLUS:
+				ungetc(c, source);
+				T1.type = PLUS;
+				str_free(&attr);
+				return T1;
+
+			case S_MINUS:
+				ungetc(c, source);
+				T1.type = MINUS;
+				str_free(&attr);
+				return T1;
+				
+			case S_ASTERISK:
+				ungetc(c, source);
+				T1.type = ASTERISK;
+				str_free(&attr);
+				return T1;
+				
+			case S_SLASH:
+				ungetc(c, source);
+				T1.type = SLASH;
+				str_free(&attr);
+				return T1;
+				
+			case S_OPEN_PARENTH:
+				ungetc(c, source);
+				T1.type = OPEN_PARENTH;
+				str_free(&attr);
+				return T1;
+				
+			case S_CLOSE_PARENTH:
+				ungetc(c, source);
+				T1.type = CLOSE_PARENTH;
+				str_free(&attr);
+				return T1;
+				
+			case S_COMMA:
+				ungetc(c, source);
+				T1.type = COMMA;
+				str_free(&attr);
+				return T1;
+				
+			case S_NE:
+				ungetc(c, source);
+				T1.type = NOT_EQUAL;
+				str_free(&attr);
+				return T1;
+
+			case S_EQUAL:
+				ungetc(c, source);
+				T1.type = EQUAL;
+				str_free(&attr);
+				return T1;
+
+			case S_LE:
+				ungetc(c, source);
+				T1.type = LESS_EQUAL;
+				str_free(&attr);
+				return T1;
+
+			case S_GE:
+				ungetc(c, source);
+				T1.type = GREATER_EQUAL;
+				str_free(&attr);
+				return T1;
+			
+			case S_LT:
+				if(c == '=') 
+				{
+					state = S_LE;
+				}
+				else
+				{
+					ungetc(c, source);
+					T1.type = LESS_THAN;
+					str_free(&attr);
+					return T1;
+				}
+				break;
+
+			case S_GT:
+				if(c == '=') 
+				{
+					state = S_GE;
+				}
+				else
+				{
+					ungetc(c, source);
+					T1.type = GREATER_THAN;
+					str_free(&attr);
+					return T1;
+				}
+				break;
+
+			case S_ASSIGNMENT:
+				if(c == '=') 
+				{
+					state = S_EQUAL;
+				}
+				else
+				{
+					ungetc(c, source);
+					T1.type = ASSIGNMENT;
 					str_free(&attr);
 					return T1;
 				}
@@ -423,15 +497,7 @@ struct token get_token()
 				else if(c == '!' || c == '?') // Function identifier can end with ? or !
 				{
 					str_add_char(&attr, c);
-					T1.type = IDF;
-					if(str_init(&T1.attr.str) == STR_ERROR)
-					{
-						T1.type = INT_ERR;
-						return T1;
-					}
-					str_copy_string(&T1.attr.str, &attr);
-					str_free(&attr);
-					return T1;
+					state = ID_F;
 				}
 				else 
 				{ 
@@ -448,6 +514,18 @@ struct token get_token()
 					return T1;
 				}
 				break;
+
+			case ID_F:
+				ungetc(c, source);
+				T1.type = IDF;
+				if(str_init(&T1.attr.str) == STR_ERROR)
+				{
+					T1.type = INT_ERR;
+					return T1;
+				}
+				str_copy_string(&T1.attr.str, &attr);
+				str_free(&attr);
+				return T1;
 
 			case ZERO: // FS: zero
 				if(c == '.')
